@@ -1,6 +1,5 @@
-source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/defaults.vim
 source $VIMRUNTIME/mswin.vim
-behave mswin
 
 set diffexpr=
 function! MyDiff()
@@ -196,17 +195,12 @@ endfunction
 		call s:deregister('vim-jsbeautify')
 	endif
 
-	" Plugin outside ~/.vim/plugged with post-update hook
-	"Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-
-	" Unmanaged plugin (manually installed and updated)
-	"Plug '~/my-prototype-plugin'
-
 	" Initialise plugin system
 	call plug#end()
 " }
 
 " Misc options {
+	set nowrap         " Set lines to no wrap
 	set viminfo+=!     " Set viminfo to store and restore global variables
 	set history=700    " Sets how many lines of history VIM has to remember
 	set modeline       " Use modelines
@@ -544,16 +538,6 @@ if PluginCheck('rainbow_parentheses')
 endif
 " }
 
-" CtrlP options {
-if PluginCheck('ctrlp')
-	let g:ctrlp_map               = "<c-p>"
-	let g:ctrlp_cmd               = "CtrlPBufTag"
-	let g:ctrlp_working_path_mode = "ra"
-	let g:ctrlp_extensions        = ['buffertag']
-	set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe,*.pyc " Windows
-endif
-" }
-
 " fzf options {
 if PluginCheck('fzf.vim')
 	" Default fzf layout
@@ -592,18 +576,6 @@ if PluginCheck('fzf.vim')
 		\ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>).' -- :/', 0, <bang>0)
 		
 
-		" FIXME: Use ripgrep to search through files tracked by Git
-		" Further reading: https://github.com/junegunn/fzf.vim/blob/master/autoload/fzf/vim.vim
-		"function! GFind(args, ...)
-		"	let root = split(system('git rev-parse --show-toplevel'), '\n')[0]
-		"	let files = split(system('git ls-files'), '\n')
-		"	call fzf#vim#grep(
-		"  \   'rg --column --line-number --no-heading --color=always --ignore-case '.shellescape(<root>).' '.shellescape(<args>), 1,
-		"  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-		"  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-		"  \   <bang>0)
-		"endfunction
-		"command! -bang -nargs=* GFind  GFind(<q-args>)
 	endif
 endif
 " }
