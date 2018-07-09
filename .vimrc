@@ -530,7 +530,8 @@ if PluginCheck('rainbow_parentheses')
 
 	augroup TastetheRainbow
 		autocmd!
-		autocmd Syntax * call Config_Rainbow()                 " Load rainbow_parentheses on syntax load
+		autocmd Syntax * call Config_Rainbow()                    " Load rainbow_parentheses on syntax load
+		autocmd ColorScheme * call rainbow_parentheses#activate() " Reactivate on Colour Scheme change
 	augroup END
 
 	" rainbow_parentheses toggle
