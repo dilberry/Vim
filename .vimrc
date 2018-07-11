@@ -166,11 +166,8 @@ endfunction
 	" vim-indent-guides
 	Plug 'https://github.com/nathanaelkane/vim-indent-guides.git'
 
-	" fzf-vim
-	Plug 'https://github.com/junegunn/fzf.vim.git'
-
-	" fzf
-	Plug 'https://github.com/junegunn/fzf.git'
+	" denite.nvim
+	Plug 'https://github.com/Shougo/denite.nvim.git'
 
 	" vim-jsbeautify
 	Plug 'https://github.com/maksimr/vim-jsbeautify.git'
@@ -183,7 +180,7 @@ endfunction
 
 	" Check for unmet dependencies
 	if !executable('python')
-		call s:deregister('gundo')
+		call s:deregister('gundo.vim')
 	endif
 
 	if !executable('ctags')
@@ -298,19 +295,19 @@ endif
     
 	" Visual Basic {
 		" Tagbar settings {
-		let g:tagbar_type_vb = {
-			\ 'ctagstype' : 'vb',
-			\ 'deffile' : $VIMHOME."\\ctags\\vb.cfg",
-			\ 'kinds'     : [
-				\ 's:subroutines',
-				\ 'f:functions',
-				\ 'v:variables',
-				\ 'c:constants',
-				\ 'e:enums',
-				\ 'n:names',
-				\ 'l:labels',
-			\ ]
-		\ }
+			let g:tagbar_type_vb = {
+				\ 'ctagstype' : 'vb',
+				\ 'deffile' : $VIMHOME."\\ctags\\vb.cfg",
+				\ 'kinds'     : [
+					\ 's:subroutines',
+					\ 'f:functions',
+					\ 'v:variables',
+					\ 'c:constants',
+					\ 'e:enums',
+					\ 'n:names',
+					\ 'l:labels',
+				\ ]
+			\ }
 		" }
 	" }
     
@@ -429,19 +426,28 @@ endif
 	noremap Y y$
 
 	" Gundo Toggle
-	if PluginCheck('gundo')
+	if PluginCheck('gundo.vim')
 		nnoremap <F5> :GundoToggle<CR>
 	endif
 " }
 
 " Tags options {
-	" Tagbar options
-	if PluginCheck('tagbar')
-		" Tagbar Toggle
-		nnoremap <silent> <F8> :TagbarToggle<CR>
-		let g:tagbar_ctags_bin = $VIMHOME."\\ctags\\ctags.exe"
-		autocmd VimEnter * nested :call tagbar#autoopen(1)
-	endif
+	" Tagbar options {
+		if PluginCheck('tagbar')
+			" Tagbar Toggle
+			nnoremap <silent> <F8> :TagbarToggle<CR>
+			let g:tagbar_ctags_bin = $VIMHOME."\\ctags\\ctags.exe"
+			autocmd VimEnter * nested :call tagbar#autoopen(1)
+		endif
+	" }
+
+	" Gutentags options {
+		if PluginCheck('vim-gutentags')
+			" Include extra defintions for VB6 tags
+			let g:gutentags_ctags_extra_args = ["−−options=".$VIMHOME."\\ctags\\vb.cfg"]
+			let g:gutentags_cache_dir = $VIMHOME."\\ctags\\cache"
+		endif
+	" }
 " }
 
 " Tab options {
@@ -578,6 +584,31 @@ if PluginCheck('fzf.vim')
 		
 
 	endif
+endif
+" }
+
+" denite options {
+if PluginCheck('denite.nvim')
+	call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git', ''])
+	call denite#custom#var('grep', 'command', ['rg'])
+	call denite#custom#var('grep', 'default_opts', ['--hidden', '--vimgrep', '--no-heading', '-S'])
+	call denite#custom#var('grep', 'recursive_opts', [])
+	call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+	call denite#custom#var('grep', 'separator', ['--'])
+	call denite#custom#var('grep', 'final_opts', [])
+	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
+	call denite#custom#map('normal', '<Esc>', '<NOP>', 'noremap')
+	call denite#custom#map('insert', '<C-v>', '<denite:do_action:vsplit>', 'noremap')
+	call denite#custom#map('normal', '<C-v>', '<denite:do_action:vsplit>', 'noremap')
+	call denite#custom#map('normal', 'dw', '<denite:delete_word_after_caret>', 'noremap')
+
+	nnoremap <C-p> :<C-u>Denite file_rec<CR>
+	nnoremap <leader>s :<C-u>Denite buffer<CR>
+	nnoremap <leader><Space>s :<C-u>DeniteBufferDir buffer<CR>
+	nnoremap <leader>8 :<C-u>DeniteCursorWord grep:. -mode=normal<CR>
+	nnoremap <leader>/ :<C-u>Denite grep:. -mode=normal<CR>
+	nnoremap <leader><Space>/ :<C-u>DeniteBufferDir grep:. -mode=normal<CR>
+	nnoremap <leader>d :<C-u>DeniteBufferDir file_rec<CR>
 endif
 " }
 
