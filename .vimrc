@@ -166,8 +166,11 @@ endfunction
 	" vim-indent-guides
 	Plug 'https://github.com/nathanaelkane/vim-indent-guides.git'
 
-	" denite.nvim
-	Plug 'https://github.com/Shougo/denite.nvim.git'
+	" fzf-vim
+	Plug 'https://github.com/junegunn/fzf.vim.git'
+
+	" fzf
+	Plug 'https://github.com/junegunn/fzf.git'
 
 	" vim-jsbeautify
 	Plug 'https://github.com/maksimr/vim-jsbeautify.git'
@@ -444,8 +447,8 @@ endif
 	" Gutentags options {
 		if PluginCheck('vim-gutentags')
 			" Include extra defintions for VB6 tags
-			let g:gutentags_ctags_extra_args = ["−−options=".$VIMHOME."\\ctags\\vb.cfg"]
-			let g:gutentags_cache_dir = $VIMHOME."\\ctags\\cache"
+			let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\ctags\ctags.cfg')]
+			let g:gutentags_cache_dir = $VIMHOME.'\ctags\cache'
 		endif
 	" }
 " }
@@ -558,6 +561,102 @@ if PluginCheck('fzf.vim')
 		cc
 	endfunction
 
+	function! s:align_lists(lists)
+		let maxes = {}
+		for list in a:lists
+			let i = 0
+			while i < len(list)
+				let maxes[i] = max([get(maxes, i, 0), len(list[i])])
+				let i += 1
+			endwhile
+		endfor
+
+		for list in a:lists
+			call map(list, "printf('%-'.maxes[v:key].'s', v:val)")
+		endfor
+
+		return a:lists
+	endfunction
+
+	function! s:btags_source(tag_cmds)
+		if !filereadable(expand('%'))
+			throw 'Save the file first'
+		endif
+
+		for cmd in a:tag_cmds
+			let lines = split(system(cmd), "\n")
+			if !v:shell_error && len(lines)
+				break
+			endif
+		endfor
+
+		if v:shell_error
+			throw get(lines, 0, 'Failed to extract tags')
+		elseif empty(lines)
+			throw 'No tags found'
+		endif
+
+		return map(s:align_lists(map(lines, 'split(v:val, "\t")')), 'join(v:val, "\t")')
+	endfunction
+
+	function! s:btags_sink(lines)
+		if len(a:lines) < 2
+			return
+		endif
+
+		normal! m'
+		let cmd = s:action_for(a:lines[0])
+		if !empty(cmd)
+			execute 'silent' cmd '%'
+		endif
+
+		let qfl = []
+		for line in a:lines[1:]
+			execute split(line, "\t")[2]
+			call add(qfl, {'filename': expand('%'), 'lnum': line('.'), 'text': getline('.')})
+		endfor
+
+		if len(qfl) > 1
+			call setqflist(qfl)
+			copen
+			wincmd p
+			cfirst
+		endif
+
+		normal! zz
+	endfunction
+
+	function! s:btags(query, ...)
+		let args = copy(a:000)
+		let escaped = fzf#shellescape(expand('%'))
+		let null = s:is_windows ? 'nul' : '/dev/null'
+		let sort = has('unix') && !has('win32unix') && executable('sort') ? '| sort -s -k 5' : ''
+		let tag_cmds = (len(args) > 1 && type(args[0]) != type({})) ? remove(args, 0) : [
+		\ printf('ctags -f - --sort=yes --excmd=number --language-force=%s --options=%s %s 2> %s %s', &filetype, shellescape($VIMHOME.'\ctags\ctags.cfg'), escaped, null, sort),
+		\ printf('ctags -f - --sort=yes --excmd=number --options=%s %s 2> %s %s', shellescape($VIMHOME.'\ctags\ctags.cfg'), escaped, null, sort)]
+
+		if type(tag_cmds) != type([])
+			let tag_cmds = [tag_cmds]
+		endif
+
+		try
+			call fzf#run({
+			\ 'source':  s:btags_source(tag_cmds),
+			\ 'options': '--reverse -m -d "\t" --with-nth 1,4.. -n 1 --tiebreak=index --prompt "BTags> "',
+			\ 'down'   : '40%',
+			\ 'sink'   : function('s:btags_sink')})
+		catch
+			echohl WarningMsg
+			echom v:exception
+			echohl None
+		endtry
+	endfunction
+
+	command! -bang -nargs=* BTags call s:btags(<q-args>, <bang>0)
+
+	" Pretend to be CtrlP
+	noremap <c-p> :BTags<CR>
+
 	let g:fzf_action = {
 		\ 'ctrl-q': function('s:build_quickfix_list'),
 		\ 'ctrl-t': 'tab split',
@@ -566,9 +665,6 @@ if PluginCheck('fzf.vim')
 	\}
 
 	let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
-
-	" Pretend to be CtrlP
-	noremap <c-p> :BTags<CR>
 
 	if executable("rg")
 		" Find files using Ripgrep and FZF
@@ -584,31 +680,6 @@ if PluginCheck('fzf.vim')
 		
 
 	endif
-endif
-" }
-
-" denite options {
-if PluginCheck('denite.nvim')
-	call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git', ''])
-	call denite#custom#var('grep', 'command', ['rg'])
-	call denite#custom#var('grep', 'default_opts', ['--hidden', '--vimgrep', '--no-heading', '-S'])
-	call denite#custom#var('grep', 'recursive_opts', [])
-	call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
-	call denite#custom#var('grep', 'separator', ['--'])
-	call denite#custom#var('grep', 'final_opts', [])
-	call denite#custom#map('insert', '<Esc>', '<denite:enter_mode:normal>', 'noremap')
-	call denite#custom#map('normal', '<Esc>', '<NOP>', 'noremap')
-	call denite#custom#map('insert', '<C-v>', '<denite:do_action:vsplit>', 'noremap')
-	call denite#custom#map('normal', '<C-v>', '<denite:do_action:vsplit>', 'noremap')
-	call denite#custom#map('normal', 'dw', '<denite:delete_word_after_caret>', 'noremap')
-
-	nnoremap <C-p> :<C-u>Denite file_rec<CR>
-	nnoremap <leader>s :<C-u>Denite buffer<CR>
-	nnoremap <leader><Space>s :<C-u>DeniteBufferDir buffer<CR>
-	nnoremap <leader>8 :<C-u>DeniteCursorWord grep:. -mode=normal<CR>
-	nnoremap <leader>/ :<C-u>Denite grep:. -mode=normal<CR>
-	nnoremap <leader><Space>/ :<C-u>DeniteBufferDir grep:. -mode=normal<CR>
-	nnoremap <leader>d :<C-u>DeniteBufferDir file_rec<CR>
 endif
 " }
 
