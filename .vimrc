@@ -1,30 +1,8 @@
-source $VIMRUNTIME/defaults.vim
-source $VIMRUNTIME/mswin.vim
-
-set diffexpr=
-function! MyDiff()
-	let opt = '-a --binary '
-	if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-	if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-	let arg1 = v:fname_in
-	if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-	let arg2 = v:fname_new
-	if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-	let arg3 = v:fname_out
-	if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-	let eq = ''
-	if $VIMRUNTIME =~ ' '
-		if &sh =~ '\<cmd'
-			let cmd = '""' . $VIMRUNTIME . '\diff"'
-			let eq = '"'
-		else
-			let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-		endif
-	else
-		let cmd = $VIMRUNTIME . '\diff'
+" Vi Compatibility {
+	if &compatible
+	  set nocompatible
 	endif
-	silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
+" }
 
 " Platform detection {
 	let s:is_windows = has('win16') || has('win32') || has('win64')
@@ -34,45 +12,78 @@ endfunction
 	                 \    (!executable('xdg-open') && system('uname') =~? '^darwin'))
 " }
 
+" Windows defaults {
+	if s:is_windows
+        source $VIMRUNTIME/mswin.vim
+    endif
+" }
+
+" Diff Function {
+	set diffexpr=
+	function! MyDiff()
+		let opt = '-a --binary '
+		if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+		if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+		let arg1 = v:fname_in
+		if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+		let arg2 = v:fname_new
+		if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+		let arg3 = v:fname_out
+		if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+		let eq = ''
+		if $VIMRUNTIME =~ ' '
+			if &sh =~ '\<cmd'
+				let cmd = '""' . $VIMRUNTIME . '\diff"'
+				let eq = '"'
+			else
+				let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+			endif
+		else
+			let cmd = $VIMRUNTIME . '\diff'
+		endif
+		silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+	endfunction
+" }
+
 " Path correction {
 	" This is to make the Vim installation portable
 	" Set the VIMHOME path variable to where this vimrc is sourced
 	let $VIMHOME = expand('<sfile>:p:h')
 
 	if s:is_windows
+		let g:python_host_prog = 'C:\Python27\python.exe'
+		let g:python3_host_prog = 'C:\Python37\python.exe'
+
 		if !executable('xmllint')
 			" Add xmllint binary path to PATH
-			let $PATH .= ";".$VIMHOME."\\xmllint\\"
+			let $PATH .= ';'.$VIMHOME.'\utils\xmllint\bin\'
 		endif
 
 		if !executable('AStyle')
 			" Add AStyle binary path to PATH
-			let $PATH .= ";".$VIMHOME."\\AStyle\\bin\\"
+			let $PATH .= ';'.$VIMHOME.'\utils\AStyle\bin\'
 		endif
 
 		if !executable('ctags')
 			" Add ctags binary path to PATH
-			let $PATH .= ";".$VIMHOME."\\ctags\\"
+			let $PATH .= ';'.$VIMHOME.'\utils\ctags\'
 		endif
 
 		if !executable('fzf')
 			" Add fzf binary path to PATH
-			let $PATH .= ";".$VIMHOME."\\fzf\\"
+			let $PATH .= ';'.$VIMHOME.'\utils\fzf\'
 		endif
 
 		if !executable('rg')
 			" Add ripgrep binary path to PATH
-			let $PATH .= ";".$VIMHOME."\\rg\\"
+			let $PATH .= ';'.$VIMHOME.'\utils\rg\'
 		endif
-
-		" Add unix utility binaries path to PATH
-		let $PATH .= ";".$VIMHOME."\\UnxUtils\\usr\\local\\wbin\\"
 	endif
 
 	" Add pylint settings folder
-	let $PATH .= ";".$VIMHOME."\\pylint\\"
+	let $PATH .= ';'.$VIMHOME.'\pylint\'
 
-	set tags+=$VIM."//tags"
+	set tags+=$VIM.'\tags'
 " }
 
 " Encoding {
@@ -90,7 +101,7 @@ endfunction
 
 	" Check if a Plugin exists
 	function! PluginCheck(bundle)
-		if matchstr(&rtp, 'plugged'.'\\'.a:bundle) != ''
+		if has_key(g:plugs, a:bundle)
 			return 1
 		else
 			return 0
@@ -98,7 +109,7 @@ endfunction
 	endfunction
 
 	" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
-	call plug#begin('~/vimfiles/plugged')
+	call plug#begin($VIMHOME.'\vimfiles\plugged')
 
 	" vim-fugitive
 	Plug 'https://github.com/tpope/vim-fugitive.git'
@@ -142,8 +153,24 @@ endfunction
 	" vim-vinegar
 	Plug 'https://github.com/tpope/vim-vinegar.git'
 
-	" YouCompleteMe
-	Plug 'https://github.com/Valloric/YouCompleteMe.git'
+	" deoplete
+	" This needs python3 neovim package to be installed
+	if has('nvim')
+		Plug 'https://github.com/Shougo/deoplete.nvim.git', { 'do': ':UpdateRemotePlugins' }
+	else
+		Plug 'https://github.com/Shougo/deoplete.nvim.git'
+		Plug 'https://github.com/roxma/nvim-yarp.git'
+		Plug 'https://github.com/roxma/vim-hug-neovim-rpc.git'
+	endif
+
+	" neco-syntax
+	Plug 'https://github.com/Shougo/neco-syntax.git'
+
+	" deoplete-jedi
+	Plug 'https://github.com/zchee/deoplete-jedi.git'
+
+	" deoplete-omnisharp
+	Plug 'https://github.com/gautamnaik1994/deoplete-omnisharp.git'
 
 	" vim-gitgutter
 	Plug 'https://github.com/airblade/vim-gitgutter.git'
@@ -181,9 +208,14 @@ endfunction
 	" vim-signature
 	Plug 'https://github.com/kshenoy/vim-signature.git'
 
+	" vim-unimpaired
+	Plug 'https://github.com/tpope/vim-unimpaired.git'
+
 	" Check for unmet dependencies
 	if !executable('python')
 		call s:deregister('gundo.vim')
+		call s:deregister('deoplete.nvim')
+		call s:deregister('deoplete-omnisharp')
 	endif
 
 	if !executable('ctags')
@@ -200,17 +232,22 @@ endfunction
 " }
 
 " Misc options {
-	set nowrap         " Set lines to no wrap
-	set viminfo+=!     " Set viminfo to store and restore global variables
-	set history=700    " Sets how many lines of history VIM has to remember
-	set modeline       " Use modelines
-	set number         " Display line numbers
-	set autochdir      " Auto change working directory to the current file
-	set hidden         " Allow changing buffer without saving
-	set autoread       " auto-reload files, if there's no conflict
-	set shortmess+=IA  " no intro message, no swap-file message
-	set updatetime=500 " this setting controls how long to wait (in ms) before fetching type / symbol information.
-	set cmdheight=2    " Remove 'Press Enter to continue' message when type information is longer than one line.
+	set backspace=indent,eol,start " Allow backspacing over everything in insert mode.
+	set ruler                      " Show the cursor position all the time
+	set showcmd                    " Display incomplete commands
+	set nowrap                     " Set lines to no wrap
+	set viminfo+=!                 " Set viminfo to store and restore global variables
+	set history=700                " Sets how many lines of history VIM has to remember
+	set modeline                   " Use modelines
+	set number                     " Display line numbers
+	set autochdir                  " Auto change working directory to the current file
+	set hidden                     " Allow changing buffer without saving
+	set autoread                   " auto-reload files, if there's no conflict
+	set shortmess+=IA              " no intro message, no swap-file message
+	set updatetime=500             " this setting controls how long to wait (in ms) before fetching type / symbol information.
+	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
+    set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
+	set nofoldenable               " Disable folding
 " }
 
 " Saving options {
@@ -233,10 +270,11 @@ endfunction
 
 	if has('gui_running')
 		if s:is_windows
-			autocmd GUIEnter * simalt ~x " Maximise on GUI entry
-			set guifont=Dina:h8:cANSI    " Select GUI font
+            set guioptions-=t
+			autocmd GUIEnter * simalt ~x             " Maximise on GUI entry
+			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
 		endif
-		autocmd GUIEnter * set vb t_vb=  " Disable audible bell
+		autocmd GUIEnter * set vb t_vb= " Disable audible bell
 	endif
 " }
 
@@ -267,25 +305,6 @@ endif
 			let g:syntastic_python_pylint_post_args = '--rcfile='.'"'.$VIMHOME.'\pylint\pylint.rc'.'"'
 		endif
 		" }
-
-		" general options {
-			" python syntax {
-			if PluginCheck('python-syntax')
-				let g:python_highlight_builtin_funcs     = 1
-				let g:python_highlight_builtin_objs      = 1
-				let g:python_highlight_builtins          = 1
-				let g:python_highlight_doctests          = 1
-				let g:python_highlight_exceptions        = 1
-				let g:python_highlight_string_format     = 1
-				let g:python_highlight_string_formatting = 1
-				let g:python_highlight_string_templates  = 1
-				let g:python_print_as_function           = 1
-			endif
-			" }
-
-			" python-folding setting
-			set nofoldenable
-		" }
 	" }
 
 	" C# {
@@ -300,7 +319,7 @@ endif
 		" Tagbar settings {
 			let g:tagbar_type_vb = {
 				\ 'ctagstype' : 'vb',
-				\ 'deffile' : $VIMHOME."\\ctags\\vb.cfg",
+				\ 'deffile' : $VIMHOME.'\utils\ctags\ctags.cfg',
 				\ 'kinds'     : [
 					\ 's:subroutines',
 					\ 'f:functions',
@@ -439,7 +458,7 @@ endif
 		if PluginCheck('tagbar')
 			" Tagbar Toggle
 			nnoremap <silent> <F8> :TagbarToggle<CR>
-			let g:tagbar_ctags_bin = $VIMHOME."\\ctags\\ctags.exe"
+			let g:tagbar_ctags_bin = $VIMHOME.'\utils\ctags\ctags.exe'
 			autocmd VimEnter * nested :call tagbar#autoopen(1)
 		endif
 	" }
@@ -447,8 +466,8 @@ endif
 	" Gutentags options {
 		if PluginCheck('vim-gutentags')
 			" Include extra defintions for VB6 tags
-			let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\ctags\ctags.cfg')]
-			let g:gutentags_cache_dir = $VIMHOME.'\ctags\cache'
+			let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
+			let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
 		endif
 	" }
 " }
@@ -599,31 +618,8 @@ if PluginCheck('fzf.vim')
 		return map(s:align_lists(map(lines, 'split(v:val, "\t")')), 'join(v:val, "\t")')
 	endfunction
 
-	function! s:btags_sink(lines)
-		if len(a:lines) < 2
-			return
-		endif
-
-		normal! m'
-		let cmd = s:action_for(a:lines[0])
-		if !empty(cmd)
-			execute 'silent' cmd '%'
-		endif
-
-		let qfl = []
-		for line in a:lines[1:]
-			execute split(line, "\t")[2]
-			call add(qfl, {'filename': expand('%'), 'lnum': line('.'), 'text': getline('.')})
-		endfor
-
-		if len(qfl) > 1
-			call setqflist(qfl)
-			copen
-			wincmd p
-			cfirst
-		endif
-
-		normal! zz
+	function! s:btags_sink(line)
+		execute split(a:line, "\t")[2]
 	endfunction
 
 	function! s:btags(query, ...)
@@ -689,7 +685,31 @@ if PluginCheck('vim-vinegar')
 endif
 " }
 
+" deoplete options {
+if PluginCheck('deoplete.nvim')
+	" General options
+	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#file#enable_buffer_path = 1
+
+	let g:deoplete#enable_smart_case = 1
+	let g:deoplete#enable_ignore_case = 1
+	let g:deoplete#enable_camel_case = 1
+
+	" Csharp options
+	let g:deoplete#omni#input_patterns = {}
+	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
+	let g:deoplete#omni#functions = {}
+	let g:deoplete#sources = {}
+	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+	let g:deoplete#sources.cs = ['omni', 'buffer', 'file', 'cs']
+
+	" Select on Tab
+	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
+endif
+" }
+
 " Omnisharp options {
+if PluginCheck('omnisharp-vim')
 	augroup omnisharp_commands
 	    autocmd!
 
@@ -731,6 +751,8 @@ endif
 
 	augroup END
 
+	let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
+
     let g:OmniSharp_server_type = 'roslyn'  
     let g:OmniSharp_prefer_global_sln = 1  
     let g:OmniSharp_timeout = 10
@@ -759,6 +781,7 @@ endif
 
 	" Add syntax highlighting for types and interfaces
 	nnoremap <leader>th :OmniSharpHighlightTypes<cr>
+endif
 " }
 
 " vim: set fdm=indent : normal zi
