@@ -628,8 +628,8 @@ if PluginCheck('fzf.vim')
 		let null = s:is_windows ? 'nul' : '/dev/null'
 		let sort = has('unix') && !has('win32unix') && executable('sort') ? '| sort -s -k 5' : ''
 		let tag_cmds = (len(args) > 1 && type(args[0]) != type({})) ? remove(args, 0) : [
-		\ printf('ctags -f - --sort=yes --excmd=number --language-force=%s --options=%s %s 2> %s %s', &filetype, shellescape($VIMHOME.'\ctags\ctags.cfg'), escaped, null, sort),
-		\ printf('ctags -f - --sort=yes --excmd=number --options=%s %s 2> %s %s', shellescape($VIMHOME.'\ctags\ctags.cfg'), escaped, null, sort)]
+		\ printf('ctags -f - --sort=yes --excmd=number --language-force=%s --options=%s %s 2> %s %s', &filetype, shellescape($VIMHOME.'\utils\ctags\ctags.cfg'), escaped, null, sort),
+		\ printf('ctags -f - --sort=yes --excmd=number --options=%s %s 2> %s %s', shellescape($VIMHOME.'\utils\ctags\ctags.cfg'), escaped, null, sort)]
 
 		if type(tag_cmds) != type([])
 			let tag_cmds = [tag_cmds]
@@ -695,16 +695,108 @@ if PluginCheck('deoplete.nvim')
 	let g:deoplete#enable_ignore_case = 1
 	let g:deoplete#enable_camel_case = 1
 
-	" Csharp options
 	let g:deoplete#omni#input_patterns = {}
-	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
 	let g:deoplete#omni#functions = {}
 	let g:deoplete#sources = {}
-	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+	let g:deoplete#sources._ = ['buffer', 'file']
+
+	" Csharp options
+	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
 	let g:deoplete#sources.cs = ['omni', 'buffer', 'file', 'cs']
 
 	" Select on Tab
 	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
+endif
+" }
+
+" denite options {
+if PluginCheck('denite.nvim')
+	" Add custom menus
+	let s:menus = {}
+	let s:menus.file = {'description': 'File search (buffer, file, file_rec, file_mru'}
+	let s:menus.line = {'description': 'Line search (change, grep, line, tag'}
+	let s:menus.others = {'description': 'Others (command, command_history, help)'}
+	let s:menus.file.command_candidates = [
+		\ ['buffer', 'Denite buffer'],
+		\ ['file: Files in the current directory', 'Denite file'],
+		\ ['file_rec: Files, recursive list under the current directory', 'Denite file_rec'],
+		\ ['file_mru: Most recently used files', 'Denite file_mru']
+		\ ]
+	let s:menus.line.command_candidates = [
+		\ ['change', 'Denite change'],
+		\ ['grep :grep', 'Denite grep'],
+		\ ['line', 'Denite line'],
+		\ ['tag', 'Denite tag']
+		\ ]
+	let s:menus.others.command_candidates = [
+		\ ['command', 'Denite command'],
+		\ ['command_history', 'Denite command_history'],
+		\ ['help', 'Denite help']
+		\ ]
+
+	call denite#custom#var('menu', 'menus', s:menus)
+
+	nnoremap [denite] <Nop>
+	nmap <Leader>u [denite]
+	nnoremap <silent> [denite]b :Denite buffer<CR>
+	nnoremap <silent> [denite]c :Denite changes<CR>
+	nnoremap <silent> [denite]f :Denite file<CR>
+	nnoremap <silent> [denite]g :Denite grep<CR>
+	nnoremap <silent> [denite]h :Denite help<CR>
+	nnoremap <silent> [denite]h :Denite help<CR>
+	nnoremap <silent> [denite]l :Denite line<CR>
+	nnoremap <silent> [denite]t :Denite tag<CR>
+	nnoremap <silent> [denite]m :Denite file_mru<CR>
+	nnoremap <silent> [denite]u :Denite menu<CR>
+
+	call denite#custom#map(
+		\ 'insert',
+		\ '<Down>',
+		\ '<denite:move_to_next_line>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<Up>',
+		\ '<denite:move_to_previous_line>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<C-N>',
+		\ '<denite:move_to_next_line>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<C-P>',
+		\ '<denite:move_to_previous_line>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<C-G>',
+		\ '<denite:assign_next_txt>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<C-T>',
+		\ '<denite:assign_previous_line>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'normal',
+		\ '/',
+		\ '<denite:enter_mode:insert>',
+		\ 'noremap'
+		\)
+	call denite#custom#map(
+		\ 'insert',
+		\ '<Esc>',
+		\ '<denite:enter_mode:normal>',
+		\ 'noremap'
+		\)
 endif
 " }
 
@@ -754,7 +846,7 @@ if PluginCheck('omnisharp-vim')
 	let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
 
     let g:OmniSharp_server_type = 'roslyn'  
-    let g:OmniSharp_prefer_global_sln = 1  
+    let g:OmniSharp_prefer_global_sln = 0
     let g:OmniSharp_timeout = 10
 	let g:OmniSharp_selector_ui = 'fzf'
 
