@@ -153,6 +153,9 @@
 			" fzf-vim
 			call dein#add('https://github.com/junegunn/fzf.vim.git')
 
+			" denite
+			call dein#add('https://github.com/Shougo/denite.nvim.git')
+
 			" vim-vinegar
 			call dein#add('https://github.com/tpope/vim-vinegar.git')
 		" }
@@ -270,7 +273,6 @@ if dein#tap('vim-airline')
 	set laststatus=2 " Show 2 lines of status
 	set noshowmode   " Don't show mode on statusline, let airline do it instead
 	let g:airline_detect_modified              = 1
-	let g:airline_theme                        = 'wombat'
 	let g:airline#extensions#tagbar#enabled    = 1
 	let g:airline#extensions#syntastic#enabled = 1
 	let g:airline#extensions#hunks#enabled     = 1
@@ -818,7 +820,7 @@ if dein#tap('omnisharp-vim')
 	let g:OmniSharp_server_type = 'roslyn'
 	let g:OmniSharp_prefer_global_sln = 0
 	let g:OmniSharp_timeout = 10
-	let g:OmniSharp_selector_ui = 'fzf'
+	let g:OmniSharp_selector_ui = 'unite'
 
 	" Contextual code actions (requires CtrlP or unite.vim)
 	nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
