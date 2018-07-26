@@ -1,6 +1,6 @@
 " Vi Compatibility {
 	if &compatible
-	  set nocompatible
+		set nocompatible
 	endif
 " }
 
@@ -8,14 +8,14 @@
 	let s:is_windows = has('win16') || has('win32') || has('win64')
 	let s:is_cygwin  = has('win32unix')
 	let s:is_mac     = !s:is_windows && !s:is_cygwin
-	                 \ && (has('mac') || has('macunix') || has('gui_macvim') ||
-	                 \    (!executable('xdg-open') && system('uname') =~? '^darwin'))
+						\ && (has('mac') || has('macunix') || has('gui_macvim') ||
+						\    (!executable('xdg-open') && system('uname') =~? '^darwin'))
 " }
 
 " Windows defaults {
 	if s:is_windows
-        source $VIMRUNTIME/mswin.vim
-    endif
+		source $VIMRUNTIME/mswin.vim
+	endif
 " }
 
 " Diff Function {
@@ -95,126 +95,121 @@
 	let g:dein_plugins_dir = expand($VIMHOME.'\vimfiles\plugins')
 	exec 'set runtimepath^='.g:dein_dir
 
-	" Check if a Plugin exists
-	function! PluginCheck(bundle)
-		if dein#tap(a:bundle)
-			return 1
-		else
-			return 0
-		endif
-	endfunction
-
 	" Specify a directory for plugins
 	if dein#load_state(g:dein_plugins_dir)
 		call dein#begin(g:dein_plugins_dir)
 
 		call dein#add(g:dein_plugins_dir)
 
-		" vim-fugitive
-		call dein#add('https://github.com/tpope/vim-fugitive.git')
+		" UI {
+			" syntastic
+			call dein#add('https://github.com/vim-syntastic/syntastic.git')
 
-		" gundo
-		call dein#add('https://github.com/sjl/gundo.vim.git')
+			" vim-airline
+			call dein#add('https://github.com/vim-airline/vim-airline.git')
 
-		" vim-airline
-		call dein#add('https://github.com/vim-airline/vim-airline.git')
+			" vim-colorschemes
+			call dein#add('https://github.com/flazz/vim-colorschemes.git')
 
-		" vim-airline-themes
-		call dein#add('https://github.com/vim-airline/vim-airline-themes.git')
+			" random-colorscheme-picker
+			call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
 
-		" vim-surround
-		call dein#add('https://github.com/tpope/vim-surround.git')
+			" vim-indent-guides
+			call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
 
-		" vim-qfreplace
-		call dein#add('https://github.com/thinca/vim-qfreplace.git')
+			" rainbow_parentheses.vim
+			call dein#add('https://github.com/kien/rainbow_parentheses.vim.git')
+		" }
 
-		" vim-colorschemes
-		call dein#add('https://github.com/flazz/vim-colorschemes.git')
+		" Git {
+			" vim-fugitive
+			call dein#add('https://github.com/tpope/vim-fugitive.git')
 
-		" Align
-		call dein#add('https://github.com/lboulard/Align.git')
+			" vim-gitgutter
+			call dein#add('https://github.com/airblade/vim-gitgutter.git')
+		" }
 
-		" rainbow_parentheses
-		call dein#add('https://github.com/kien/rainbow_parentheses.vim.git')
+		" Editing {
+			" Align
+			call dein#add('https://github.com/lboulard/Align.git')
 
-		" omnisharp-vim
-		call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
+			" vim-surround
+			call dein#add('https://github.com/tpope/vim-surround.git')
 
-		" vim-csharp
-		call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
+			" YAIFA
+			call dein#add('https://github.com/Raimondi/YAIFA.git')
 
-		" syntastic
-		call dein#add('https://github.com/vim-syntastic/syntastic.git')
+			" vim-repeat
+			call dein#add('https://github.com/tpope/vim-repeat.git')
 
-		" vim-dispatch
-		call dein#add('https://github.com/tpope/vim-dispatch.git')
+			" vim-unimpaired
+			call dein#add('https://github.com/tpope/vim-unimpaired.git')
 
-		" vim-vinegar
-		call dein#add('https://github.com/tpope/vim-vinegar.git')
+			" vim-qfreplace
+			call dein#add('https://github.com/thinca/vim-qfreplace.git')
+		" }
 
-		" deoplete
-		" This needs python3 neovim package to be installed
-		if has('nvim')
-			call dein#add('https://github.com/Shougo/deoplete.nvim.git')
-		else
-			call dein#add('https://github.com/Shougo/deoplete.nvim.git')
-			call dein#add('https://github.com/roxma/nvim-yarp.git')
-			call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
-		endif
+		" Browsing {
+			" fzf-vim
+			call dein#add('https://github.com/junegunn/fzf.vim.git')
 
-		" neco-syntax
-		call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': 'deoplete.nvim'})
+			" vim-vinegar
+			call dein#add('https://github.com/tpope/vim-vinegar.git')
+		" }
 
-		" deoplete-jedi
-		call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': 'python'})
+		" Omnicompletion {
+			" deoplete
+			" This needs python3 neovim package to be installed
+			if has('nvim')
+				call dein#add('https://github.com/Shougo/deoplete.nvim.git')
+			else
+				call dein#add('https://github.com/Shougo/deoplete.nvim.git')
+				call dein#add('https://github.com/roxma/nvim-yarp.git')
+				call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
+			endif
 
-		" deoplete-omnisharp
-		call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
+			" neco-syntax
+			call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': 'deoplete.nvim'})
 
-		" vim-gitgutter
-		call dein#add('https://github.com/airblade/vim-gitgutter.git')
+			" omnisharp-vim
+			call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
 
-		" vim-repeat
-		call dein#add('https://github.com/tpope/vim-repeat.git')
+			" deoplete-jedi
+			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': 'python'})
 
-		" tagbar
-		call dein#add('https://github.com/majutsushi/tagbar.git')
+			" deoplete-omnisharp
+			call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
+		" }
 
-		" vim-gutentags
-		call dein#add('https://github.com/ludovicchabant/vim-gutentags.git')
+		" Tags {
+			" tagbar
+			call dein#add('https://github.com/majutsushi/tagbar.git')
 
-		" YAIFA
-		call dein#add('https://github.com/Raimondi/YAIFA.git')
+			" vim-gutentags
+			call dein#add('https://github.com/ludovicchabant/vim-gutentags.git')
+		" }
 
-		" random-colorscheme-picker
-		call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
+		" File types{
+			" vim-csharp
+			call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
 
-		" vim-indent-guides
-		call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
-
-		" fzf-vim
-		call dein#add('https://github.com/junegunn/fzf.vim.git')
-
-		" vim-jsbeautify
-		call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['js', 'json']})
-
-		" vim-unimpaired
-		call dein#add('https://github.com/tpope/vim-unimpaired.git')
+			" vim-jsbeautify
+			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['js', 'json']})
+		" }
 
 		" Check for unmet dependencies
 		if !executable('python')
-			"call s:deregister('gundo.vim')
-			"call s:deregister('deoplete.nvim')
-			"call s:deregister('deoplete-omnisharp')
+			call dein#disable('deoplete.nvim')
+			call dein#disable('deoplete-omnisharp')
 		endif
 
 		if !executable('ctags')
-			"call s:deregister('tagbar')
-			"call s:deregister('vim-gutentags')
+			call dein#disable('tagbar')
+			call dein#disable('vim-gutentags')
 		endif
 
 		if !executable('node')
-			"call s:deregister('vim-jsbeautify')
+			call dein#disable('vim-jsbeautify')
 		endif
 
 		" Initialise plugin system
@@ -238,7 +233,7 @@
 	set shortmess+=IA              " no intro message, no swap-file message
 	set updatetime=500             " this setting controls how long to wait (in ms) before fetching type / symbol information.
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
-    set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
+	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
 " }
 
@@ -262,17 +257,18 @@
 
 	if has('gui_running')
 		if s:is_windows
-            set guioptions-=t
+			set guioptions-=t
 			autocmd GUIEnter * simalt ~x             " Maximise on GUI entry
 			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
 		endif
-		autocmd GUIEnter * set vb t_vb= " Disable audible bell
+		autocmd GUIEnter * set vb t_vb=              " Disable audible bell
 	endif
 " }
 
 " vim-airline options {
-if PluginCheck('vim-airline')
-	set laststatus=2
+if dein#tap('vim-airline')
+	set laststatus=2 " Show 2 lines of status
+	set noshowmode   " Don't show mode on statusline, let airline do it instead
 	let g:airline_detect_modified              = 1
 	let g:airline_theme                        = 'wombat'
 	let g:airline#extensions#tagbar#enabled    = 1
@@ -284,18 +280,17 @@ endif
 " Filetype options {
 	filetype on        " Enable filetypes
 	syntax on          " Enable syntax highlighting
-
 	filetype plugin on " Enable filetype plugins
 
 	" syntastic settings {
-	if PluginCheck('syntastic')
+	if dein#tap('syntastic')
 		let g:syntastic_mode_map = { 'mode' : 'passive', 'active_filetypes' : [], 'passive_filetypes' : [] }
 		noremap <Leader>c :SyntasticCheck<CR>
 	endif
 
 	" Python {
 		" syntastic settings {
-		if PluginCheck('syntastic')
+		if dein#tap('syntastic')
 			let g:syntastic_python_checkers         = ['pylint']
 			let g:syntastic_python_pylint_post_args = '--rcfile='.'"'.$VIMHOME.'\pylint\pylint.rc'.'"'
 		endif
@@ -304,14 +299,15 @@ endif
 
 	" C# {
 		" syntastic settings {
-		if PluginCheck('syntastic')
-            let g:syntastic_cs_checkers = ['code_checker']
+		if dein#tap('syntastic')
+			let g:syntastic_cs_checkers = ['code_checker']
 		endif
 		" }
 	" }
-    
+
 	" Visual Basic {
 		" Tagbar settings {
+		if dein#tap('tagbar')
 			let g:tagbar_type_vb = {
 				\ 'ctagstype' : 'vb',
 				\ 'deffile' : $VIMHOME.'\utils\ctags\ctags.cfg',
@@ -325,9 +321,10 @@ endif
 					\ 'l:labels',
 				\ ]
 			\ }
+		endif
 		" }
 	" }
-    
+
 	augroup AStyler
 		autocmd!
 	augroup END
@@ -378,24 +375,11 @@ endif
 		autocmd FileType css noremap <buffer> <Leader>a :call CSSBeautify()<cr>
 	" }
 
-	if !executable('node')
+	if !executable('node') || !dein#tap('vim-jsbeautify')
 		augroup JSBeautify
 			autocmd!
 		augroup END
 	endif
-
-	" markdown options {
-	if PluginCheck('vim-markdown')
-		let g:vim_markdown_folding_disabled = 1
-		if executable('markdown_py')
-			augroup markdown
-				autocmd BufWritePost * if &ft == 'mkd'
-							\| call system('markdown_py '.'"'.expand('%').'"'.' -f '.'"'.expand('%:r').'.html'.'"')
-							\| endif
-			augroup END
-		endif
-	endif
-	" }
 
 	" XML options {
 		let g:xml_syntax_folding = 1
@@ -409,7 +393,7 @@ endif
 	set smarttab       " Backspace to remove space-indents
 
 	" indent-guides options {
-	if PluginCheck('vim-indent-guides')
+	if dein#tap('vim-indent-guides')
 		let g:indent_guides_enable_on_vim_startup = 1
 	endif
 	" }
@@ -441,29 +425,24 @@ endif
 	" Yank to EOL, making Y behave more like the other capitals (C and D).
 	" Taken from http://vimbits.com/bits/11
 	noremap Y y$
-
-	" Gundo Toggle
-	if PluginCheck('gundo.vim')
-		nnoremap <F5> :GundoToggle<CR>
-	endif
 " }
 
 " Tags options {
 	" Tagbar options {
-		if PluginCheck('tagbar')
-			" Tagbar Toggle
-			nnoremap <silent> <F8> :TagbarToggle<CR>
-			let g:tagbar_ctags_bin = $VIMHOME.'\utils\ctags\ctags.exe'
-			autocmd VimEnter * nested :call tagbar#autoopen(1)
-		endif
+	if dein#tap('tagbar')
+		" Tagbar Toggle
+		nnoremap <silent> <F8> :TagbarToggle<CR>
+		let g:tagbar_ctags_bin = $VIMHOME.'\utils\ctags\ctags.exe'
+		autocmd VimEnter * nested :call tagbar#autoopen(1)
+	endif
 	" }
 
 	" Gutentags options {
-		if PluginCheck('vim-gutentags')
-			" Include extra defintions for VB6 tags
-			let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
-			let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
-		endif
+	if dein#tap('vim-gutentags')
+		" Include extra defintions for VB6 tags
+		let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
+		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
+	endif
 	" }
 " }
 
@@ -520,7 +499,7 @@ endif
 " }
 
 " Rainbow Parentheses options {
-if PluginCheck('rainbow_parentheses')
+if dein#tap('rainbow_parentheses.vim')
 	let g:rbpt_colorpairs = [
 		\ ['brown',       'RoyalBlue3' ],
 		\ ['Darkblue',    'SeaGreen3'  ],
@@ -563,7 +542,7 @@ endif
 " }
 
 " fzf options {
-if PluginCheck('fzf.vim')
+if dein#tap('fzf.vim')
 	" Default fzf layout
 	" - down / up / left / right
 	let g:fzf_layout = { 'down': '~40%' }
@@ -652,7 +631,7 @@ if PluginCheck('fzf.vim')
 		\ 'ctrl-q': function('s:build_quickfix_list'),
 		\ 'ctrl-t': 'tab split',
 		\ 'ctrl-x': 'split',
-		\ 'ctrl-v': 'vsplit' 
+		\ 'ctrl-v': 'vsplit'
 	\}
 
 	let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
@@ -668,20 +647,19 @@ if PluginCheck('fzf.vim')
 
 		command! -bang -nargs=* GFind
 		\ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>).' -- :/', 0, <bang>0)
-		
 
 	endif
 endif
 " }
 
 " vim vinegar options {
-if PluginCheck('vim-vinegar')
+if dein#tap('vim-vinegar')
 	autocmd FileType netrw setl bufhidden=wipe
 endif
 " }
 
 " deoplete options {
-if PluginCheck('deoplete.nvim')
+if dein#tap('deoplete.nvim')
 	" General options
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#file#enable_buffer_path = 1
@@ -705,7 +683,7 @@ endif
 " }
 
 " denite options {
-if PluginCheck('denite.nvim')
+if dein#tap('denite.nvim')
 	" Add custom menus
 	let s:menus = {}
 	let s:menus.file = {'description': 'File search (buffer, file, file_rec, file_mru'}
@@ -796,53 +774,50 @@ endif
 " }
 
 " Omnisharp options {
-if PluginCheck('omnisharp-vim')
+if dein#tap('omnisharp-vim')
 	augroup omnisharp_commands
-	    autocmd!
+		autocmd!
 
-	    "Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
-	    autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+		"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
+		autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 
-	    " Synchronous build (blocks Vim)
-	    "autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
-	    " Builds can also run asynchronously with vim-dispatch installed
-	    autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
-	    " automatic syntax check on events (TextChanged requires Vim 7.4)
-	    " autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
-	    autocmd BufEnter,BufWritePost *.cs SyntasticCheck
+		" Synchronous build (blocks Vim)
+		"autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
+		" Builds can also run asynchronously with vim-dispatch installed
+		autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
+		" automatic syntax check on events (TextChanged requires Vim 7.4)
+		" autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
+		autocmd BufEnter,BufWritePost *.cs SyntasticCheck
 
-	    " Automatically add new cs files to the nearest project on save
-	    autocmd BufWritePost *.cs call OmniSharp#AddToProject()
+		"show type information automatically when the cursor stops moving
+		autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 
-	    "show type information automatically when the cursor stops moving
-	    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+		"The following commands are contextual, based on the current cursor position.
 
-	    "The following commands are contextual, based on the current cursor position.
-
-	    autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
-	    autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
-	    autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
-	    autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
-	    autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
-	    "finds members in the current buffer
-	    autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
-	    " cursor can be anywhere on the line containing an issue
-	    autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
-	    autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
-	    autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
-	    autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
-	    "navigate up by method/property/field
-	    autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
-	    "navigate down by method/property/field
+		autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
+		autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
+		autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
+		autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
+		autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
+		"finds members in the current buffer
+		autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
+		" cursor can be anywhere on the line containing an issue
+		autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
+		autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
+		autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
+		autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
+		"navigate up by method/property/field
+		autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
+		"navigate down by method/property/field
 		autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
 
 	augroup END
 
 	let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
 
-    let g:OmniSharp_server_type = 'roslyn'  
-    let g:OmniSharp_prefer_global_sln = 0
-    let g:OmniSharp_timeout = 10
+	let g:OmniSharp_server_type = 'roslyn'
+	let g:OmniSharp_prefer_global_sln = 0
+	let g:OmniSharp_timeout = 10
 	let g:OmniSharp_selector_ui = 'fzf'
 
 	" Contextual code actions (requires CtrlP or unite.vim)
