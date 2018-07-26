@@ -82,12 +82,6 @@
 
 	" Add pylint settings folder
 	let $PATH .= ';'.$VIMHOME.'\pylint\'
-
-	set tags+=$VIM.'\tags'
-" }
-
-" Encoding {
-	set encoding=utf-8
 " }
 
 " Plug {
@@ -221,6 +215,38 @@
 	endif
 " }
 
+" Encoding {
+	set encoding=utf-8
+" }
+
+" Key Remapping {
+	" Remove the Windows ^M - when the encodings gets messed up
+	noremap <Leader>M mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+
+	" Buffer cycle
+	nnoremap <Tab> :bnext<CR>
+	nnoremap <S-Tab> :bprevious<CR>
+
+	" Increment/Decrement remapping
+	noremap <C-kPlus> <C-A>
+	noremap <C-kMinus> <C-X>
+
+	" Swap Normal and Visual mode semicolon and colon
+	nnoremap ; :
+	nnoremap : ;
+	vnoremap ; :
+	vnoremap : ;
+
+	" Retain selection after shift operations
+	" Taken from http://vimbits.com/bits/20
+	vnoremap < <gv
+	vnoremap > >gv
+
+	" Yank to EOL, making Y behave more like the other capitals (C and D).
+	" Taken from http://vimbits.com/bits/11
+	noremap Y y$
+" }
+
 " Misc options {
 	set backspace=indent,eol,start " Allow backspacing over everything in insert mode.
 	set ruler                      " Show the cursor position all the time
@@ -255,6 +281,32 @@
 	set incsearch  " Make search act like search in modern browsers
 " }
 
+" Tab options {
+	" Completion options
+	set completeopt=longest,menuone
+
+	" Tab completion in commands
+	set wildmenu
+	set wildmode=list:longest
+" }
+
+" Filetype options {
+	filetype on        " Enable filetypes
+	syntax on          " Enable syntax highlighting
+	filetype plugin on " Enable filetype plugins
+
+	" XML options {
+		let g:xml_syntax_folding = 1
+		au FileType xml setlocal foldmethod=syntax
+	" }
+" }
+
+" Indent options {
+	filetype indent on " Enable filetype indentation
+	set autoindent     " Auto indent for code blocks
+	set smarttab       " Backspace to remove space-indents
+" }
+
 " GUI options {
 	set nolazyredraw " Don't redraw while executing macros
 
@@ -264,8 +316,52 @@
 			autocmd GUIEnter * simalt ~x             " Maximise on GUI entry
 			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
 		endif
-		autocmd GUIEnter * set vb t_vb=              " Disable audible bell
+		autocmd GUIEnter * set vb t_vb=                  " Disable audible bell
 	endif
+" }
+
+" Slickfix {
+	" Quickfix and qfreplace
+	" Turn into leader command with line search of current pattern, open quickfix
+	" and qfreplace. On buffer save, save changes back but don't write to file
+	function! Slickfix()
+		call setqflist([])
+		let s:ft_backup = &filetype
+		:g//caddexpr expand("%").":".line(".").":". getline(".")
+		execute "cw"
+		execute "set filetype=".s:ft_backup
+	endfunction
+
+	function! QFWinNum()
+		redir =>bufliststr
+		silent! ls
+		redir END
+		let buflist = map(filter(split(bufliststr, '\n'), 'v:val =~ "Quickfix List"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
+		for bufnum in buflist
+			return winbufnr(bufnum)
+		endfor
+		return -1
+	endfunction
+
+	function! SlickWinChange()
+		execute ".cc"
+		execute "normal zz"
+		set nocursorline
+		set cursorline
+		execute QFWinNum()."wincmd w"
+	endfunction
+
+	function! SlickWinClose()
+		execute ".cc"
+		execute "normal zz"
+		set nocursorline
+		execute "bdelete ".QFWinNum()
+		call setqflist([])
+	endfunction
+
+	command! Slickfix call Slickfix()
+	noremap <Leader>f * :Slickfix<CR>
+	autocmd! BufReadPost quickfix nnoremap <buffer> <Space> :call SlickWinChange()<CR>
 " }
 
 " vim-airline options {
@@ -279,11 +375,7 @@ if dein#tap('vim-airline')
 endif
 " }
 
-" Filetype options {
-	filetype on        " Enable filetypes
-	syntax on          " Enable syntax highlighting
-	filetype plugin on " Enable filetype plugins
-
+" Filetype plugins {
 	" syntastic settings {
 	if dein#tap('syntastic')
 		let g:syntastic_mode_map = { 'mode' : 'passive', 'active_filetypes' : [], 'passive_filetypes' : [] }
@@ -382,54 +474,15 @@ endif
 			autocmd!
 		augroup END
 	endif
-
-	" XML options {
-		let g:xml_syntax_folding = 1
-		au FileType xml setlocal foldmethod=syntax
-	" }
 " }
 
-" Indent options {
-	filetype indent on " Enable filetype indentation
-	set autoindent     " Auto indent for code blocks
-	set smarttab       " Backspace to remove space-indents
-
-	" indent-guides options {
-	if dein#tap('vim-indent-guides')
-		let g:indent_guides_enable_on_vim_startup = 1
-	endif
-	" }
+" indent-guides options {
+if dein#tap('vim-indent-guides')
+	let g:indent_guides_enable_on_vim_startup = 1
+endif
 " }
 
-" Key Remapping {
-	" Remove the Windows ^M - when the encodings gets messed up
-	noremap <Leader>M mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
-
-	" Buffer cycle
-	nnoremap <Tab> :bnext<CR>
-	nnoremap <S-Tab> :bprevious<CR>
-
-	" Increment/Decrement remapping
-	noremap <C-kPlus> <C-A>
-	noremap <C-kMinus> <C-X>
-
-	" Swap Normal and Visual mode semicolon and colon
-	nnoremap ; :
-	nnoremap : ;
-	vnoremap ; :
-	vnoremap : ;
-
-	" Retain selection after shift operations
-	" Taken from http://vimbits.com/bits/20
-	vnoremap < <gv
-	vnoremap > >gv
-
-	" Yank to EOL, making Y behave more like the other capitals (C and D).
-	" Taken from http://vimbits.com/bits/11
-	noremap Y y$
-" }
-
-" Tags options {
+" Tag plugins {
 	" Tagbar options {
 	if dein#tap('tagbar')
 		" Tagbar Toggle
@@ -446,58 +499,6 @@ endif
 		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
 	endif
 	" }
-" }
-
-" Tab options {
-	" Completion options
-	set completeopt=longest,menuone
-
-	" Tab completion in commands
-	set wildmenu
-	set wildmode=list:longest
-
-" Slickfix {
-	" Quickfix and qfreplace
-	" Turn into leader command with line search of current pattern, open quickfix
-	" and qfreplace. On buffer save, save changes back but don't write to file
-	function! Slickfix()
-		call setqflist([])
-		let s:ft_backup = &filetype
-		:g//caddexpr expand("%").":".line(".").":". getline(".")
-		execute "cw"
-		execute "set filetype=".s:ft_backup
-	endfunction
-
-	function! QFWinNum()
-		redir =>bufliststr
-		silent! ls
-		redir END
-		let buflist = map(filter(split(bufliststr, '\n'), 'v:val =~ "Quickfix List"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-		for bufnum in buflist
-			return winbufnr(bufnum)
-		endfor
-		return -1
-	endfunction
-
-	function! SlickWinChange()
-		execute ".cc"
-		execute "normal zz"
-		set nocursorline
-		set cursorline
-		execute QFWinNum()."wincmd w"
-	endfunction
-
-	function! SlickWinClose()
-		execute ".cc"
-		execute "normal zz"
-		set nocursorline
-		execute "bdelete ".QFWinNum()
-		call setqflist([])
-	endfunction
-
-	command! Slickfix call Slickfix()
-	noremap <Leader>f * :Slickfix<CR>
-	autocmd! BufReadPost quickfix nnoremap <buffer> <Space> :call SlickWinChange()<CR>
 " }
 
 " Rainbow Parentheses options {
@@ -677,7 +678,7 @@ if dein#tap('deoplete.nvim')
 
 	" Csharp options
 	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
-	let g:deoplete#sources.cs = ['omni', 'buffer', 'file', 'cs']
+	let g:deoplete#sources.cs = ['omni', 'buffer', 'file']
 
 	" Select on Tab
 	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
