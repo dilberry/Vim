@@ -91,144 +91,136 @@
 " }
 
 " Plug {
-	" Deregister a Plugin from vim-plug to prevent loading
-	function! s:deregister(repo)
-		let repo = substitute(a:repo, '[\/]\+$', '', '')
-		let name = fnamemodify(repo, ':t:s?\.git$??')
-		call remove(g:plugs, name)
-		call remove(g:plugs_order, index(g:plugs_order, name))
-	endfunction
+	let g:dein_dir = expand($VIMHOME.'\vimfiles\dein.vim')
+	let g:dein_plugins_dir = expand($VIMHOME.'\vimfiles\plugins')
+	exec 'set runtimepath^='.g:dein_dir
 
 	" Check if a Plugin exists
 	function! PluginCheck(bundle)
-		if has_key(g:plugs, a:bundle)
+		if dein#tap(a:bundle)
 			return 1
 		else
 			return 0
 		endif
 	endfunction
 
-	" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
-	call plug#begin($VIMHOME.'\vimfiles\plugged')
+	" Specify a directory for plugins
+	if dein#load_state(g:dein_plugins_dir)
+		call dein#begin(g:dein_plugins_dir)
 
-	" vim-fugitive
-	Plug 'https://github.com/tpope/vim-fugitive.git'
+		call dein#add(g:dein_plugins_dir)
 
-	" gundo
-	Plug 'https://github.com/sjl/gundo.vim.git'
-	
-	" vim-airline
-	Plug 'https://github.com/vim-airline/vim-airline.git'
+		" vim-fugitive
+		call dein#add('https://github.com/tpope/vim-fugitive.git')
 
-	" vim-airline-themes
-	Plug 'https://github.com/vim-airline/vim-airline-themes.git'
+		" gundo
+		call dein#add('https://github.com/sjl/gundo.vim.git')
 
-	" vim-surround
-	Plug 'https://github.com/tpope/vim-surround.git'
+		" vim-airline
+		call dein#add('https://github.com/vim-airline/vim-airline.git')
 
-	" vim-qfreplace
-	Plug 'https://github.com/thinca/vim-qfreplace.git'
+		" vim-airline-themes
+		call dein#add('https://github.com/vim-airline/vim-airline-themes.git')
 
-	" vim-colorschemes
-	Plug 'https://github.com/flazz/vim-colorschemes.git'
+		" vim-surround
+		call dein#add('https://github.com/tpope/vim-surround.git')
 
-	" Align
-	Plug 'https://github.com/lboulard/Align.git'
+		" vim-qfreplace
+		call dein#add('https://github.com/thinca/vim-qfreplace.git')
 
-	" rainbow_parentheses
-	Plug 'https://github.com/kien/rainbow_parentheses.vim.git'
+		" vim-colorschemes
+		call dein#add('https://github.com/flazz/vim-colorschemes.git')
 
-	" omnisharp-vim
-	Plug 'https://github.com/OmniSharp/omnisharp-vim.git', { 'for': 'cs' }
+		" Align
+		call dein#add('https://github.com/lboulard/Align.git')
 
-	" vim-csharp
-	Plug 'https://github.com/OrangeT/vim-csharp.git', { 'for': 'cs' }
+		" rainbow_parentheses
+		call dein#add('https://github.com/kien/rainbow_parentheses.vim.git')
 
-	" syntastic
-	Plug 'https://github.com/vim-syntastic/syntastic.git'
+		" omnisharp-vim
+		call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
 
-	" vim-dispatch
-	Plug 'https://github.com/tpope/vim-dispatch.git'
+		" vim-csharp
+		call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
 
-	" vim-vinegar
-	Plug 'https://github.com/tpope/vim-vinegar.git'
+		" syntastic
+		call dein#add('https://github.com/vim-syntastic/syntastic.git')
 
-	" deoplete
-	" This needs python3 neovim package to be installed
-	if has('nvim')
-		Plug 'https://github.com/Shougo/deoplete.nvim.git', { 'do': ':UpdateRemotePlugins' }
-	else
-		Plug 'https://github.com/Shougo/deoplete.nvim.git'
-		Plug 'https://github.com/roxma/nvim-yarp.git'
-		Plug 'https://github.com/roxma/vim-hug-neovim-rpc.git'
+		" vim-dispatch
+		call dein#add('https://github.com/tpope/vim-dispatch.git')
+
+		" vim-vinegar
+		call dein#add('https://github.com/tpope/vim-vinegar.git')
+
+		" deoplete
+		" This needs python3 neovim package to be installed
+		if has('nvim')
+			call dein#add('https://github.com/Shougo/deoplete.nvim.git')
+		else
+			call dein#add('https://github.com/Shougo/deoplete.nvim.git')
+			call dein#add('https://github.com/roxma/nvim-yarp.git')
+			call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
+		endif
+
+		" neco-syntax
+		call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': 'deoplete.nvim'})
+
+		" deoplete-jedi
+		call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': 'python'})
+
+		" deoplete-omnisharp
+		call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
+
+		" vim-gitgutter
+		call dein#add('https://github.com/airblade/vim-gitgutter.git')
+
+		" vim-repeat
+		call dein#add('https://github.com/tpope/vim-repeat.git')
+
+		" tagbar
+		call dein#add('https://github.com/majutsushi/tagbar.git')
+
+		" vim-gutentags
+		call dein#add('https://github.com/ludovicchabant/vim-gutentags.git')
+
+		" YAIFA
+		call dein#add('https://github.com/Raimondi/YAIFA.git')
+
+		" random-colorscheme-picker
+		call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
+
+		" vim-indent-guides
+		call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
+
+		" fzf-vim
+		call dein#add('https://github.com/junegunn/fzf.vim.git')
+
+		" vim-jsbeautify
+		call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['js', 'json']})
+
+		" vim-unimpaired
+		call dein#add('https://github.com/tpope/vim-unimpaired.git')
+
+		" Check for unmet dependencies
+		if !executable('python')
+			"call s:deregister('gundo.vim')
+			"call s:deregister('deoplete.nvim')
+			"call s:deregister('deoplete-omnisharp')
+		endif
+
+		if !executable('ctags')
+			"call s:deregister('tagbar')
+			"call s:deregister('vim-gutentags')
+		endif
+
+		if !executable('node')
+			"call s:deregister('vim-jsbeautify')
+		endif
+
+		" Initialise plugin system
+		call dein#end()
+		call dein#save_state()
 	endif
-
-	" neco-syntax
-	Plug 'https://github.com/Shougo/neco-syntax.git'
-
-	" deoplete-jedi
-	Plug 'https://github.com/zchee/deoplete-jedi.git'
-
-	" deoplete-omnisharp
-	Plug 'https://github.com/gautamnaik1994/deoplete-omnisharp.git'
-
-	" vim-gitgutter
-	Plug 'https://github.com/airblade/vim-gitgutter.git'
-
-	" vim-repeat
-	Plug 'https://github.com/tpope/vim-repeat.git'
-
-	" tagbar
-	Plug 'https://github.com/majutsushi/tagbar.git'
-
-	" vim-gutentags
-	Plug 'https://github.com/ludovicchabant/vim-gutentags.git'
-
-	" YAIFA
-	Plug 'https://github.com/Raimondi/YAIFA.git'
-
-	" vim-plugin-random-colorscheme-picker
-	Plug 'https://github.com/sunuslee/vim-plugin-random-colorscheme-picker.git'
-
-	" vim-indent-guides
-	Plug 'https://github.com/nathanaelkane/vim-indent-guides.git'
-
-	" fzf-vim
-	Plug 'https://github.com/junegunn/fzf.vim.git'
-
-	" fzf
-	Plug 'https://github.com/junegunn/fzf.git'
-
-	" vim-jsbeautify
-	Plug 'https://github.com/maksimr/vim-jsbeautify.git'
-
-	" DirDiff
-	Plug 'https://github.com/vim-scripts/DirDiff.vim.git'
-
-	" vim-signature
-	Plug 'https://github.com/kshenoy/vim-signature.git'
-
-	" vim-unimpaired
-	Plug 'https://github.com/tpope/vim-unimpaired.git'
-
-	" Check for unmet dependencies
-	if !executable('python')
-		call s:deregister('gundo.vim')
-		call s:deregister('deoplete.nvim')
-		call s:deregister('deoplete-omnisharp')
-	endif
-
-	if !executable('ctags')
-		call s:deregister('tagbar')
-		call s:deregister('vim-gutentags')
-	endif
-
-	if !executable('node')
-		call s:deregister('vim-jsbeautify')
-	endif
-
-	" Initialise plugin system
-	call plug#end()
 " }
 
 " Misc options {
@@ -281,14 +273,17 @@
 " vim-airline options {
 if PluginCheck('vim-airline')
 	set laststatus=2
-	let g:airline_detect_modified           = 1
-	let g:airline_theme                     = 'wombat'
-	let g:airline#extensions#tagbar#enabled = 1
+	let g:airline_detect_modified              = 1
+	let g:airline_theme                        = 'wombat'
+	let g:airline#extensions#tagbar#enabled    = 1
+	let g:airline#extensions#syntastic#enabled = 1
+	let g:airline#extensions#hunks#enabled     = 1
 endif
 " }
 
 " Filetype options {
 	filetype on        " Enable filetypes
+	syntax on          " Enable syntax highlighting
 
 	filetype plugin on " Enable filetype plugins
 
