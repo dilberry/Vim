@@ -117,7 +117,10 @@
 
 		" Git {
 			" vim-fugitive
-			call dein#add('https://github.com/tpope/vim-fugitive.git')
+			call dein#add('https://github.com/tpope/vim-fugitive.git', { 'rev': 'v2.3'})
+
+			" gitv
+			call dein#add('https://github.com/gregsexton/gitv.git')
 
 			" vim-gitgutter
 			call dein#add('https://github.com/airblade/vim-gitgutter.git')
