@@ -144,8 +144,11 @@
 		" }
 
 		" Browsing {
+			" fzf
+			call dein#add('https://github.com/junegunn/fzf.git', { 'merged': 0 })
+
 			" fzf-vim
-			call dein#add('https://github.com/junegunn/fzf.vim.git')
+			call dein#add('https://github.com/junegunn/fzf.vim.git', { 'merged': 0, 'depends': ['fzf'] })
 
 			" denite
 			call dein#add('https://github.com/Shougo/denite.nvim.git')
@@ -724,6 +727,17 @@ if dein#tap('denite.nvim')
 	nnoremap <silent> [denite]t :Denite tag<CR>
 	nnoremap <silent> [denite]m :Denite file_mru<CR>
 	nnoremap <silent> [denite]u :Denite menu<CR>
+
+	" reset 50% winheight on window resize
+	augroup deniteresize
+		autocmd!
+		autocmd VimResized,VimEnter * call denite#custom#option('default',
+			\'winheight', winheight(0) / 2)
+	augroup end
+
+	call denite#custom#option('default', { 'prompt': '>' })
+
+	call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git', ''])
 
 	call denite#custom#map(
 		\ 'insert',
