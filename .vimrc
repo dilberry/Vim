@@ -105,14 +105,17 @@
 			" vim-colorschemes
 			call dein#add('https://github.com/flazz/vim-colorschemes.git')
 
+			" colour-schemes
+			call dein#add('https://github.com/daylerees/colour-schemes.git', { 'rtp': 'vim'})
+
 			" random-colorscheme-picker
 			call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
 
 			" vim-indent-guides
 			call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
 
-			" rainbow_parentheses.vim
-			call dein#add('https://github.com/kien/rainbow_parentheses.vim.git')
+			" rainbow
+			call dein#add('https://github.com/luochen1990/rainbow.git')
 		" }
 
 		" Git {
@@ -197,7 +200,7 @@
 			call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
 
 			" vim-jsbeautify
-			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['js', 'json']})
+			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css']})
 		" }
 
 		" Check for unmet dependencies
@@ -508,45 +511,27 @@ endif
 " }
 
 " Rainbow Parentheses options {
-if dein#tap('rainbow_parentheses.vim')
-	let g:rbpt_colorpairs = [
-		\ ['brown',       'RoyalBlue3' ],
-		\ ['Darkblue',    'SeaGreen3'  ],
-		\ ['darkgray',    'DarkOrchid3'],
-		\ ['darkgreen',   'firebrick3' ],
-		\ ['darkcyan',    'RoyalBlue3' ],
-		\ ['darkred',     'SeaGreen3'  ],
-		\ ['darkmagenta', 'DarkOrchid3'],
-		\ ['brown',       'firebrick3' ],
-		\ ['gray',        'RoyalBlue3' ],
-		\ ['black',       'SeaGreen3'  ],
-		\ ['darkmagenta', 'DarkOrchid3'],
-		\ ['Darkblue',    'firebrick3' ],
-		\ ['darkgreen',   'RoyalBlue3' ],
-		\ ['darkcyan',    'SeaGreen3'  ],
-		\ ['darkred',     'DarkOrchid3'],
-		\ ['red',         'firebrick3' ],
-		\ ]
-
-	function! Config_Rainbow()
-		call rainbow_parentheses#load(0)                       " Load Round brackets
-		call rainbow_parentheses#load(1)                       " Load Square brackets
-		call rainbow_parentheses#load(2)                       " Load Braces
-		autocmd TastetheRainbow VimEnter * call Load_Rainbow() " 64bit Hack - Set VimEnter after syntax load
-	endfunction
-
-	function! Load_Rainbow()
-		call rainbow_parentheses#activate()
-	endfunction
-
-	augroup TastetheRainbow
-		autocmd!
-		autocmd Syntax * call Config_Rainbow()                    " Load rainbow_parentheses on syntax load
-		autocmd ColorScheme * call rainbow_parentheses#activate() " Reactivate on Colour Scheme change
-	augroup END
+if dein#tap('rainbow')
+	let g:rainbow_active = 1 " Enable rainbow by default
+	let g:rainbow_conf = {
+	\	'guifgs': ['skyblue3', 'seagreen3', 'darkorchid3', 'firebrick3', 'steelblue3', 'chartreuse3', 'violetred3', 'OrangeRed3'],
+	\	'ctermfgs': [ 'brown', 'Darkblue', 'darkgray', 'darkgreen', 'darkcyan', 'darkred', 'darkmagenta', 'brown'],
+	\	'operators': '_,_',
+	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+	\	'separately': {
+	\		'*': {},
+	\		'vim': {
+	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+	\		},
+	\		'html': {
+	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+	\		},
+	\		'css': 0,
+	\	}
+	\}
 
 	" rainbow_parentheses toggle
-	nnoremap <silent> <Leader>t :call rainbow_parentheses#toggle()<CR>
+	nnoremap <silent> <Leader>t :RainbowToggle<CR>
 endif
 " }
 
@@ -738,73 +723,56 @@ if dein#tap('denite.nvim')
 			\'winheight', winheight(0) / 2)
 	augroup end
 
-	call denite#custom#option('default', { 'prompt': '>' })
+	call denite#custom#option('default', { 'prompt': 'λ' })
 
 	call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git', ''])
 
-	call denite#custom#map(
-		\ 'insert',
-		\ '<Down>',
-		\ '<denite:move_to_next_line>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<Up>',
-		\ '<denite:move_to_previous_line>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<C-N>',
-		\ '<denite:move_to_next_line>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<C-P>',
-		\ '<denite:move_to_previous_line>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<C-G>',
-		\ '<denite:assign_next_txt>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<C-T>',
-		\ '<denite:assign_previous_line>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'normal',
-		\ '/',
-		\ '<denite:enter_mode:insert>',
-		\ 'noremap'
-		\)
-	call denite#custom#map(
-		\ 'insert',
-		\ '<Esc>',
-		\ '<denite:enter_mode:normal>',
-		\ 'noremap'
-		\)
+	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>', 'noremap')
+	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>', 'noremap')
+	call denite#custom#map('insert', '<C-N>' , '<denite:move_to_next_line>'    , 'noremap')
+	call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>'    , 'noremap')
+	call denite#custom#map('insert', '<C-G>' , '<denite:assign_next_txt>'      , 'noremap')
+	call denite#custom#map('insert', '<C-T>' , '<denite:assign_previous_line>' , 'noremap')
+	call denite#custom#map('normal', '/'     , '<denite:enter_mode:insert>'    , 'noremap')
+	call denite#custom#map('insert', '<Esc>' , '<denite:enter_mode:normal>'    , 'noremap')
 endif
 " }
 
 " Omnisharp options {
 if dein#tap('omnisharp-vim')
+	function! s:omnisharp_mapping() abort
+		" Synchronous build (blocks Vim)
+		"autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
+		" Builds can also run asynchronously with vim-dispatch installed
+		nnoremap <buffer><leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
+		"The following commands are contextual, based on the current cursor position.
+		nnoremap <buffer>gd :OmniSharpGotoDefinition<cr>
+		nnoremap <buffer><leader>fi :OmniSharpFindImplementations<cr>
+		nnoremap <buffer><leader>ft :OmniSharpFindType<cr>
+		nnoremap <buffer><leader>fs :OmniSharpFindSymbol<cr>
+		nnoremap <buffer><leader>fu :OmniSharpFindUsages<cr>
+		"finds members in the current buffer
+		nnoremap <buffer><leader>fm :OmniSharpFindMembers<cr>
+		" cursor can be anywhere on the line containing an issue
+		nnoremap <buffer><leader>x  :OmniSharpFixIssue<cr>
+		nnoremap <buffer><leader>fx :OmniSharpFixUsings<cr>
+		nnoremap <buffer><leader>tt :OmniSharpTypeLookup<cr>
+		nnoremap <buffer><leader>dc :OmniSharpDocumentation<cr>
+		"navigate up by method/property/field
+		nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
+		"navigate down by method/property/field
+		nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
+	endfunction
+
 	augroup omnisharp_commands
 		autocmd!
 
 		"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
 		autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
 
-		" Synchronous build (blocks Vim)
-		"autocmd FileType cs nnoremap <F5> :wa!<cr>:OmniSharpBuild<cr>
-		" Builds can also run asynchronously with vim-dispatch installed
-		autocmd FileType cs nnoremap <leader>b :wa!<cr>:OmniSharpBuildAsync<cr>
+		"Set omnisharp key mappings
+		autocmd FileType cs call s:omnisharp_mapping()
+
 		" automatic syntax check on events (TextChanged requires Vim 7.4)
 		" autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
 		autocmd BufEnter,BufWritePost *.cs SyntasticCheck
@@ -812,24 +780,6 @@ if dein#tap('omnisharp-vim')
 		"show type information automatically when the cursor stops moving
 		autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 
-		"The following commands are contextual, based on the current cursor position.
-
-		autocmd FileType cs nnoremap gd :OmniSharpGotoDefinition<cr>
-		autocmd FileType cs nnoremap <leader>fi :OmniSharpFindImplementations<cr>
-		autocmd FileType cs nnoremap <leader>ft :OmniSharpFindType<cr>
-		autocmd FileType cs nnoremap <leader>fs :OmniSharpFindSymbol<cr>
-		autocmd FileType cs nnoremap <leader>fu :OmniSharpFindUsages<cr>
-		"finds members in the current buffer
-		autocmd FileType cs nnoremap <leader>fm :OmniSharpFindMembers<cr>
-		" cursor can be anywhere on the line containing an issue
-		autocmd FileType cs nnoremap <leader>x  :OmniSharpFixIssue<cr>
-		autocmd FileType cs nnoremap <leader>fx :OmniSharpFixUsings<cr>
-		autocmd FileType cs nnoremap <leader>tt :OmniSharpTypeLookup<cr>
-		autocmd FileType cs nnoremap <leader>dc :OmniSharpDocumentation<cr>
-		"navigate up by method/property/field
-		autocmd FileType cs nnoremap <C-K> :OmniSharpNavigateUp<cr>
-		"navigate down by method/property/field
-		autocmd FileType cs nnoremap <C-J> :OmniSharpNavigateDown<cr>
 
 	augroup END
 
