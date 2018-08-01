@@ -159,6 +159,9 @@
 			" denite
 			call dein#add('https://github.com/Shougo/denite.nvim.git')
 
+			" vim-leader-guide
+			call dein#add('https://github.com/hecal3/vim-leader-guide.git')
+
 			" vim-vinegar
 			call dein#add('https://github.com/tpope/vim-vinegar.git')
 		" }
@@ -678,6 +681,76 @@ endif
 
 " denite options {
 if dein#tap('denite.nvim')
+	function! s:maybe_add_denite_item(name, cmd)
+		if exists('s:menus')
+			call add(s:menus.user_commands.command_candidates, [a:name, a:cmd])
+		endif
+	endfunction
+
+	function! s:maybe_add_leader_guide_item(key, name, cmd)
+		if exists('g:lmap')
+			execute 'let g:lmap' . a:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
+		endif
+	endfunction
+
+	function! s:leader_bind(map, key, key2, key3, value, denite_name, guide_name, is_cmd)
+		" Args:
+		"     map: mapping mode (nmap, inoremap, etc.)
+		"     key, key2, key3: up to three keys in the sequences
+		"     value: command to be executed (<CR> automatically gets added if is_cmd)
+		"     denite_name: name in the denite menu
+		"     guide_name: short name for leader guide menu
+		"     is_cmd: 1 if command is a complete command, else 0 if user input is needed
+		" leader_bind('nnoremap', 'g', 'b', '', 'Gblame', 'Git: Blame', 'blame', 1, 1)
+		" leader_bind('nnoremap', 'g', 'g', 'n', 'GitGutterNextHunk', 'Git: Next Hunk', 'next-hunk', 1, 0)
+		if a:is_cmd
+			" If a:value is a complete command e.g. :Gblame<CR>
+			let l:value = ':' . a:value . '<CR>'
+			" The underscore denotes the leader key (space).
+			let l:denite_name = a:denite_name . ' (_' . a:key . a:key2 . a:key3 . ')'
+			let l:denite_cmd = a:value
+			let l:guide_name = a:guide_name
+		else
+			" If a:value is not a complete command e.g. :Gmove<Space> that needs the
+			" user to finish the command, we'll append (nop) to indicate that
+			" selecting the menu item either in denite or leader-guide does nothing,
+			" because incomplete commands are not supported.
+			" a:value in this case should contain a leading ':' and trailing '<Space>'.
+			" TODO: figure out a way to use incomplete commands.
+			let l:value = a:value
+			let l:denite_name = a:denite_name . ' (_' . a:key . a:key2 . ') (nop)'
+			let l:denite_cmd = ''
+			let l:guide_name = a:guide_name . ' (nop)'
+		endif
+
+		execute a:map . ' <leader>' . a:key . a:key2 . a:key3 . ' ' . l:value
+		call s:maybe_add_denite_item(l:denite_name, l:denite_cmd)
+
+		if strlen(a:key3)
+			let l:key = '[' . shellescape(a:key) . ']' . '[' . shellescape(a:key2) . ']' . '[' . shellescape(a:key3) . ']'
+		else
+			if strlen(a:key2)
+				let l:key = '[' . shellescape(a:key) . ']' . '[' . shellescape(a:key2) . ']'
+			else
+				let l:key = '[' . shellescape(a:key) . ']'
+			endif
+		endif
+		call s:maybe_add_leader_guide_item(l:key, l:guide_name, l:denite_cmd)
+	endfunction
+
+	function! s:denite_add_user_command(item, cmd)
+		call add(s:menus.user_commands.command_candidates, [a:item, a:cmd])
+	endfunction
+
+	let g:lmap = {}
+	let g:leaderGuide_vertical = 0
+	let g:leaderGuide_position = 'botright'
+	let g:leaderGuide_max_size = 30
+
+	call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
+	nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
+	vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
+
 	" Add custom menus
 	let s:menus = {}
 	let s:menus.user_commands = {'description': 'User commands'}
@@ -720,6 +793,20 @@ if dein#tap('denite.nvim')
 	nnoremap <silent> [denite]t :Denite tag<CR>
 	nnoremap <silent> [denite]m :Denite file_mru<CR>
 	nnoremap <silent> [denite]u :Denite menu<CR>
+
+	nmap <Leader>g [git]
+	let g:lmap.g = {'name': 'Git/'}
+	call s:leader_bind('nnoremap', 'g', 'b', '', 'Gblame'         , 'Git: Blame'                , 'blame'                , 1)
+	call s:leader_bind('nnoremap', 'g', 'B', '', 'Gbrowse'        , 'Git: Status'               , 'status'               , 1)
+	call s:leader_bind('nnoremap', 'g', 'c', '', ':Gcommit<Space>', 'Git: Commit'               , 'commit'               , 0)
+	call s:leader_bind('nnoremap', 'g', 'C', '', 'Gcheckout'      , 'Git: Checkout'             , 'checkout'             , 1)
+	call s:leader_bind('nnoremap', 'g', 'D', '', 'Gdiff HEAD'     , 'Git: Diff HEAD'            , 'diff HEAD'            , 1)
+	call s:leader_bind('nnoremap', 'g', 'd', '', 'Gdiff'          , 'Git: Diff'                 , 'diff'                 , 1)
+	call s:leader_bind('nnoremap', 'g', 'm', '', ':Gmove<Space>'  , 'Git: Move'                 , 'move'                 , 0)
+	call s:leader_bind('nnoremap', 'g', 'p', '', 'Gpull'          , 'Git: Pull'                 , 'pull'                 , 1)
+	call s:leader_bind('nnoremap', 'g', 'P', '', 'Gpush'          , 'Git: Push'                 , 'push'                 , 1)
+	call s:leader_bind('nnoremap', 'g', 'r', '', 'Gread'          , 'Git: Checkout current file', 'checkout-current-file', 1)
+	call s:leader_bind('nnoremap', 'g', 's', '', 'Gstatus'        , 'Git: Status'               , 'status'               , 1)
 
 	" reset 50% winheight on window resize
 	augroup deniteresize
