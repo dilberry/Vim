@@ -325,7 +325,7 @@
 			autocmd GUIEnter * simalt ~x             " Maximise on GUI entry
 			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
 		endif
-		autocmd GUIEnter * set vb t_vb=                  " Disable audible bell
+		autocmd GUIEnter * set vb t_vb=              " Disable audible bell
 	endif
 " }
 
@@ -510,11 +510,11 @@ endif
 	" }
 " }
 
-" Rainbow Parentheses options {
+" Rainbow options {
 if dein#tap('rainbow')
 	let g:rainbow_active = 1 " Enable rainbow by default
 	let g:rainbow_conf = {
-	\	'guifgs': ['skyblue3', 'seagreen3', 'darkorchid3', 'firebrick3', 'steelblue3', 'chartreuse3', 'violetred3', 'OrangeRed3'],
+	\	'guifgs': ['deepskyblue3', 'seagreen3', 'darkorchid3', 'firebrick3', 'steelblue3', 'chartreuse3', 'violetred3', 'orangered3'],
 	\	'ctermfgs': [ 'brown', 'Darkblue', 'darkgray', 'darkgreen', 'darkcyan', 'darkred', 'darkmagenta', 'brown'],
 	\	'operators': '_,_',
 	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
@@ -680,6 +680,11 @@ endif
 if dein#tap('denite.nvim')
 	" Add custom menus
 	let s:menus = {}
+	let s:menus.user_commands = {'description': 'User commands'}
+	let s:menus.user_commands.command_candidates = [
+		\ ['command', 'Denite command'],
+		\ ['help', 'Denite help']
+		\ ]
 	let s:menus.file = {'description': 'File search (buffer, file, file_rec, file_mru'}
 	let s:menus.line = {'description': 'Line search (change, grep, line, tag'}
 	let s:menus.others = {'description': 'Others (command, command_history, help)'}
@@ -734,6 +739,9 @@ if dein#tap('denite.nvim')
 	call denite#custom#map('insert', '<C-G>' , '<denite:assign_next_txt>'      , 'noremap')
 	call denite#custom#map('insert', '<C-T>' , '<denite:assign_previous_line>' , 'noremap')
 	call denite#custom#map('normal', '/'     , '<denite:enter_mode:insert>'    , 'noremap')
+	call denite#custom#map('normal', '<Esc>' , '<denite:quit>'                 , 'noremap')
+	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>', 'noremap')
+	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'    , 'noremap')
 	call denite#custom#map('insert', '<Esc>' , '<denite:enter_mode:normal>'    , 'noremap')
 endif
 " }
