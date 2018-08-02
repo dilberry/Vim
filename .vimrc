@@ -565,10 +565,7 @@ endif
 		let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
 		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
 		" Let Gutentags separate tags based on Visual Studio and VB6 solutions
-		" FIXME: This doesn't appear to work
-		" Likely looking for directories or exact match
-		" TODO: Look at g:gutentags_project_root_finder
-		let g:gutentags_project_root = ['*.sln', '*.vbp']
+		let g:gutentags_project_root = ['.vs', '*.sln', '*.vbp']
 	endif
 	" }
 " }
@@ -848,6 +845,7 @@ if dein#tap('denite.nvim')
 	let s:menus.t = {'description': 'Tags'}
 	let s:menus.t.command_candidates = []
 	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'buffer tag', 'buffer tag', 1)
+	" FIXME: Denite code is interpreting tag paths as relative
 	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'global tag', 'global tag', 1)
 
 	let s:menus.f = {'description': 'Files'}
