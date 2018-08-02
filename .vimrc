@@ -329,8 +329,8 @@
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
-	set timeoutlen=100
-	set ttimeoutlen=100
+	set timeoutlen=100             " Navigation character timeout
+	set ttimeoutlen=100            " Other character timeout
 " }
 
 " Saving options {
