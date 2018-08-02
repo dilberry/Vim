@@ -221,6 +221,10 @@
 			call dein#disable('vim-jsbeautify')
 		endif
 
+		if !executable('git')
+			call dein#disable('vim-fugitive')
+		endif
+
 		" Initialise plugin system
 		call dein#end()
 		call dein#save_state()
@@ -231,7 +235,35 @@
 	set encoding=utf-8
 " }
 
+" Leader mapping function {
+    let s:leader_bind_callbacks = []
+	function! s:leader_bind(map, keys, value, long_name, short_name, is_cmd)
+		if a:is_cmd
+			" If a:value is a complete command e.g. :Gblame<CR>
+			let l:value = ':' . a:value . '<CR>'
+			" The underscore denotes the leader key (space).
+			let l:long_name = a:long_name . ' (_' . join(a:keys, '') . ')'
+			let l:cmd_value = a:value
+			let l:short_name = a:short_name
+		else
+			let l:value = a:value
+			let l:long_name = a:long_name . ' (_' . join(a:keys, '') . ') (nop)'
+			let l:cmd_value = ''
+			let l:short_name = a:short_name . ' (nop)'
+		endif
+
+		execute a:map . ' <leader>' . join(a:keys, '') . ' ' . l:value
+
+        for CallBack in s:leader_bind_callbacks
+            call CallBack(a:keys, l:long_name, l:cmd_value)
+        endfor
+	endfunction
+" }
+
 " Key Remapping {
+	" Set Leader to Space
+	let mapleader = ' '
+
 	" Remove the Windows ^M - when the encodings gets messed up
 	noremap <Leader>M mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
@@ -276,6 +308,8 @@
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
+	set timeoutlen=100
+	set ttimeoutlen=100
 " }
 
 " Saving options {
@@ -679,69 +713,8 @@ if dein#tap('deoplete.nvim')
 endif
 " }
 
-" denite options {
-if dein#tap('denite.nvim')
-	function! s:maybe_add_denite_item(name, cmd)
-		if exists('s:menus')
-			call add(s:menus.user_commands.command_candidates, [a:name, a:cmd])
-		endif
-	endfunction
-
-	function! s:maybe_add_leader_guide_item(key, name, cmd)
-		if exists('g:lmap')
-			execute 'let g:lmap' . a:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
-		endif
-	endfunction
-
-	function! s:leader_bind(map, key, key2, key3, value, denite_name, guide_name, is_cmd)
-		" Args:
-		"     map: mapping mode (nmap, inoremap, etc.)
-		"     key, key2, key3: up to three keys in the sequences
-		"     value: command to be executed (<CR> automatically gets added if is_cmd)
-		"     denite_name: name in the denite menu
-		"     guide_name: short name for leader guide menu
-		"     is_cmd: 1 if command is a complete command, else 0 if user input is needed
-		" leader_bind('nnoremap', 'g', 'b', '', 'Gblame', 'Git: Blame', 'blame', 1, 1)
-		" leader_bind('nnoremap', 'g', 'g', 'n', 'GitGutterNextHunk', 'Git: Next Hunk', 'next-hunk', 1, 0)
-		if a:is_cmd
-			" If a:value is a complete command e.g. :Gblame<CR>
-			let l:value = ':' . a:value . '<CR>'
-			" The underscore denotes the leader key (space).
-			let l:denite_name = a:denite_name . ' (_' . a:key . a:key2 . a:key3 . ')'
-			let l:denite_cmd = a:value
-			let l:guide_name = a:guide_name
-		else
-			" If a:value is not a complete command e.g. :Gmove<Space> that needs the
-			" user to finish the command, we'll append (nop) to indicate that
-			" selecting the menu item either in denite or leader-guide does nothing,
-			" because incomplete commands are not supported.
-			" a:value in this case should contain a leading ':' and trailing '<Space>'.
-			" TODO: figure out a way to use incomplete commands.
-			let l:value = a:value
-			let l:denite_name = a:denite_name . ' (_' . a:key . a:key2 . ') (nop)'
-			let l:denite_cmd = ''
-			let l:guide_name = a:guide_name . ' (nop)'
-		endif
-
-		execute a:map . ' <leader>' . a:key . a:key2 . a:key3 . ' ' . l:value
-		call s:maybe_add_denite_item(l:denite_name, l:denite_cmd)
-
-		if strlen(a:key3)
-			let l:key = '[' . shellescape(a:key) . ']' . '[' . shellescape(a:key2) . ']' . '[' . shellescape(a:key3) . ']'
-		else
-			if strlen(a:key2)
-				let l:key = '[' . shellescape(a:key) . ']' . '[' . shellescape(a:key2) . ']'
-			else
-				let l:key = '[' . shellescape(a:key) . ']'
-			endif
-		endif
-		call s:maybe_add_leader_guide_item(l:key, l:guide_name, l:denite_cmd)
-	endfunction
-
-	function! s:denite_add_user_command(item, cmd)
-		call add(s:menus.user_commands.command_candidates, [a:item, a:cmd])
-	endfunction
-
+" vim-leader-guide options {
+if dein#tap('vim-leader-guide')
 	let g:lmap = {}
 	let g:leaderGuide_vertical = 0
 	let g:leaderGuide_position = 'botright'
@@ -751,62 +724,42 @@ if dein#tap('denite.nvim')
 	nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
 	vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
 
+	if dein#tap('vim-fugitive')
+		let g:lmap.g = {'name': 'Git/'}
+	endif
+
+	if dein#tap('denite.nvim')
+        let g:lmap.u = {'name': 'Denite/'}
+        let g:lmap.u.t = {'name': 'Tag/'}
+        let g:lmap.u.f = {'name': 'File/'}
+	endif
+
+	function! s:add_leader_guide_item(keys, name, cmd)
+        let l:local_keys = deepcopy(a:keys)
+        let l:key = '[' . join(map(l:local_keys, 'shellescape(v:val)'), '][') . ']'
+
+        execute 'let g:lmap' . l:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
+	endfunction
+
+    call add(s:leader_bind_callbacks, function('s:add_leader_guide_item'))
+endif
+" }
+
+" denite options {
+if dein#tap('denite.nvim')
 	" Add custom menus
 	let s:menus = {}
-	let s:menus.user_commands = {'description': 'User commands'}
-	let s:menus.user_commands.command_candidates = [
-		\ ['command', 'Denite command'],
-		\ ['help', 'Denite help']
-		\ ]
-	let s:menus.file = {'description': 'File search (buffer, file, file_rec, file_mru'}
-	let s:menus.line = {'description': 'Line search (change, grep, line, tag'}
-	let s:menus.others = {'description': 'Others (command, command_history, help)'}
-	let s:menus.file.command_candidates = [
-		\ ['buffer', 'Denite buffer'],
-		\ ['file: Files in the current directory', 'Denite file'],
-		\ ['file_rec: Files, recursive list under the current directory', 'Denite file_rec'],
-		\ ['file_mru: Most recently used files', 'Denite file_mru']
-		\ ]
-	let s:menus.line.command_candidates = [
-		\ ['change', 'Denite change'],
-		\ ['grep :grep', 'Denite grep'],
-		\ ['line', 'Denite line'],
-		\ ['tag', 'Denite tag']
-		\ ]
-	let s:menus.others.command_candidates = [
-		\ ['command', 'Denite command'],
-		\ ['command_history', 'Denite command_history'],
-		\ ['help', 'Denite help']
-		\ ]
-
 	call denite#custom#var('menu', 'menus', s:menus)
 
-	nnoremap [denite] <Nop>
-	nmap <Leader>u [denite]
-	nnoremap <silent> [denite]b :Denite buffer<CR>
-	nnoremap <silent> [denite]c :Denite changes<CR>
-	nnoremap <silent> [denite]f :Denite file<CR>
-	nnoremap <silent> [denite]g :Denite grep<CR>
-	nnoremap <silent> [denite]h :Denite help<CR>
-	nnoremap <silent> [denite]h :Denite help<CR>
-	nnoremap <silent> [denite]l :Denite line<CR>
-	nnoremap <silent> [denite]t :Denite tag<CR>
-	nnoremap <silent> [denite]m :Denite file_mru<CR>
-	nnoremap <silent> [denite]u :Denite menu<CR>
+	function! s:add_denite_item(keys, name, cmd)
+		if exists('s:menus.' . join(a:keys[:-2], '.'))
+			execute 'call add(s:menus.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
+        else
+            execute 'let s:menus.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']}'
+		endif
+	endfunction
 
-	nmap <Leader>g [git]
-	let g:lmap.g = {'name': 'Git/'}
-	call s:leader_bind('nnoremap', 'g', 'b', '', 'Gblame'         , 'Git: Blame'                , 'blame'                , 1)
-	call s:leader_bind('nnoremap', 'g', 'B', '', 'Gbrowse'        , 'Git: Status'               , 'status'               , 1)
-	call s:leader_bind('nnoremap', 'g', 'c', '', ':Gcommit<Space>', 'Git: Commit'               , 'commit'               , 0)
-	call s:leader_bind('nnoremap', 'g', 'C', '', 'Gcheckout'      , 'Git: Checkout'             , 'checkout'             , 1)
-	call s:leader_bind('nnoremap', 'g', 'D', '', 'Gdiff HEAD'     , 'Git: Diff HEAD'            , 'diff HEAD'            , 1)
-	call s:leader_bind('nnoremap', 'g', 'd', '', 'Gdiff'          , 'Git: Diff'                 , 'diff'                 , 1)
-	call s:leader_bind('nnoremap', 'g', 'm', '', ':Gmove<Space>'  , 'Git: Move'                 , 'move'                 , 0)
-	call s:leader_bind('nnoremap', 'g', 'p', '', 'Gpull'          , 'Git: Pull'                 , 'pull'                 , 1)
-	call s:leader_bind('nnoremap', 'g', 'P', '', 'Gpush'          , 'Git: Push'                 , 'push'                 , 1)
-	call s:leader_bind('nnoremap', 'g', 'r', '', 'Gread'          , 'Git: Checkout current file', 'checkout-current-file', 1)
-	call s:leader_bind('nnoremap', 'g', 's', '', 'Gstatus'        , 'Git: Status'               , 'status'               , 1)
+    call add(s:leader_bind_callbacks, function('s:add_denite_item'))
 
 	" reset 50% winheight on window resize
 	augroup deniteresize
@@ -817,19 +770,69 @@ if dein#tap('denite.nvim')
 
 	call denite#custom#option('default', { 'prompt': 'λ' })
 
-	call denite#custom#var('file_rec', 'command', ['rg', '--files', '--glob', '!.git', ''])
+	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
+	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
+	call denite#custom#map('insert', '<C-N>' , '<denite:move_to_next_line>'             , 'noremap')
+	call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
+	call denite#custom#map('insert', '<C-G>' , '<denite:assign_next_txt>'               , 'noremap')
+	call denite#custom#map('insert', '<C-T>' , '<denite:assign_previous_line>'          , 'noremap')
+	call denite#custom#map('insert', '<C-h>' , '<denite:smart_delete_char_before_caret>', 'noremap')
+	call denite#custom#map('insert', '<Esc>' , '<denite:enter_mode:normal>'             , 'noremap')
+	call denite#custom#map('normal', '/'     , '<denite:enter_mode:insert>'             , 'noremap')
+	call denite#custom#map('normal', '<Esc>' , '<denite:quit>'                          , 'noremap')
+	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
+	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
 
-	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>', 'noremap')
-	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>', 'noremap')
-	call denite#custom#map('insert', '<C-N>' , '<denite:move_to_next_line>'    , 'noremap')
-	call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>'    , 'noremap')
-	call denite#custom#map('insert', '<C-G>' , '<denite:assign_next_txt>'      , 'noremap')
-	call denite#custom#map('insert', '<C-T>' , '<denite:assign_previous_line>' , 'noremap')
-	call denite#custom#map('normal', '/'     , '<denite:enter_mode:insert>'    , 'noremap')
-	call denite#custom#map('normal', '<Esc>' , '<denite:quit>'                 , 'noremap')
-	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>', 'noremap')
-	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'    , 'noremap')
-	call denite#custom#map('insert', '<Esc>' , '<denite:enter_mode:normal>'    , 'noremap')
+	let s:menus.u = {'description': 'Denite'}
+	let s:menus.u.command_candidates = []
+	call s:leader_bind('nnoremap <silent>', ['u', 'u'     ], 'Denite menu'        , 'menu'        , 'menu'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'h'     ], 'Denite help'        , 'help'        , 'help'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'b'     ], 'Denite buffer'      , 'buffer'      , 'buffer'      , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'g'     ], 'Denite grep'        , 'grep'        , 'grep'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'l'     ], 'Denite line'        , 'line'        , 'line'        , 1)
+
+	let s:menus.u.t = {'description': 'Tags'}
+	let s:menus.u.t.command_candidates = []
+	call s:leader_bind('nnoremap <silent>', ['u', 't', 'b'], 'Denite outline'     , 'buffer tag'  , 'buffer tag'  , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 't', 'g'], 'Denite tag'         , 'global tag'  , 'global tag'  , 1)
+
+	let s:menus.u.f = {'description': 'Files'}
+	let s:menus.u.f.command_candidates = []
+	call s:leader_bind('nnoremap <silent>', ['u', 'f', 'f'], 'Denite file'        , 'file'        , 'file'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'f', 'm'], 'Denite file_mru'    , 'file_mru'    , 'file_mru'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'f', 'r'], 'Denite file_rec'    , 'file_rec'    , 'file_rec'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['u', 'f', 'g'], 'Denite file_rec_git', 'file_rec_git', 'file_rec_git', 1)
+
+	if dein#tap('vim-fugitive')
+		let s:menus.g = {'description': 'Git'}
+		let s:menus.g.command_candidates = []
+		call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'         , 'Git: Blame'                , 'blame'                , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'        , 'Git: Browse'               , 'browse'               , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'c'], ':Gcommit<Space>', 'Git: Commit'               , 'commit'               , 0)
+		call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'      , 'Git: Checkout'             , 'checkout'             , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'     , 'Git: Diff HEAD'            , 'diff HEAD'            , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'          , 'Git: Diff'                 , 'diff'                 , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>'  , 'Git: Move'                 , 'move'                 , 0)
+		call s:leader_bind('nnoremap <silent>', ['g', 'p'], 'Gpull'          , 'Git: Pull'                 , 'pull'                 , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'          , 'Git: Push'                 , 'push'                 , 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'          , 'Git: Checkout current file', 'checkout-current-file', 1)
+		call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'        , 'Git: Status'               , 'status'               , 1)
+	endif
+
+	if executable('rg')
+		call denite#custom#var('file_rec', 'command', ['rg', '--files', '--no-heading', '--glob', '!.git', ''])
+		call denite#custom#var('grep', 'command', ['rg'])
+		call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+		call denite#custom#var('grep', 'recursive_opts', [])
+		call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+		call denite#custom#var('grep', 'separator', ['--'])
+		call denite#custom#var('grep', 'final_opts', [])
+	endif
+
+	if executable('git')
+        call denite#custom#alias('source', 'file_rec_git', 'file_rec')
+		call denite#custom#var('file_rec_git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
+	endif
 endif
 " }
 
@@ -857,6 +860,29 @@ if dein#tap('omnisharp-vim')
 		nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
 		"navigate down by method/property/field
 		nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
+		" Contextual code actions (requires CtrlP or unite.vim)
+		nnoremap <buffer><leader><space> :OmniSharpGetCodeActions<cr>
+		" Run code actions with text selected in visual mode to extract method
+		vnoremap <buffer><leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+
+		" rename with dialog
+		nnoremap <buffer><leader>nm :OmniSharpRename<cr>
+		nnoremap <buffer><F2> :OmniSharpRename<cr>
+		" rename without dialog - with cursor on the symbol to rename... ':Rename newname'
+		command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
+
+		" Force OmniSharp to reload the solution. Useful when switching branches etc.
+		nnoremap <buffer><leader>rl :OmniSharpReloadSolution<cr>
+		nnoremap <buffer><leader>cf :OmniSharpCodeFormat<cr>
+		" Load the current .cs file to the nearest project
+		nnoremap <buffer><leader>tp :OmniSharpAddToProject<cr>
+
+		" Start the omnisharp server for the current solution
+		nnoremap <buffer><leader>ss :OmniSharpStartServer<cr>
+		nnoremap <buffer><leader>sp :OmniSharpStopServer<cr>
+
+		" Add syntax highlighting for types and interfaces
+		nnoremap <buffer><leader>th :OmniSharpHighlightTypes<cr>
 	endfunction
 
 	augroup omnisharp_commands
@@ -874,40 +900,17 @@ if dein#tap('omnisharp-vim')
 
 		"show type information automatically when the cursor stops moving
 		autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-
-
 	augroup END
 
-	let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
+	if !executable('OmniSharp')
+		let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
+	endif
 
 	let g:OmniSharp_server_type = 'roslyn'
 	let g:OmniSharp_prefer_global_sln = 0
 	let g:OmniSharp_timeout = 10
 	let g:OmniSharp_selector_ui = 'unite'
 
-	" Contextual code actions (requires CtrlP or unite.vim)
-	nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
-	" Run code actions with text selected in visual mode to extract method
-	vnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
-
-	" rename with dialog
-	nnoremap <leader>nm :OmniSharpRename<cr>
-	nnoremap <F2> :OmniSharpRename<cr>
-	" rename without dialog - with cursor on the symbol to rename... ':Rename newname'
-	command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
-
-	" Force OmniSharp to reload the solution. Useful when switching branches etc.
-	nnoremap <leader>rl :OmniSharpReloadSolution<cr>
-	nnoremap <leader>cf :OmniSharpCodeFormat<cr>
-	" Load the current .cs file to the nearest project
-	nnoremap <leader>tp :OmniSharpAddToProject<cr>
-
-	" Start the omnisharp server for the current solution
-	nnoremap <leader>ss :OmniSharpStartServer<cr>
-	nnoremap <leader>sp :OmniSharpStopServer<cr>
-
-	" Add syntax highlighting for types and interfaces
-	nnoremap <leader>th :OmniSharpHighlightTypes<cr>
 endif
 " }
 
