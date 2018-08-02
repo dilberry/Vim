@@ -564,6 +564,11 @@ endif
 		" Include extra defintions for VB6 tags
 		let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
 		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
+		" Let Gutentags separate tags based on Visual Studio and VB6 solutions
+		" FIXME: This doesn't appear to work
+		" Likely looking for directories or exact match
+		" TODO: Look at g:gutentags_project_root_finder
+		let g:gutentags_project_root = ['*.sln', '*.vbp']
 	endif
 	" }
 " }
