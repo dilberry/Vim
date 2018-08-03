@@ -120,7 +120,7 @@
 
 		" Git {
 			" vim-fugitive
-			call dein#add('https://github.com/tpope/vim-fugitive.git', { 'rev': 'v2.3'})
+			call dein#add('https://github.com/tpope/vim-fugitive.git', { 'rev': 'v2.4'})
 
 			" gitv
 			call dein#add('https://github.com/gregsexton/gitv.git')
@@ -158,6 +158,9 @@
 
 			" denite
 			call dein#add('https://github.com/Shougo/denite.nvim.git')
+
+			" denite_tags
+			call dein#add('https://github.com/dilberry/denite_tags.git')
 
 			" vim-leader-guide
 			call dein#add('https://github.com/hecal3/vim-leader-guide.git')
@@ -553,7 +556,7 @@ endif
 	" Tagbar options {
 	if dein#tap('tagbar')
 		" Tagbar Toggle
-		nnoremap <silent> <F8> :TagbarToggle<CR>
+		call s:leader_bind('nnoremap', ['b', 't'], 'TagbarToggle', 'Buffer: Tagbar Toggle', 'tagbar_toggle', 1)
 		let g:tagbar_ctags_bin = $VIMHOME.'\utils\ctags\ctags.exe'
 		autocmd VimEnter * nested :call tagbar#autoopen(1)
 	endif
@@ -830,6 +833,7 @@ if dein#tap('denite.nvim')
 	call denite#custom#map('normal', '<Esc>' , '<denite:quit>'                          , 'noremap')
 	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
+	call denite#custom#map('normal', '<C-a>' , '<denite:multiple_mappings:denite:toggle_select_all' . ',denite:do_action:quickfix>', 'noremap')
 
 	let s:menus.b = {'description': 'Buffer'}
 	let s:menus.b.command_candidates = []
@@ -844,16 +848,15 @@ if dein#tap('denite.nvim')
 
 	let s:menus.t = {'description': 'Tags'}
 	let s:menus.t.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'buffer tag', 'buffer tag', 1)
-	" FIXME: Denite code is interpreting tag paths as relative
-	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'global tag', 'global tag', 1)
+	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline'      , 'buffer tag', 'buffer tag', 1)
+	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag_full_path', 'global tag', 'global tag', 1)
 
 	let s:menus.f = {'description': 'Files'}
 	let s:menus.f.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['f', 'f'], 'Denite file'        , 'file'        , 'file'        , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file_mru'    , 'file_mru'    , 'file_mru'    , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file_rec'    , 'file_rec'    , 'file_rec'    , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'Denite file_rec_git', 'file_rec_git', 'file_rec_git', 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'file'        , 'file'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file_mru'              , 'file_mru'    , 'file_mru'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file_rec'              , 'file_rec'    , 'file_rec'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file_rec_git', 'file_rec_git', 'file_rec_git', 1)
 
 	if dein#tap('vim-fugitive')
 		let s:menus.g = {'description': 'Git'}
@@ -927,9 +930,7 @@ if dein#tap('omnisharp-vim')
 		" Builds can also run asynchronously with vim-dispatch installed
 		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'b'] , 'wa!<cr>:OmniSharpBuildAsync'  , 'Build Async'          , 'build_async'          , 1)
 		" Force OmniSharp to reload the solution. Useful when switching branches etc.
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'r'] , 'OmniSharpReloadSolution'      , 'Reload Solution'      , 'reload_solution'      , 1)
-		" Load the current .cs file to the nearest project
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'a'] , 'OmniSharpAddToProject'        , 'Add To Project'       , 'add_to_project'       , 1)
+		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'r'] , 'OmniSharpRestartServer'       , 'Restart Server'       , 'restart_server'       , 1)
 
 		" Start the omnisharp server for the current solution
 		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 's'] , 'OmniSharpStartServer'         , 'Start Server'         , 'start_server'         , 1)
