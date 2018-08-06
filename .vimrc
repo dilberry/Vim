@@ -545,20 +545,27 @@ endif
 		autocmd!
 	augroup END
 
+	function! g:Astyler_call(astyle_mode) abort
+		call system('AStyle --mode=' . a:astyle_mode . ' --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')
+	endfunction
+
+	function! s:astyler_mappings(astyle_cmd) abort
+		echomsg a:astyle_cmd
+		call s:leader_bind('nnoremap <buffer>', ['m' , 'a'], a:astyle_cmd, 'Auto format', 'auto_format', 1)
+
+		call s:leader_binds_process()
+	endfunction
+
 	" C options {
-		autocmd AStyler FileType c :nnoremap <Leader>a :call system('AStyle --mode=c --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')<CR>
+		autocmd AStyler FileType c call s:astyler_mappings('call g:Astyler_call(' . string('c') . ')')
 	" }
 
 	" C++ options {
-		autocmd AStyler FileType cpp :nnoremap <Leader>a :call system('AStyle --mode=c --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')<CR>
+		autocmd AStyler FileType cpp call s:astyler_mappings('call g:Astyler_call(' . string('c') . ')')
 	" }
 
 	" java options {
-		autocmd AStyler FileType java :nnoremap <Leader>a :call system('AStyle --mode=java --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')<CR>
-	" }
-
-	" javascript options {
-		autocmd AStyler FileType javascript :nnoremap <Leader>a :call system('AStyle --mode=java --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')<CR>
+		autocmd AStyler FileType java s:astyler_mappings('call g:Astyler_call(' . string('java') . ')')
 	" }
 
 	if !executable('AStyle')
@@ -571,24 +578,30 @@ endif
 		autocmd!
 	augroup END
 
+	function! s:jsbeautify_mappings(jsbeautify_cmd) abort
+		call s:leader_bind('noremap <buffer>', ['m' , 'a'], a:jsbeautify_cmd, 'Auto format', 'auto_format', 1)
+
+		call s:leader_binds_process()
+	endfunction
+
 	" javascript options {
-		autocmd FileType javascript noremap <buffer>  <Leader>a :call JsBeautify()<cr>
+		autocmd JSBeautify FileType javascript call s:jsbeautify_mappings('call JsBeautify()')
 	" }
 
 	" json options {
-		autocmd FileType json noremap <buffer> <Leader>a :call JsonBeautify()<cr>
+		autocmd JSBeautify FileType json call s:jsbeautify_mappings('call JsBeautify()')
 	" }
 
 	" jsx options {
-		autocmd FileType jsx noremap <buffer> <Leader>a :call JsxBeautify()<cr>
+		autocmd JSBeautify FileType jsx call s:jsbeautify_mappings('call JsxBeautify()')
 	" }
 
 	" html options {
-		autocmd FileType html noremap <buffer> <Leader>a :call HtmlBeautify()<cr>
+		autocmd JSBeautify FileType html call s:jsbeautify_mappings('call HtmlBeautify()')
 	" }
 
 	" css options {
-		autocmd FileType css noremap <buffer> <Leader>a :call CSSBeautify()<cr>
+		autocmd JSBeautify FileType css call s:jsbeautify_mappings('call CSSBeautify()')
 	" }
 
 	if !executable('node') || !dein#tap('vim-jsbeautify')
@@ -703,6 +716,7 @@ if dein#tap('deoplete.nvim')
 	call deoplete#custom#source('cs', 'matchers', ['matcher_fuzzy'])
 
 	" Vim options
+	let g:deoplete#sources.vim = ['omni', 'buffer', 'file']
 	call deoplete#custom#source('vim', 'disabled_syntaxes', ['Comment', 'String'])
 
 	" Select on Tab
@@ -728,6 +742,7 @@ if dein#tap('vim-leader-guide')
 	if dein#tap('denite.nvim')
         let g:lmap.b = {'name': 'Buffer/'}
         let g:lmap.f = {'name': 'Files/'}
+        let g:lmap.m = {'name': 'Modify/'}
         let g:lmap.t = {'name': 'Tags/'}
         let g:lmap.u = {'name': 'Denite/'}
 	endif
@@ -800,6 +815,9 @@ if dein#tap('denite.nvim')
 	call s:leader_bind('nnoremap <silent>', ['u', 'b'], 'Denite buffer', 'buffer', 'buffer', 1)
 	call s:leader_bind('nnoremap <silent>', ['u', 'g'], 'Denite grep'  , 'grep'  , 'grep'  , 1)
 	call s:leader_bind('nnoremap <silent>', ['u', 'l'], 'Denite line'  , 'line'  , 'line'  , 1)
+
+	let s:menus.m = {'description': 'Modify'}
+	let s:menus.m.command_candidates = []
 
 	let s:menus.t = {'description': 'Tags'}
 	let s:menus.t.command_candidates = []
