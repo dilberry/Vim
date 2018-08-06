@@ -69,11 +69,6 @@
 			let $PATH .= ';'.$VIMHOME.'\utils\ctags\'
 		endif
 
-		if !executable('fzf')
-			" Add fzf binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\fzf\'
-		endif
-
 		if !executable('rg')
 			" Add ripgrep binary path to PATH
 			let $PATH .= ';'.$VIMHOME.'\utils\rg\'
@@ -96,8 +91,8 @@
 		call dein#add(g:dein_plugins_dir)
 
 		" UI {
-			" syntastic
-			call dein#add('https://github.com/vim-syntastic/syntastic.git')
+			" ale
+			call dein#add('https://github.com/w0rp/ale.git')
 
 			" vim-airline
 			call dein#add('https://github.com/vim-airline/vim-airline.git')
@@ -150,12 +145,6 @@
 		" }
 
 		" Browsing {
-			" fzf
-			call dein#add('https://github.com/junegunn/fzf.git', { 'merged': 0 })
-
-			" fzf-vim
-			call dein#add('https://github.com/junegunn/fzf.vim.git', { 'merged': 0, 'depends': ['fzf'] })
-
 			" denite
 			call dein#add('https://github.com/Shougo/denite.nvim.git')
 
@@ -191,6 +180,9 @@
 
 			" deoplete-omnisharp
 			call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
+
+			" neco-vim
+			call dein#add('https://github.com/Shougo/neco-vim.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
 		" }
 
 		" Tags {
@@ -317,7 +309,7 @@
 
 " Misc options {
 	set backspace=indent,eol,start " Allow backspacing over everything in insert mode.
-	set ruler                      " Show the cursor position all the time
+	set ruler                      " Show the cursor position all the time, not applicable in airline
 	set showcmd                    " Display incomplete commands
 	set nowrap                     " Set lines to no wrap
 	set viminfo+=!                 " Set viminfo to store and restore global variables
@@ -438,33 +430,93 @@
 if dein#tap('vim-airline')
 	set laststatus=2 " Show 2 lines of status
 	set noshowmode   " Don't show mode on statusline, let airline do it instead
-	let g:airline_detect_modified              = 1
-	let g:airline#extensions#tagbar#enabled    = 1
-	let g:airline#extensions#syntastic#enabled = 1
-	let g:airline#extensions#hunks#enabled     = 1
+	let g:airline_detect_modified           = 1
+	let g:airline#extensions#tagbar#enabled = 1
+	let g:airline#extensions#ale#enabled    = 1
+	let g:airline#extensions#hunks#enabled  = 1
 endif
 " }
 
 " Filetype plugins {
-	" syntastic settings {
-	if dein#tap('syntastic')
-		let g:syntastic_mode_map = { 'mode' : 'passive', 'active_filetypes' : [], 'passive_filetypes' : [] }
-        call s:leader_bind('nnoremap', ['b', 's'], 'SyntasticCheck', 'Buffer: Syntax Check', 'syntax_check', 1)
+	" ale settings {
+	if dein#tap('ale')
+        call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Buffer: Linting Toggle', 'linting_toggle', 1)
 	endif
+	" }
 
 	" Python {
-		" syntastic settings {
-		if dein#tap('syntastic')
-			let g:syntastic_python_checkers         = ['pylint']
-			let g:syntastic_python_pylint_post_args = '--rcfile='.'"'.$VIMHOME.'\pylint\pylint.rc'.'"'
-		endif
-		" }
 	" }
 
 	" C# {
-		" syntastic settings {
-		if dein#tap('syntastic')
-			let g:syntastic_cs_checkers = ['code_checker']
+		" Omnisharp options {
+		if dein#tap('omnisharp-vim')
+			function! s:omnisharp_mappings() abort
+				"The following commands are contextual, based on the current cursor position.
+				nnoremap <buffer>gd :OmniSharpGotoDefinition<cr>
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'i'] , 'OmniSharpFindImplementations' , 'Find Implementations' , 'find_implementations' , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 't'] , 'OmniSharpFindType'            , 'Find Type'            , 'find_type'            , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 's'] , 'OmniSharpFindSymbol'          , 'Find Symbol'          , 'find_symbol'          , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'u'] , 'OmniSharpFindUsages'          , 'Find Usages'          , 'find_usages'          , 1)
+				"finds members in the current buffer
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'm'] , 'OmniSharpFindMembers'         , 'Find Members'         , 'find_members'         , 1)
+
+				" cursor can be anywhere on the line containing an issue
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'i'] , 'OmniSharpFixIssue'            , 'Fix Issue'            , 'fix_issue'            , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'u'] , 'OmniSharpFixUsings'           , 'Fix Usings'           , 'fix_usings'           , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'f'] , 'OmniSharpCodeFormat'          , 'Format Code'          , 'format_code'          , 1)
+
+				" rename with dialog
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'r'] , 'OmniSharpRename'              , 'Rename'               , 'rename'               , 1)
+				nnoremap <buffer><F2> :OmniSharpRename<cr>
+				" rename without dialog - with cursor on the symbol to rename... ':Rename newname'
+				command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
+
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 't'] , 'OmniSharpTypeLookup'          , 'Lookup Type'          , 'lookup_type'          , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'd'] , 'OmniSharpDocumentation'       , 'Lookup Documentation' , 'lookup_documentation' , 1)
+				" Contextual code actions (requires CtrlP or unite.vim)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'a'] , 'OmniSharpGetCodeActions'      , 'Get Code Actions'     , 'get_code_actions'     , 1)
+				call s:leader_bind('vnoremap <buffer>' , ['o' , 'l' , 'a'] , 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', 1)
+
+				"navigate up by method/property/field
+				nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
+				"navigate down by method/property/field
+				nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
+
+				" Builds can also run asynchronously with vim-dispatch installed
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'b'] , 'wa!<cr>:OmniSharpBuildAsync'  , 'Build Async'          , 'build_async'          , 1)
+				" Force OmniSharp to reload the solution. Useful when switching branches etc.
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'r'] , 'OmniSharpRestartServer'       , 'Restart Server'       , 'restart_server'       , 1)
+
+				" Start the omnisharp server for the current solution
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 's'] , 'OmniSharpStartServer'         , 'Start Server'         , 'start_server'         , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'p'] , 'OmniSharpStopServer'          , 'Stop Server'          , 'stop_server'          , 1)
+				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'h'] , 'OmniSharpHighlightTypes'      , 'Highlight Types'      , 'highlight_types'      , 1)
+
+				call s:leader_binds_process()
+			endfunction
+
+			augroup omnisharp_commands
+				autocmd!
+
+				"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
+				autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+
+				"Set omnisharp key mappings
+				autocmd FileType cs call s:omnisharp_mappings()
+
+				"show type information automatically when the cursor stops moving
+				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+			augroup END
+
+			if !executable('OmniSharp')
+				let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
+			endif
+
+			let g:OmniSharp_server_type = 'roslyn'
+			let g:OmniSharp_prefer_global_sln = 0
+			let g:OmniSharp_timeout = 10
+			let g:OmniSharp_selector_ui = 'unite'
+
 		endif
 		" }
 	" }
@@ -598,117 +650,6 @@ if dein#tap('rainbow')
 endif
 " }
 
-" fzf options {
-if dein#tap('fzf.vim')
-	" Default fzf layout
-	" - down / up / left / right
-	let g:fzf_layout = { 'down': '~40%' }
-
-	" CTRL-A CTRL-Q to select all and build quickfix list
-	function! s:build_quickfix_list(lines)
-		call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-		copen
-		cc
-	endfunction
-
-	function! s:align_lists(lists)
-		let maxes = {}
-		for list in a:lists
-			let i = 0
-			while i < len(list)
-				let maxes[i] = max([get(maxes, i, 0), len(list[i])])
-				let i += 1
-			endwhile
-		endfor
-
-		for list in a:lists
-			call map(list, "printf('%-'.maxes[v:key].'s', v:val)")
-		endfor
-
-		return a:lists
-	endfunction
-
-	function! s:btags_source(tag_cmds)
-		if !filereadable(expand('%'))
-			throw 'Save the file first'
-		endif
-
-		for cmd in a:tag_cmds
-			let lines = split(system(cmd), "\n")
-			if !v:shell_error && len(lines)
-				break
-			endif
-		endfor
-
-		if v:shell_error
-			throw get(lines, 0, 'Failed to extract tags')
-		elseif empty(lines)
-			throw 'No tags found'
-		endif
-
-		return map(s:align_lists(map(lines, 'split(v:val, "\t")')), 'join(v:val, "\t")')
-	endfunction
-
-	function! s:btags_sink(line)
-		execute split(a:line, "\t")[2]
-	endfunction
-
-	function! s:btags(query, ...)
-		let args = copy(a:000)
-		let escaped = fzf#shellescape(expand('%'))
-		let null = s:is_windows ? 'nul' : '/dev/null'
-		let sort = has('unix') && !has('win32unix') && executable('sort') ? '| sort -s -k 5' : ''
-		let tag_cmds = (len(args) > 1 && type(args[0]) != type({})) ? remove(args, 0) : [
-		\ printf('ctags -f - --sort=yes --excmd=number --language-force=%s --options=%s %s 2> %s %s', &filetype, shellescape($VIMHOME.'\utils\ctags\ctags.cfg'), escaped, null, sort),
-		\ printf('ctags -f - --sort=yes --excmd=number --options=%s %s 2> %s %s', shellescape($VIMHOME.'\utils\ctags\ctags.cfg'), escaped, null, sort)]
-
-		if type(tag_cmds) != type([])
-			let tag_cmds = [tag_cmds]
-		endif
-
-		try
-			call fzf#run({
-			\ 'source':  s:btags_source(tag_cmds),
-			\ 'options': '--reverse -m -d "\t" --with-nth 1,4.. -n 1 --tiebreak=index --prompt "BTags> "',
-			\ 'down'   : '40%',
-			\ 'sink'   : function('s:btags_sink')})
-		catch
-			echohl WarningMsg
-			echom v:exception
-			echohl None
-		endtry
-	endfunction
-
-	command! -bang -nargs=* BTags call s:btags(<q-args>, <bang>0)
-
-	" Pretend to be CtrlP
-	noremap <c-p> :BTags<CR>
-
-	let g:fzf_action = {
-		\ 'ctrl-q': function('s:build_quickfix_list'),
-		\ 'ctrl-t': 'tab split',
-		\ 'ctrl-x': 'split',
-		\ 'ctrl-v': 'vsplit'
-	\}
-
-	let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
-
-	if executable("rg")
-		" Find files using Ripgrep and FZF
-		command! -bang -nargs=* Find
-		\ call fzf#vim#grep(
-		\   'rg --column --line-number --no-heading --color=always --ignore-case '.shellescape(<q-args>), 1,
-		\   <bang>0 ? fzf#vim#with_preview('up:60%')
-		\           : fzf#vim#with_preview('right:50%:hidden', '?'),
-		\   <bang>0)
-
-		command! -bang -nargs=* GFind
-		\ call fzf#vim#grep('git grep --line-number '.shellescape(<q-args>).' -- :/', 0, <bang>0)
-
-	endif
-endif
-" }
-
 " vim-vinegar options {
 if dein#tap('vim-vinegar')
 	autocmd FileType netrw setl bufhidden=wipe
@@ -728,6 +669,14 @@ if dein#tap('vim-fugitive')
     call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'          , 'Git: Push'                 , 'push'                 , 1)
     call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'          , 'Git: Checkout current file', 'checkout-current-file', 1)
     call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'        , 'Git: Status'               , 'status'               , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'         , 'Git: Write'                , 'write'                , 1)
+endif
+" }
+
+" gitv options {
+if dein#tap('gitv')
+    call s:leader_bind('nnoremap <silent>', ['g', 'v'], 'Gitv'           , 'Git: Version (Commits)'    , 'version_commits'      , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'V'], '!Gitv'          , 'Git: Version (Files)'      , 'version_files'        , 1)
 endif
 " }
 
@@ -744,11 +693,17 @@ if dein#tap('deoplete.nvim')
 	let g:deoplete#omni#input_patterns = {}
 	let g:deoplete#omni#functions = {}
 	let g:deoplete#sources = {}
-	let g:deoplete#sources._ = ['buffer', 'file']
+	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+	call deoplete#custom#source('buffer', 'rank', 100)
 
 	" Csharp options
 	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
 	let g:deoplete#sources.cs = ['omni', 'buffer', 'file']
+	call deoplete#custom#source('cs', 'disabled_syntaxes', ['Comment', 'String'])
+	call deoplete#custom#source('cs', 'matchers', ['matcher_fuzzy'])
+
+	" Vim options
+	call deoplete#custom#source('vim', 'disabled_syntaxes', ['Comment', 'String'])
 
 	" Select on Tab
 	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
@@ -890,82 +845,6 @@ if dein#tap('denite.nvim')
         call denite#custom#alias('source', 'file_rec_git', 'file_rec')
 		call denite#custom#var('file_rec_git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
 	endif
-endif
-" }
-
-" Omnisharp options {
-if dein#tap('omnisharp-vim')
-	function! s:omnisharp_mapping() abort
-		"The following commands are contextual, based on the current cursor position.
-		nnoremap <buffer>gd :OmniSharpGotoDefinition<cr>
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'i'] , 'OmniSharpFindImplementations' , 'Find Implementations' , 'find_implementations' , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 't'] , 'OmniSharpFindType'            , 'Find Type'            , 'find_type'            , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 's'] , 'OmniSharpFindSymbol'          , 'Find Symbol'          , 'find_symbol'          , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'u'] , 'OmniSharpFindUsages'          , 'Find Usages'          , 'find_usages'          , 1)
-		"finds members in the current buffer
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'm'] , 'OmniSharpFindMembers'         , 'Find Members'         , 'find_members'         , 1)
-
-		" cursor can be anywhere on the line containing an issue
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'i'] , 'OmniSharpFixIssue'            , 'Fix Issue'            , 'fix_issue'            , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'u'] , 'OmniSharpFixUsings'           , 'Fix Usings'           , 'fix_usings'           , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'f'] , 'OmniSharpCodeFormat'          , 'Format Code'          , 'format_code'          , 1)
-
-		" rename with dialog
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'r'] , 'OmniSharpRename'              , 'Rename'               , 'rename'               , 1)
-		nnoremap <buffer><F2> :OmniSharpRename<cr>
-		" rename without dialog - with cursor on the symbol to rename... ':Rename newname'
-		command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
-
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 't'] , 'OmniSharpTypeLookup'          , 'Lookup Type'          , 'lookup_type'          , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'd'] , 'OmniSharpDocumentation'       , 'Lookup Documentation' , 'lookup_documentation' , 1)
-		" Contextual code actions (requires CtrlP or unite.vim)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'a'] , 'OmniSharpGetCodeActions'      , 'Get Code Actions'     , 'get_code_actions'     , 1)
-		call s:leader_bind('vnoremap <buffer>' , ['o' , 'l' , 'a'] , 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', 1)
-
-		"navigate up by method/property/field
-		nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
-		"navigate down by method/property/field
-		nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
-
-		" Builds can also run asynchronously with vim-dispatch installed
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'b'] , 'wa!<cr>:OmniSharpBuildAsync'  , 'Build Async'          , 'build_async'          , 1)
-		" Force OmniSharp to reload the solution. Useful when switching branches etc.
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'r'] , 'OmniSharpRestartServer'       , 'Restart Server'       , 'restart_server'       , 1)
-
-		" Start the omnisharp server for the current solution
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 's'] , 'OmniSharpStartServer'         , 'Start Server'         , 'start_server'         , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'p'] , 'OmniSharpStopServer'          , 'Stop Server'          , 'stop_server'          , 1)
-		call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'h'] , 'OmniSharpHighlightTypes'      , 'Highlight Types'      , 'highlight_types'      , 1)
-
-		call s:leader_binds_process()
-	endfunction
-
-	augroup omnisharp_commands
-		autocmd!
-
-		"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
-		autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-
-		"Set omnisharp key mappings
-		autocmd FileType cs call s:omnisharp_mapping()
-
-		" automatic syntax check on events (TextChanged requires Vim 7.4)
-		" autocmd BufEnter,TextChanged,InsertLeave *.cs SyntasticCheck
-		autocmd BufEnter,BufWritePost *.cs SyntasticCheck
-
-		"show type information automatically when the cursor stops moving
-		autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-	augroup END
-
-	if !executable('OmniSharp')
-		let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
-	endif
-
-	let g:OmniSharp_server_type = 'roslyn'
-	let g:OmniSharp_prefer_global_sln = 0
-	let g:OmniSharp_timeout = 10
-	let g:OmniSharp_selector_ui = 'unite'
-
 endif
 " }
 
