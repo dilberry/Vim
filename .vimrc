@@ -151,6 +151,9 @@
 			" denite_tags
 			call dein#add('https://github.com/dilberry/denite_tags.git')
 
+			" denite-ale
+			call dein#add('https://github.com/iyuuya/denite-ale.git')
+
 			" vim-leader-guide
 			call dein#add('https://github.com/hecal3/vim-leader-guide.git')
 
@@ -169,9 +172,6 @@
 				call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
 			endif
 
-			" neco-syntax
-			call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': 'deoplete.nvim'})
-
 			" omnisharp-vim
 			call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
 
@@ -183,6 +183,9 @@
 
 			" neco-vim
 			call dein#add('https://github.com/Shougo/neco-vim.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+
+			" neco-syntax
+			call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
 		" }
 
 		" Tags {
@@ -281,7 +284,7 @@
 	let mapleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
-    call s:leader_bind('nnoremap', ['b', 'M'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Buffer: Fix Line Endings', 'fix_line_endings', 1)
+    call s:leader_bind('nnoremap', ['b', 'M'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings', 'fix_line_endings', 1)
 
 	" Buffer cycle
 	nnoremap <Tab> :bnext<CR>
@@ -422,7 +425,7 @@
 	endfunction
 
 	command! Slickfix call Slickfix()
-    call s:leader_bind('nnoremap', ['b', 'f'], 'Slickfix', 'Buffer: Slickfix', 'slickfix', 1)
+    call s:leader_bind('nnoremap', ['b', 'f'], 'Slickfix', 'Slickfix', 'slickfix', 1)
 	autocmd! BufReadPost quickfix nnoremap <buffer> <Space> :call SlickWinChange()<CR>
 " }
 
@@ -440,7 +443,7 @@ endif
 " Filetype plugins {
 	" ale settings {
 	if dein#tap('ale')
-        call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Buffer: Linting Toggle', 'linting_toggle', 1)
+        call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', 1)
 	endif
 	" }
 
@@ -450,32 +453,64 @@ endif
 	" C# {
 		" Omnisharp options {
 		if dein#tap('omnisharp-vim')
+			function! s:omnisharp_menu_check() abort
+				if dein#tap('denite.nvim')
+					if !exists('s:menus.o')
+						let s:menus.o = {'description': 'Omnisharp'}
+						let s:menus.o.command_candidates = []
+						let s:menus.o.f = {'description': 'Find'}
+						let s:menus.o.f.command_candidates = []
+						let s:menus.o.g = {'description': 'Goto'}
+						let s:menus.o.g.command_candidates = []
+						let s:menus.o.m = {'description': 'Modify'}
+						let s:menus.o.m.command_candidates = []
+						let s:menus.o.l = {'description': 'Lookup'}
+						let s:menus.o.l.command_candidates = []
+						let s:menus.o.s = {'description': 'Solution'}
+						let s:menus.o.s.command_candidates = []
+					endif
+				endif
+
+				if dein#tap('vim-leader-guide')
+					if !exists('g:lmap.o')
+						let g:lmap.o = {'name': 'Omnisharp/'}
+						let g:lmap.o.f = {'name': 'Find/'}
+						let g:lmap.o.g = {'name': 'Goto/'}
+						let g:lmap.o.m = {'name': 'Modify/'}
+						let g:lmap.o.l = {'name': 'Lookup/'}
+						let g:lmap.o.s = {'name': 'Solution/'}
+					endif
+				endif
+			endfunction
+
 			function! s:omnisharp_mappings() abort
+				call s:omnisharp_menu_check()
+
 				"The following commands are contextual, based on the current cursor position.
-				nnoremap <buffer>gd :OmniSharpGotoDefinition<cr>
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'i'] , 'OmniSharpFindImplementations' , 'Find Implementations' , 'find_implementations' , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 't'] , 'OmniSharpFindType'            , 'Find Type'            , 'find_type'            , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 's'] , 'OmniSharpFindSymbol'          , 'Find Symbol'          , 'find_symbol'          , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'u'] , 'OmniSharpFindUsages'          , 'Find Usages'          , 'find_usages'          , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'g', 'd'], 'OmniSharpGotoDefinition'     , 'Goto Definition'     , 'goto_definition'     , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'f', 'i'], 'OmniSharpFindImplementations', 'Find Implementations', 'find_implementations', 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'f', 't'], 'OmniSharpFindType'           , 'Find Type'           , 'find_type'           , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'f', 's'], 'OmniSharpFindSymbol'         , 'Find Symbol'         , 'find_symbol'         , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'f', 'u'], 'OmniSharpFindUsages'         , 'Find Usages'         , 'find_usages'         , 1)
 				"finds members in the current buffer
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'f' , 'm'] , 'OmniSharpFindMembers'         , 'Find Members'         , 'find_members'         , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'f', 'm'], 'OmniSharpFindMembers'        , 'Find Members'        , 'find_members'        , 1)
 
 				" cursor can be anywhere on the line containing an issue
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'i'] , 'OmniSharpFixIssue'            , 'Fix Issue'            , 'fix_issue'            , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'u'] , 'OmniSharpFixUsings'           , 'Fix Usings'           , 'fix_usings'           , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'f'] , 'OmniSharpCodeFormat'          , 'Format Code'          , 'format_code'          , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'm', 'i'], 'OmniSharpFixIssue'           , 'Fix Issue'           , 'fix_issue'           , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'm', 'u'], 'OmniSharpFixUsings'          , 'Fix Usings'          , 'fix_usings'          , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'm', 'f'], 'OmniSharpCodeFormat'         , 'Format Code'         , 'format_code'         , 1)
 
 				" rename with dialog
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'm' , 'r'] , 'OmniSharpRename'              , 'Rename'               , 'rename'               , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'm', 'r'], 'OmniSharpRename'             , 'Rename'              , 'rename'              , 1)
 				nnoremap <buffer><F2> :OmniSharpRename<cr>
 				" rename without dialog - with cursor on the symbol to rename... ':Rename newname'
 				command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
 
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 't'] , 'OmniSharpTypeLookup'          , 'Lookup Type'          , 'lookup_type'          , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'd'] , 'OmniSharpDocumentation'       , 'Lookup Documentation' , 'lookup_documentation' , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'l', 't'], 'OmniSharpTypeLookup'         , 'Lookup Type'         , 'lookup_type'         , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'l', 'd'], 'OmniSharpDocumentation'      , 'Lookup Documentation', 'lookup_documentation', 1)
 				" Contextual code actions (requires CtrlP or unite.vim)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 'l' , 'a'] , 'OmniSharpGetCodeActions'      , 'Get Code Actions'     , 'get_code_actions'     , 1)
-				call s:leader_bind('vnoremap <buffer>' , ['o' , 'l' , 'a'] , 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 'l', 'a'], 'OmniSharpGetCodeActions'     , 'Get Code Actions'    , 'get_code_actions'    , 1)
+				call s:leader_bind('vnoremap <buffer>', ['o', 'l', 'a'], 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', 1)
 
 				"navigate up by method/property/field
 				nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
@@ -483,14 +518,14 @@ endif
 				nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
 
 				" Builds can also run asynchronously with vim-dispatch installed
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'b'] , 'wa!<cr>:OmniSharpBuildAsync'  , 'Build Async'          , 'build_async'          , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'b'], 'wa!<cr>:OmniSharpBuildAsync' , 'Build Async'         , 'build_async'         , 1)
 				" Force OmniSharp to reload the solution. Useful when switching branches etc.
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'r'] , 'OmniSharpRestartServer'       , 'Restart Server'       , 'restart_server'       , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'r'], 'OmniSharpRestartServer'      , 'Restart Server'      , 'restart_server'      , 1)
 
 				" Start the omnisharp server for the current solution
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 's'] , 'OmniSharpStartServer'         , 'Start Server'         , 'start_server'         , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'p'] , 'OmniSharpStopServer'          , 'Stop Server'          , 'stop_server'          , 1)
-				call s:leader_bind('nnoremap <buffer>' , ['o' , 's' , 'h'] , 'OmniSharpHighlightTypes'      , 'Highlight Types'      , 'highlight_types'      , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 's'], 'OmniSharpStartServer'        , 'Start Server'        , 'start_server'        , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'p'], 'OmniSharpStopServer'         , 'Stop Server'         , 'stop_server'         , 1)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'h'], 'OmniSharpHighlightTypes'     , 'Highlight Types'     , 'highlight_types'     , 1)
 
 				call s:leader_binds_process()
 			endfunction
@@ -545,27 +580,43 @@ endif
 		autocmd!
 	augroup END
 
-	function! g:Astyler_call(astyle_mode) abort
+	function! g:AstylerCall(astyle_mode) abort
 		call system('AStyle --mode=' . a:astyle_mode . ' --style=allman -t -U -S -p -n --delete-empty-lines '.'"'.expand('%').'"')
 	endfunction
 
-	function! s:astyler_mappings(astyle_cmd) abort
-		echomsg a:astyle_cmd
-		call s:leader_bind('nnoremap <buffer>', ['m' , 'a'], a:astyle_cmd, 'Auto format', 'auto_format', 1)
+	function! s:formatter_menu_check() abort
+		if dein#tap('denite.nvim')
+			if !exists('s:menus.m')
+				let s:menus.m = {'description': 'Modify'}
+				let s:menus.m.command_candidates = []
+			endif
+		endif
+
+		if dein#tap('vim-leader-guide')
+			if !exists('g:lmap.m')
+				let g:lmap.m = {'name': 'Modify/'}
+			endif
+		endif
+	endfunction
+
+	function! s:formatter_mappings(format_cmd) abort
+		call s:formatter_menu_check()
+
+		call s:leader_bind('nnoremap <buffer>', ['m' , 'a'], a:format_cmd, 'Auto format', 'auto_format', 1)
 
 		call s:leader_binds_process()
 	endfunction
 
 	" C options {
-		autocmd AStyler FileType c call s:astyler_mappings('call g:Astyler_call(' . string('c') . ')')
+		autocmd AStyler FileType c call s:formatter_mappings('call g:AstylerCall(' . string('c') . ')')
 	" }
 
 	" C++ options {
-		autocmd AStyler FileType cpp call s:astyler_mappings('call g:Astyler_call(' . string('c') . ')')
+		autocmd AStyler FileType cpp call s:formatter_mappings('call g:AstylerCall(' . string('c') . ')')
 	" }
 
 	" java options {
-		autocmd AStyler FileType java s:astyler_mappings('call g:Astyler_call(' . string('java') . ')')
+		autocmd AStyler FileType java s:formatter_mappings('call g:AstylerCall(' . string('java') . ')')
 	" }
 
 	if !executable('AStyle')
@@ -578,30 +629,24 @@ endif
 		autocmd!
 	augroup END
 
-	function! s:jsbeautify_mappings(jsbeautify_cmd) abort
-		call s:leader_bind('noremap <buffer>', ['m' , 'a'], a:jsbeautify_cmd, 'Auto format', 'auto_format', 1)
-
-		call s:leader_binds_process()
-	endfunction
-
 	" javascript options {
-		autocmd JSBeautify FileType javascript call s:jsbeautify_mappings('call JsBeautify()')
+		autocmd JSBeautify FileType javascript call s:formatter_mappings('call JsBeautify()')
 	" }
 
 	" json options {
-		autocmd JSBeautify FileType json call s:jsbeautify_mappings('call JsBeautify()')
+		autocmd JSBeautify FileType json call s:formatter_mappings('call JsBeautify()')
 	" }
 
 	" jsx options {
-		autocmd JSBeautify FileType jsx call s:jsbeautify_mappings('call JsxBeautify()')
+		autocmd JSBeautify FileType jsx call s:formatter_mappings('call JsxBeautify()')
 	" }
 
 	" html options {
-		autocmd JSBeautify FileType html call s:jsbeautify_mappings('call HtmlBeautify()')
+		autocmd JSBeautify FileType html call s:formatter_mappings('call HtmlBeautify()')
 	" }
 
 	" css options {
-		autocmd JSBeautify FileType css call s:jsbeautify_mappings('call CSSBeautify()')
+		autocmd JSBeautify FileType css call s:formatter_mappings('call CSSBeautify()')
 	" }
 
 	if !executable('node') || !dein#tap('vim-jsbeautify')
@@ -611,9 +656,22 @@ endif
 	endif
 " }
 
+" Align options {
+if dein#tap('Align')
+	" Prevent mappings
+	let g:loaded_AlignMaps = 'v43'
+	let g:loaded_AlignMapsPlugin = 'v43'
+	let g:loaded_cecutil = 'v17'
+endif
+" }
+
 " indent-guides options {
 if dein#tap('vim-indent-guides')
 	let g:indent_guides_enable_on_vim_startup = 1
+	let g:indent_guides_default_mapping = 0 " Disable leader mapping
+
+	" indent-guides toggle
+    call s:leader_bind('nnoremap', ['b', 'g'], 'IndentGuidesToggle', 'Indent Guides Toggle', 'indent_guides_toggle', 1)
 endif
 " }
 
@@ -621,7 +679,7 @@ endif
 	" Tagbar options {
 	if dein#tap('tagbar')
 		" Tagbar Toggle
-		call s:leader_bind('nnoremap', ['b', 't'], 'TagbarToggle', 'Buffer: Tagbar Toggle', 'tagbar_toggle', 1)
+		call s:leader_bind('nnoremap', ['b', 't'], 'TagbarToggle', 'Tagbar Toggle', 'tagbar_toggle', 1)
 		let g:tagbar_ctags_bin = $VIMHOME.'\utils\ctags\ctags.exe'
 		autocmd VimEnter * nested :call tagbar#autoopen(1)
 	endif
@@ -659,7 +717,7 @@ if dein#tap('rainbow')
 	\}
 
 	" rainbow_parentheses toggle
-    call s:leader_bind('nnoremap', ['b', 'r'], 'RainbowToggle', 'Buffer: Rainbow Toggle', 'rainbow_toggle', 1)
+    call s:leader_bind('nnoremap', ['b', 'r'], 'RainbowToggle', 'Rainbow Toggle', 'rainbow_toggle', 1)
 endif
 " }
 
@@ -671,25 +729,34 @@ endif
 
 " vim-fugitive options {
 if dein#tap('vim-fugitive')
-    call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'         , 'Git: Blame'                , 'blame'                , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'        , 'Git: Browse'               , 'browse'               , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'c'], ':Gcommit<Space>', 'Git: Commit'               , 'commit'               , 0)
-    call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'      , 'Git: Checkout'             , 'checkout'             , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'     , 'Git: Diff HEAD'            , 'diff HEAD'            , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'          , 'Git: Diff'                 , 'diff'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>'  , 'Git: Move'                 , 'move'                 , 0)
-    call s:leader_bind('nnoremap <silent>', ['g', 'p'], 'Gpull'          , 'Git: Pull'                 , 'pull'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'          , 'Git: Push'                 , 'push'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'          , 'Git: Checkout current file', 'checkout-current-file', 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'        , 'Git: Status'               , 'status'               , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'         , 'Git: Write'                , 'write'                , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'    , 'Checkout'             , 'checkout'             , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'   , 'Diff HEAD'            , 'diff HEAD'            , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'        , 'Diff'                 , 'diff'                 , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>', 'Move'                 , 'move'                 , 0)
+    call s:leader_bind('nnoremap <silent>', ['g', 'p'], 'Gpull'        , 'Pull'                 , 'pull'                 , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'        , 'Push'                 , 'push'                 , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'        , 'Checkout current file', 'checkout-current-file', 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'      , 'Status'               , 'status'               , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'       , 'Write'                , 'write'                , 1)
 endif
 " }
 
 " gitv options {
 if dein#tap('gitv')
-    call s:leader_bind('nnoremap <silent>', ['g', 'v'], 'Gitv'           , 'Git: Version (Commits)'    , 'version_commits'      , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'V'], '!Gitv'          , 'Git: Version (Files)'      , 'version_files'        , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'v'], 'Gitv'         , 'Version (Commits)'    , 'version_commits'      , 1)
+    call s:leader_bind('nnoremap <silent>', ['g', 'V'], 'Gitv!'        , 'Version (Files)'      , 'version_files'        , 1)
+endif
+" }
+
+" vim-gitgutter options {
+if dein#tap('vim-gitgutter')
+	" Disable leader mappings
+	let g:gitgutter_map_keys = 0
+	nmap [c <Plug>GitGutterPrevHunk
+	nmap ]c <Plug>GitGutterNextHunk
 endif
 " }
 
@@ -698,6 +765,9 @@ if dein#tap('deoplete.nvim')
 	" General options
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#file#enable_buffer_path = 1
+	let g:deoplete#auto_completion_start_length = 2
+	let g:deoplete#manual_completion_start_length = 1
+	let g:deoplete#sources#syntax#min_keyword_length = 3
 
 	let g:deoplete#enable_smart_case = 1
 	let g:deoplete#enable_ignore_case = 1
@@ -739,20 +809,12 @@ if dein#tap('vim-leader-guide')
 		let g:lmap.g = {'name': 'Git/'}
 	endif
 
-	if dein#tap('denite.nvim')
-        let g:lmap.b = {'name': 'Buffer/'}
-        let g:lmap.f = {'name': 'Files/'}
-        let g:lmap.m = {'name': 'Modify/'}
-        let g:lmap.t = {'name': 'Tags/'}
-        let g:lmap.u = {'name': 'Denite/'}
-	endif
+	let g:lmap.b = {'name': 'Buffer/'}
+	let g:lmap.f = {'name': 'Files/'}
+	let g:lmap.t = {'name': 'Tags/'}
 
-	if dein#tap('omnisharp-vim')
-        let g:lmap.o = {'name': 'Omnisharp/'}
-		let g:lmap.o.f = {'name': 'Find/'}
-		let g:lmap.o.m = {'name': 'Modify/'}
-		let g:lmap.o.l = {'name': 'Lookup/'}
-		let g:lmap.o.s = {'name': 'Solution/'}
+	if dein#tap('denite.nvim')
+        let g:lmap.d = {'name': 'Denite/'}
 	endif
 
 	function! s:add_leader_guide_item(keys, name, cmd)
@@ -807,46 +869,34 @@ if dein#tap('denite.nvim')
 
 	let s:menus.b = {'description': 'Buffer'}
 	let s:menus.b.command_candidates = []
+	if dein#tap('denite-ale')
+		call s:leader_bind('nnoremap <silent>', ['b', 's'], 'Denite ale', 'Syntax Errors', 'syntax_errors', 1)
+	endif
 
-	let s:menus.u = {'description': 'Denite'}
-	let s:menus.u.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['u', 'u'], 'Denite menu'  , 'menu'  , 'menu'  , 1)
-	call s:leader_bind('nnoremap <silent>', ['u', 'h'], 'Denite help'  , 'help'  , 'help'  , 1)
-	call s:leader_bind('nnoremap <silent>', ['u', 'b'], 'Denite buffer', 'buffer', 'buffer', 1)
-	call s:leader_bind('nnoremap <silent>', ['u', 'g'], 'Denite grep'  , 'grep'  , 'grep'  , 1)
-	call s:leader_bind('nnoremap <silent>', ['u', 'l'], 'Denite line'  , 'line'  , 'line'  , 1)
-
-	let s:menus.m = {'description': 'Modify'}
-	let s:menus.m.command_candidates = []
-
-	let s:menus.t = {'description': 'Tags'}
-	let s:menus.t.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline'      , 'buffer tag', 'buffer tag', 1)
-	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag_full_path', 'global tag', 'global tag', 1)
+	let s:menus.d = {'description': 'Denite'}
+	let s:menus.d.command_candidates = []
+	call s:leader_bind('nnoremap <silent>', ['d', 'b'], 'Denite buffer', 'Buffers', 'buffers', 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'd'], 'Denite menu'  , 'Menu'   , 'menu'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'g'], 'Denite grep'  , 'Grep'   , 'grep'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'h'], 'Denite help'  , 'Help'   , 'help'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'l'], 'Denite line'  , 'Lines'  , 'lines'  , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'm'], 'Denite mark'  , 'Marks'  , 'marks'  , 1)
 
 	let s:menus.f = {'description': 'Files'}
 	let s:menus.f.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'file'        , 'file'        , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file_mru'              , 'file_mru'    , 'file_mru'    , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file_rec'              , 'file_rec'    , 'file_rec'    , 1)
-	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file_rec_git', 'file_rec_git', 'file_rec_git', 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'Files'                , 'file'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file_mru'              , 'Files (Most Used)'    , 'file_mru'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file_rec'              , 'Files (Recursive)'    , 'file_rec'    , 1)
+	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file_rec_git', 'Files (Git Recursive)', 'file_rec_git', 1)
+
+	let s:menus.t = {'description': 'Tags'}
+	let s:menus.t.command_candidates = []
+	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline'      , 'Tags (Buffer)', 'buffer_tag', 1)
+	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag_full_path', 'Tags (Global)', 'global_tag', 1)
 
 	if dein#tap('vim-fugitive')
 		let s:menus.g = {'description': 'Git'}
 		let s:menus.g.command_candidates = []
-	endif
-
-	if dein#tap('omnisharp-vim')
-		let s:menus.o = {'description': 'Omnisharp'}
-		let s:menus.o.command_candidates = []
-		let s:menus.o.f = {'description': 'Find'}
-		let s:menus.o.f.command_candidates = []
-		let s:menus.o.m = {'description': 'Modify'}
-		let s:menus.o.m.command_candidates = []
-		let s:menus.o.l = {'description': 'Lookup'}
-		let s:menus.o.l.command_candidates = []
-		let s:menus.o.s = {'description': 'Solution'}
-		let s:menus.o.s.command_candidates = []
 	endif
 
 	if executable('rg')
