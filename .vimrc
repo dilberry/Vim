@@ -243,8 +243,8 @@
 " }
 
 " Leader mapping functions {
-    let s:leader_bind_callbacks = []
-    let s:leader_binds = []
+	let s:leader_bind_callbacks = []
+	let s:leader_binds = []
 
 	function! s:leader_bind(map, keys, value, long_name, short_name, is_cmd)
 		let l:args = {}
@@ -274,9 +274,9 @@
 
 		execute a:map . ' <leader>' . join(a:keys, '') . ' ' . l:value
 
-        for CallBack in s:leader_bind_callbacks
-            call CallBack(a:keys, l:long_name, l:cmd_value)
-        endfor
+		for CallBack in s:leader_bind_callbacks
+			call CallBack(a:keys, l:long_name, l:cmd_value)
+		endfor
 	endfunction
 
 	function! s:leader_binds_process()
@@ -293,7 +293,7 @@
 	let mapleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
-    call s:leader_bind('nnoremap', ['b', 'M'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings', 'fix_line_endings', 1)
+	call s:leader_bind('nnoremap', ['b', 'M'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings', 'fix_line_endings', 1)
 
 	" Buffer cycle
 	nnoremap <Tab> :bnext<CR>
@@ -434,7 +434,7 @@
 	endfunction
 
 	command! Slickfix call Slickfix()
-    call s:leader_bind('nnoremap', ['b', 'f'], 'Slickfix', 'Slickfix', 'slickfix', 1)
+	call s:leader_bind('nnoremap', ['b', 'f'], 'Slickfix', 'Slickfix', 'slickfix', 1)
 	autocmd! BufReadPost quickfix nnoremap <buffer> <Space> :call SlickWinChange()<CR>
 " }
 
@@ -452,7 +452,7 @@ endif
 " Filetype plugins {
 	" ale settings {
 	if dein#tap('ale')
-        call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', 1)
+		call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', 1)
 	endif
 	" }
 
@@ -680,7 +680,7 @@ if dein#tap('vim-indent-guides')
 	let g:indent_guides_default_mapping = 0 " Disable leader mapping
 
 	" indent-guides toggle
-    call s:leader_bind('nnoremap', ['b', 'g'], 'IndentGuidesToggle', 'Indent Guides Toggle', 'indent_guides_toggle', 1)
+	call s:leader_bind('nnoremap', ['b', 'g'], 'IndentGuidesToggle', 'Indent Guides Toggle', 'indent_guides_toggle', 1)
 endif
 " }
 
@@ -726,7 +726,7 @@ if dein#tap('rainbow')
 	\}
 
 	" rainbow_parentheses toggle
-    call s:leader_bind('nnoremap', ['b', 'r'], 'RainbowToggle', 'Rainbow Toggle', 'rainbow_toggle', 1)
+	call s:leader_bind('nnoremap', ['b', 'r'], 'RainbowToggle', 'Rainbow Toggle', 'rainbow_toggle', 1)
 endif
 " }
 
@@ -738,25 +738,25 @@ endif
 
 " vim-fugitive options {
 if dein#tap('vim-fugitive')
-    call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'    , 'Checkout'             , 'checkout'             , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'   , 'Diff HEAD'            , 'diff HEAD'            , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'        , 'Diff'                 , 'diff'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>', 'Move'                 , 'move'                 , 0)
-    call s:leader_bind('nnoremap <silent>', ['g', 'p'], 'Gpull'        , 'Pull'                 , 'pull'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'        , 'Push'                 , 'push'                 , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'        , 'Checkout current file', 'checkout-current-file', 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'      , 'Status'               , 'status'               , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'       , 'Write'                , 'write'                , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'    , 'Checkout'             , 'checkout'             , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'   , 'Diff HEAD'            , 'diff HEAD'            , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'        , 'Diff'                 , 'diff'                 , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>', 'Move'                 , 'move'                 , 0)
+	call s:leader_bind('nnoremap <silent>', ['g', 'p'], 'Gpull'        , 'Pull'                 , 'pull'                 , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'P'], 'Gpush'        , 'Push'                 , 'push'                 , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'        , 'Checkout current file', 'checkout-current-file', 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'      , 'Status'               , 'status'               , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'       , 'Write'                , 'write'                , 1)
 endif
 " }
 
 " gitv options {
 if dein#tap('gitv')
-    call s:leader_bind('nnoremap <silent>', ['g', 'v'], 'Gitv'         , 'Version (Commits)'    , 'version_commits'      , 1)
-    call s:leader_bind('nnoremap <silent>', ['g', 'V'], 'Gitv!'        , 'Version (Files)'      , 'version_files'        , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'v'], 'Gitv'         , 'Version (Commits)'    , 'version_commits'      , 1)
+	call s:leader_bind('nnoremap <silent>', ['g', 'V'], 'Gitv!'        , 'Version (Files)'      , 'version_files'        , 1)
 endif
 " }
 
@@ -827,17 +827,17 @@ if dein#tap('vim-leader-guide')
 	let g:lmap.t = {'name': 'Tags/'}
 
 	if dein#tap('denite.nvim')
-        let g:lmap.d = {'name': 'Denite/'}
+		let g:lmap.d = {'name': 'Denite/'}
 	endif
 
 	function! s:add_leader_guide_item(keys, name, cmd)
-        let l:local_keys = deepcopy(a:keys)
-        let l:key = '[' . join(map(l:local_keys, 'shellescape(v:val)'), '][') . ']'
+		let l:local_keys = deepcopy(a:keys)
+		let l:key = '[' . join(map(l:local_keys, 'shellescape(v:val)'), '][') . ']'
 
-        execute 'let g:lmap' . l:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
+		execute 'let g:lmap' . l:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
 	endfunction
 
-    call add(s:leader_bind_callbacks, function('s:add_leader_guide_item'))
+	call add(s:leader_bind_callbacks, function('s:add_leader_guide_item'))
 endif
 " }
 
@@ -850,12 +850,12 @@ if dein#tap('denite.nvim')
 	function! s:add_denite_item(keys, name, cmd)
 		if exists('s:menus.' . join(a:keys[:-2], '.'))
 			execute 'call add(s:menus.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
-        else
-            execute 'let s:menus.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
+		else
+			execute 'let s:menus.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
 		endif
 	endfunction
 
-    call add(s:leader_bind_callbacks, function('s:add_denite_item'))
+	call add(s:leader_bind_callbacks, function('s:add_denite_item'))
 
 	" reset 50% winheight on window resize
 	augroup deniteresize
@@ -896,6 +896,7 @@ if dein#tap('denite.nvim')
 	call s:leader_bind('nnoremap <silent>', ['d', 'l'], 'Denite line'       , 'Lines'  , 'lines'  , 1)
 	call s:leader_bind('nnoremap <silent>', ['d', 'm'], 'Denite mark'       , 'Marks'  , 'marks'  , 1)
 	call s:leader_bind('nnoremap <silent>', ['d', 'r'], 'Denite -resume'    , 'Resume' , 'resume' , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'y'], 'Denite neoyank'    , 'Yanks'  , 'yanks'  , 1)
 
 	let s:menus.f = {'description': 'Files'}
 	let s:menus.f.command_candidates = []
@@ -925,7 +926,7 @@ if dein#tap('denite.nvim')
 	endif
 
 	if executable('git')
-        call denite#custom#alias('source', 'file_rec_git', 'file_rec')
+		call denite#custom#alias('source', 'file_rec_git', 'file_rec')
 		call denite#custom#var('file_rec_git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
 	endif
 endif
