@@ -154,6 +154,15 @@
 			" denite-ale
 			call dein#add('https://github.com/iyuuya/denite-ale.git')
 
+			" denite-git
+			call dein#add('https://github.com/neoclide/denite-git.git')
+
+			" denite-extra
+			call dein#add('https://github.com/neoclide/denite-extra.git')
+
+			" neoyank.vim
+			call dein#add('https://github.com/Shougo/neoyank.vim.git')
+
 			" vim-leader-guide
 			call dein#add('https://github.com/hecal3/vim-leader-guide.git')
 
@@ -773,21 +782,25 @@ if dein#tap('deoplete.nvim')
 	let g:deoplete#enable_ignore_case = 1
 	let g:deoplete#enable_camel_case = 1
 
-	let g:deoplete#omni#input_patterns = {}
+	if !exists('g:deoplete#omni#input_patterns')
+		let g:deoplete#omni#input_patterns = {}
+	endif
+
 	let g:deoplete#omni#functions = {}
 	let g:deoplete#sources = {}
 	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+	let g:deoplete#ignore_sources = {}
+	let g:deoplete#ignore_sources._ = ['buffer', 'around']
+	call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 	call deoplete#custom#source('buffer', 'rank', 100)
 
 	" Csharp options
 	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
 	let g:deoplete#sources.cs = ['omni', 'buffer', 'file']
-	call deoplete#custom#source('cs', 'disabled_syntaxes', ['Comment', 'String'])
 	call deoplete#custom#source('cs', 'matchers', ['matcher_fuzzy'])
 
 	" Vim options
-	let g:deoplete#sources.vim = ['omni', 'buffer', 'file']
-	call deoplete#custom#source('vim', 'disabled_syntaxes', ['Comment', 'String'])
+	let g:deoplete#sources.vim = ['vim']
 
 	" Select on Tab
 	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
@@ -875,12 +888,14 @@ if dein#tap('denite.nvim')
 
 	let s:menus.d = {'description': 'Denite'}
 	let s:menus.d.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['d', 'b'], 'Denite buffer', 'Buffers', 'buffers', 1)
-	call s:leader_bind('nnoremap <silent>', ['d', 'd'], 'Denite menu'  , 'Menu'   , 'menu'   , 1)
-	call s:leader_bind('nnoremap <silent>', ['d', 'g'], 'Denite grep'  , 'Grep'   , 'grep'   , 1)
-	call s:leader_bind('nnoremap <silent>', ['d', 'h'], 'Denite help'  , 'Help'   , 'help'   , 1)
-	call s:leader_bind('nnoremap <silent>', ['d', 'l'], 'Denite line'  , 'Lines'  , 'lines'  , 1)
-	call s:leader_bind('nnoremap <silent>', ['d', 'm'], 'Denite mark'  , 'Marks'  , 'marks'  , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'b'], 'Denite buffer'     , 'Buffers', 'buffers', 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'c'], 'Denite colorscheme', 'Colours', 'colours', 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'd'], 'Denite menu'       , 'Menu'   , 'menu'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'g'], 'Denite grep'       , 'Grep'   , 'grep'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'h'], 'Denite help'       , 'Help'   , 'help'   , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'l'], 'Denite line'       , 'Lines'  , 'lines'  , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'm'], 'Denite mark'       , 'Marks'  , 'marks'  , 1)
+	call s:leader_bind('nnoremap <silent>', ['d', 'r'], 'Denite -resume'    , 'Resume' , 'resume' , 1)
 
 	let s:menus.f = {'description': 'Files'}
 	let s:menus.f.command_candidates = []
