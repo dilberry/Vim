@@ -1,9 +1,3 @@
-" Vi Compatibility {
-	if &compatible
-		set nocompatible
-	endif
-" }
-
 " Platform detection {
 	let s:is_windows = has('win16') || has('win32') || has('win64')
 	let s:is_cygwin  = has('win32unix')
@@ -16,33 +10,6 @@
 	if s:is_windows
 		source $VIMRUNTIME/mswin.vim
 	endif
-" }
-
-" Diff Function {
-	set diffexpr=
-	function! MyDiff() abort
-		let opt = '-a --binary '
-		if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-		if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-		let arg1 = v:fname_in
-		if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-		let arg2 = v:fname_new
-		if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-		let arg3 = v:fname_out
-		if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-		let eq = ''
-		if $VIMRUNTIME =~ ' '
-			if &sh =~ '\<cmd'
-				let cmd = '""' . $VIMRUNTIME . '\diff"'
-				let eq = '"'
-			else
-				let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-			endif
-		else
-			let cmd = $VIMRUNTIME . '\diff'
-		endif
-		silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-	endfunction
 " }
 
 " Path correction {
@@ -74,9 +41,6 @@
 			let $PATH .= ';'.$VIMHOME.'\utils\rg\'
 		endif
 	endif
-
-	" Add pylint settings folder
-	let $PATH .= ';'.$VIMHOME.'\pylint\'
 " }
 
 " Plug {
@@ -334,9 +298,9 @@
 	set number                     " Display line numbers
 	set autochdir                  " Auto change working directory to the current file
 	set hidden                     " Allow changing buffer without saving
-	set autoread                   " auto-reload files, if there's no conflict
-	set shortmess+=IA              " no intro message, no swap-file message
-	set updatetime=500             " this setting controls how long to wait (in ms) before fetching type / symbol information.
+	set autoread                   " Auto-reload files, if there's no conflict
+	set shortmess+=IA              " No intro message, no swap-file message
+	set updatetime=500             " This setting controls how long to wait (in ms) before fetching type / symbol information.
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
@@ -530,11 +494,6 @@ endif
 				" Contextual code actions (requires CtrlP or unite.vim)
 				call s:leader_bind('nnoremap <buffer>', ['o', 'l', 'a'], 'OmniSharpGetCodeActions'     , 'Get Code Actions'    , 'get_code_actions'    , 1)
 				call s:leader_bind('vnoremap <buffer>', ['o', 'l', 'a'], 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', 1)
-
-				"navigate up by method/property/field
-				nnoremap <buffer><C-K> :OmniSharpNavigateUp<cr>
-				"navigate down by method/property/field
-				nnoremap <buffer><C-J> :OmniSharpNavigateDown<cr>
 
 				" Builds can also run asynchronously with vim-dispatch installed
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'b'], 'wa!<cr>:OmniSharpBuildAsync' , 'Build Async'         , 'build_async'         , 1)
@@ -746,7 +705,9 @@ if dein#tap('vaffle.vim')
 	nnoremap <silent> - :Vaffle<CR>
 	let g:vaffle_show_hidden_files = 1 " Show hidden files
 	function! s:vaffle_mappings() abort
+		" Go up directory like vim-vinegar
 		nmap <buffer> -     <Plug>(vaffle-open-parent)
+		" Actually quit, unlike vim-vinegar
 		nmap <buffer> <Esc> <Plug>(vaffle-quit)
 	endfunction
 
