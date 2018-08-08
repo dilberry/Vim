@@ -359,50 +359,6 @@
 	endif
 " }
 
-" Slickfix {
-	" Quickfix and qfreplace
-	" Turn into leader command with line search of current pattern, open quickfix
-	" and qfreplace. On buffer save, save changes back but don't write to file
-	function! Slickfix() abort
-		call setqflist([])
-		let s:ft_backup = &filetype
-		:g//caddexpr expand("%").":".line(".").":". getline(".")
-		execute "cw"
-		execute "set filetype=".s:ft_backup
-	endfunction
-
-	function! QFWinNum() abort
-		redir =>bufliststr
-		silent! ls
-		redir END
-		let buflist = map(filter(split(bufliststr, '\n'), 'v:val =~ "Quickfix List"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-		for bufnum in buflist
-			return winbufnr(bufnum)
-		endfor
-		return -1
-	endfunction
-
-	function! SlickWinChange() abort
-		execute ".cc"
-		execute "normal zz"
-		set nocursorline
-		set cursorline
-		execute QFWinNum()."wincmd w"
-	endfunction
-
-	function! SlickWinClose() abort
-		execute ".cc"
-		execute "normal zz"
-		set nocursorline
-		execute "bdelete ".QFWinNum()
-		call setqflist([])
-	endfunction
-
-	command! Slickfix call Slickfix()
-	call s:leader_bind('nnoremap', ['b', 'f'], 'Slickfix', 'Slickfix', 'slickfix', 1)
-	autocmd! BufReadPost quickfix nnoremap <buffer> <Space> :call SlickWinChange()<CR>
-" }
-
 " vim-airline options {
 if dein#tap('vim-airline')
 	set laststatus=2 " Show 2 lines of status
