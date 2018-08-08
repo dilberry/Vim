@@ -110,10 +110,7 @@
 
 		" Browsing {
 			" denite
-			call dein#add('https://github.com/Shougo/denite.nvim.git')
-
-			" denite_tags
-			call dein#add('https://github.com/dilberry/denite_tags.git')
+			call dein#add('https://github.com/dilberry/denite.nvim.git')
 
 			" denite-ale
 			call dein#add('https://github.com/iyuuya/denite-ale.git')
@@ -150,7 +147,7 @@
 
 			" deoplete-jedi
 			" Requires jedi package in python install
-			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': ['python', 'python3', 'djangohtml']})
+			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim'], 'on_ft': ['python', 'python3', 'djangohtml']})
 
 			" deoplete-omnisharp
 			call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
@@ -769,18 +766,30 @@ if dein#tap('deoplete.nvim')
 		let g:deoplete#omni#input_patterns = {}
 	endif
 
-	let g:deoplete#omni#functions = {}
-	let g:deoplete#sources = {}
+	if !exists('g:deoplete#sources')
+		let g:deoplete#sources = {}
+	endif
+
+	if !exists('g:deoplete#omni#functions')
+		let g:deoplete#omni#functions = {}
+	endif
+
+	if !exists('g:deoplete#ignore_sources')
+		let g:deoplete#ignore_sources = {}
+	endif
+
 	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
-	let g:deoplete#ignore_sources = {}
 	let g:deoplete#ignore_sources._ = ['buffer', 'around']
 	call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
+	call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
 	call deoplete#custom#source('buffer', 'rank', 100)
 
 	" Csharp options
 	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
 	let g:deoplete#sources.cs = ['omni', 'buffer', 'file']
-	call deoplete#custom#source('cs', 'matchers', ['matcher_fuzzy'])
+
+	" Python options
+	let g:deoplete#sources.python = ['jedi']
 
 	" Vim options
 	let g:deoplete#sources.vim = ['vim']
@@ -848,8 +857,6 @@ if dein#tap('denite.nvim')
 	augroup end
 
 	call denite#custom#option('default', { 'prompt': 'λ' })
-	" Sort like Sublime
-	call denite#custom#source('_', 'sorters', ['sorter/sublime'])
 
 	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
@@ -892,8 +899,8 @@ if dein#tap('denite.nvim')
 
 	let s:menus.t = {'description': 'Tags'}
 	let s:menus.t.command_candidates = []
-	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline'      , 'Tags (Buffer)', 'buffer_tag', 1)
-	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag_full_path', 'Tags (Global)', 'global_tag', 1)
+	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'Tags (Buffer)', 'buffer_tag', 1)
+	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'Tags (Global)', 'global_tag', 1)
 
 	if dein#tap('vim-fugitive')
 		let s:menus.g = {'description': 'Git'}
