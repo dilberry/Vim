@@ -258,7 +258,7 @@
 	let mapleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
-	call s:leader_bind('nnoremap', ['b', 'M'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings', 'fix_line_endings', 1)
+	call s:leader_bind('nnoremap', ['b', 'm', 'E'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings (Windows)', 'fix_line_endings_windows', 1)
 
 	" Buffer cycle
 	nnoremap <Tab> :bnext<CR>
@@ -773,6 +773,7 @@ if dein#tap('vim-leader-guide')
 	endif
 
 	let g:lmap.b = {'name': 'Buffer/'}
+	let g:lmap.b.m = {'name': 'Modify/'}
 	let g:lmap.f = {'name': 'Files/'}
 	let g:lmap.t = {'name': 'Tags/'}
 
@@ -832,6 +833,8 @@ if dein#tap('denite.nvim')
 
 	let s:menus.b = {'description': 'Buffer'}
 	let s:menus.b.command_candidates = []
+	let s:menus.b.m = {'description': 'Modify'}
+	let s:menus.b.m.command_candidates = []
 	if dein#tap('denite-ale')
 		call s:leader_bind('nnoremap <silent>', ['b', 's'], 'Denite ale', 'Syntax Errors', 'syntax_errors', 1)
 	endif
