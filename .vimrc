@@ -20,7 +20,7 @@
 
 " Diff Function {
 	set diffexpr=
-	function! MyDiff()
+	function! MyDiff() abort
 		let opt = '-a --binary '
 		if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
 		if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
@@ -166,8 +166,8 @@
 			" vim-leader-guide
 			call dein#add('https://github.com/hecal3/vim-leader-guide.git')
 
-			" vim-vinegar
-			call dein#add('https://github.com/tpope/vim-vinegar.git')
+			" vaffle.vim
+			call dein#add('https://github.com/cocopon/vaffle.vim.git')
 		" }
 
 		" Omnicompletion {
@@ -185,7 +185,8 @@
 			call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
 
 			" deoplete-jedi
-			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': 'python'})
+			" Requires jedi package in python install
+			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim', 'jedi'], 'on_ft': ['python', 'python3', 'djangohtml']})
 
 			" deoplete-omnisharp
 			call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
@@ -208,6 +209,9 @@
 		" File types{
 			" vim-csharp
 			call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
+
+			" vim-polyglot
+			call dein#add('https://github.com/sheerun/vim-polyglot.git')
 
 			" vim-jsbeautify
 			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css']})
@@ -246,7 +250,7 @@
 	let s:leader_bind_callbacks = []
 	let s:leader_binds = []
 
-	function! s:leader_bind(map, keys, value, long_name, short_name, is_cmd)
+	function! s:leader_bind(map, keys, value, long_name, short_name, is_cmd) abort
 		let l:args = {}
 		let l:args.map        = a:map
 		let l:args.keys       = a:keys
@@ -257,7 +261,7 @@
 		call add(s:leader_binds, l:args)
 	endfunction
 
-	function! s:leader_bind_process(map, keys, value, long_name, short_name, is_cmd)
+	function! s:leader_bind_process(map, keys, value, long_name, short_name, is_cmd) abort
 		if a:is_cmd
 			" If a:value is a complete command e.g. :Gblame<CR>
 			let l:value = ':' . a:value . '<CR>'
@@ -279,7 +283,7 @@
 		endfor
 	endfunction
 
-	function! s:leader_binds_process()
+	function! s:leader_binds_process() abort
 		for args in s:leader_binds
 			call s:leader_bind_process(args.map, args.keys, args.value, args.long_name, args.short_name, args.is_cmd)
 		endfor
@@ -398,7 +402,7 @@
 	" Quickfix and qfreplace
 	" Turn into leader command with line search of current pattern, open quickfix
 	" and qfreplace. On buffer save, save changes back but don't write to file
-	function! Slickfix()
+	function! Slickfix() abort
 		call setqflist([])
 		let s:ft_backup = &filetype
 		:g//caddexpr expand("%").":".line(".").":". getline(".")
@@ -406,7 +410,7 @@
 		execute "set filetype=".s:ft_backup
 	endfunction
 
-	function! QFWinNum()
+	function! QFWinNum() abort
 		redir =>bufliststr
 		silent! ls
 		redir END
@@ -417,7 +421,7 @@
 		return -1
 	endfunction
 
-	function! SlickWinChange()
+	function! SlickWinChange() abort
 		execute ".cc"
 		execute "normal zz"
 		set nocursorline
@@ -425,7 +429,7 @@
 		execute QFWinNum()."wincmd w"
 	endfunction
 
-	function! SlickWinClose()
+	function! SlickWinClose() abort
 		execute ".cc"
 		execute "normal zz"
 		set nocursorline
@@ -453,6 +457,12 @@ endif
 	" ale settings {
 	if dein#tap('ale')
 		call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', 1)
+	endif
+	" }
+
+	" vim-polyglot {
+	if dein#tap('vim-polyglot')
+		let g:polyglot_disabled = ['graphql']
 	endif
 	" }
 
@@ -730,9 +740,20 @@ if dein#tap('rainbow')
 endif
 " }
 
-" vim-vinegar options {
-if dein#tap('vim-vinegar')
-	autocmd FileType netrw setl bufhidden=wipe
+" vaffle.vim options {
+if dein#tap('vaffle.vim')
+	" Open like vim-vinegar
+	nnoremap <silent> - :Vaffle<CR>
+	let g:vaffle_show_hidden_files = 1 " Show hidden files
+	function! s:vaffle_mappings() abort
+		nmap <buffer> -     <Plug>(vaffle-open-parent)
+		nmap <buffer> <Esc> <Plug>(vaffle-quit)
+	endfunction
+
+	augroup vimrc_vaffle
+		autocmd!
+		autocmd FileType vaffle call s:vaffle_mappings()
+	augroup END
 endif
 " }
 
@@ -777,6 +798,7 @@ if dein#tap('deoplete.nvim')
 	let g:deoplete#auto_completion_start_length = 2
 	let g:deoplete#manual_completion_start_length = 1
 	let g:deoplete#sources#syntax#min_keyword_length = 3
+	let g:deoplete#auto_complete_delay = 0
 
 	let g:deoplete#enable_smart_case = 1
 	let g:deoplete#enable_ignore_case = 1
@@ -830,7 +852,7 @@ if dein#tap('vim-leader-guide')
 		let g:lmap.d = {'name': 'Denite/'}
 	endif
 
-	function! s:add_leader_guide_item(keys, name, cmd)
+	function! s:add_leader_guide_item(keys, name, cmd) abort
 		let l:local_keys = deepcopy(a:keys)
 		let l:key = '[' . join(map(l:local_keys, 'shellescape(v:val)'), '][') . ']'
 
@@ -847,7 +869,7 @@ if dein#tap('denite.nvim')
 	let s:menus = {}
 	call denite#custom#var('menu', 'menus', s:menus)
 
-	function! s:add_denite_item(keys, name, cmd)
+	function! s:add_denite_item(keys, name, cmd) abort
 		if exists('s:menus.' . join(a:keys[:-2], '.'))
 			execute 'call add(s:menus.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
 		else
@@ -865,6 +887,8 @@ if dein#tap('denite.nvim')
 	augroup end
 
 	call denite#custom#option('default', { 'prompt': 'λ' })
+	" Sort like Sublime
+	call denite#custom#source('_', 'sorters', ['sorter/sublime'])
 
 	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
