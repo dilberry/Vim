@@ -157,6 +157,12 @@
 
 			" neco-syntax
 			call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+
+			" deoplete-ternjs
+			call dein#add('https://github.com/carlitux/deoplete-ternjs.git', { 'depends': ['deoplete.nvim'], 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
+
+			" jspc.vim
+			call dein#add('https://github.com/othree/jspc.vim.git', { 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
 		" }
 
 		" Tags {
@@ -507,6 +513,10 @@ endif
 		" }
 	" }
 
+	augroup OmniFuncs
+		autocmd!
+	augroup END
+
 	augroup AStyler
 		autocmd!
 	augroup END
@@ -562,6 +572,9 @@ endif
 
 	" javascript options {
 		autocmd JSBeautify FileType javascript call s:formatter_mappings('call JsBeautify()')
+		if dein#tap('jspc.vim')
+			autocmd OmniFuncs FileType javascript setlocal omnifunc=jspc#omni
+		endif
 	" }
 
 	" json options {
@@ -574,10 +587,14 @@ endif
 
 	" html options {
 		autocmd JSBeautify FileType html call s:formatter_mappings('call HtmlBeautify()')
+		if dein#tap('vim-polyglot')
+			autocmd OmniFuncs FileType html setlocal omnifunc=htmlcomplete#CompleteTags
+		endif
 	" }
 
 	" css options {
 		autocmd JSBeautify FileType css call s:formatter_mappings('call CSSBeautify()')
+		autocmd OmniFuncs FileType css setlocal omnifunc=csscomplete#CompleteCSS
 	" }
 
 	if !executable('node') || !dein#tap('vim-jsbeautify')
@@ -744,7 +761,9 @@ if dein#tap('deoplete.nvim')
 
 	" Csharp options
 	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
-	let g:deoplete#sources.cs = ['omni', 'buffer', 'file']
+
+	" Javascript options
+	let g:deoplete#sources.javascript = ['tern', 'omni']
 
 	" Python options
 	let g:deoplete#sources.python = ['jedi']
