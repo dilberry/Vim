@@ -657,16 +657,18 @@ if dein#tap('vaffle.vim')
 	" Open like vim-vinegar
 	nnoremap <silent> - :Vaffle<CR>
 	let g:vaffle_show_hidden_files = 1 " Show hidden files
-	function! s:vaffle_mappings() abort
+	function! s:vaffle_options() abort
 		" Go up directory like vim-vinegar
 		nmap <buffer> -     <Plug>(vaffle-open-parent)
 		" Actually quit, unlike vim-vinegar
 		nmap <buffer> <Esc> <Plug>(vaffle-quit)
+		" Show cursorline in vaffle
+		setlocal cursorline
 	endfunction
 
 	augroup vimrc_vaffle
 		autocmd!
-		autocmd FileType vaffle call s:vaffle_mappings()
+		autocmd FileType vaffle call s:vaffle_options()
 	augroup END
 endif
 " }
