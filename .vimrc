@@ -357,8 +357,17 @@
 
 	if has('gui_running')
 		if s:is_windows
+			function! s:gvim_resize()
+				" simalt appears to happen after VimEnter
+				" Variables set, during startup, from winheight() will be
+				" wrong
+				set lines=999
+				set columns=9999
+                " Fake Alt+Space+x
+                simalt ~x
+			endfunction
 			set guioptions-=t
-			autocmd GUIEnter * simalt ~x             " Maximise on GUI entry
+			autocmd GUIEnter * call s:gvim_resize()  " Maximise on GUI entry
 			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
 		endif
 		autocmd GUIEnter * set vb t_vb=              " Disable audible bell
@@ -834,7 +843,10 @@ if dein#tap('denite.nvim')
 			\'winheight', winheight(0) / 2)
 	augroup end
 
-	call denite#custom#option('default', { 'prompt': 'λ' })
+	call denite#custom#option('default', 'prompt', 'λ')
+	call denite#custom#option('default', 'auto_resize', 1)
+	call denite#custom#option('default', 'highlight_mode_insert', 'Pmenu')
+	call denite#custom#option('default', 'highlight_mode_normal', 'Cursorline')
 
 	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
