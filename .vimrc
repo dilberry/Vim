@@ -763,7 +763,7 @@ if dein#tap('deoplete.nvim')
 	endif
 
 	let g:deoplete#sources._ = ['omni', 'buffer', 'file']
-	let g:deoplete#ignore_sources._ = ['buffer', 'around']
+	let g:deoplete#ignore_sources._ = ['around']
 	call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 	call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
 	call deoplete#custom#source('buffer', 'rank', 100)
@@ -864,7 +864,8 @@ if dein#tap('denite.nvim')
 	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
 	call denite#custom#map('normal', 'yy'    , '<denite:do_action:yank>'                , 'noremap')
-	call denite#custom#map('normal', '<C-a>' , '<denite:multiple_mappings:denite:toggle_select_all' . ',denite:do_action:quickfix>', 'noremap')
+	call denite#custom#map('normal', '<C-a>' , '<denite:multiple_mappings:denite:toggle_select_all>', 'noremap')
+	call denite#custom#map('normal', 'q'     , '<denite:do_action:quickfix>'            , 'noremap')
 
 	let s:menus.b = {'description': 'Buffer'}
 	let s:menus.b.command_candidates = []
