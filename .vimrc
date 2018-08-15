@@ -79,7 +79,7 @@
 
 		" Git {
 			" vim-fugitive
-			call dein#add('https://github.com/tpope/vim-fugitive.git', { 'rev': 'v2.4'})
+			call dein#add('https://github.com/tpope/vim-fugitive.git')
 
 			" gitv
 			call dein#add('https://github.com/gregsexton/gitv.git')
@@ -110,7 +110,7 @@
 
 		" Browsing {
 			" denite
-			call dein#add('https://github.com/dilberry/denite.nvim.git')
+			call dein#add('https://github.com/Shougo/denite.nvim.git')
 
 			" denite-ale
 			call dein#add('https://github.com/iyuuya/denite-ale.git')
@@ -148,9 +148,6 @@
 			" deoplete-jedi
 			" Requires jedi package in python install
 			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim'], 'on_ft': ['python', 'python3', 'djangohtml']})
-
-			" deoplete-omnisharp
-			call dein#add('https://github.com/gautamnaik1994/deoplete-omnisharp.git', { 'depends': ['deoplete.nvim'], 'on_ft': 'cs'})
 
 			" neco-vim
 			call dein#add('https://github.com/Shougo/neco-vim.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
@@ -434,7 +431,17 @@ endif
 				endif
 			endfunction
 
-			function! s:omnisharp_mappings() abort
+			function! s:omnisharp_options() abort
+				"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
+				setlocal omnifunc=OmniSharp#Complete
+
+				" Error format for make
+				setlocal errorformat=\ %#%f(%l\\\,%c):\ %m
+
+				" FIXME Need to add correct msbuild to path
+				" May also need to use OmniSharp#FindSolution
+				setlocal makeprg=msbuild\ /nologo\ /v:q\ /property:GenerateFullPaths=true\ /clp:ErrorsOnly\ .
+
 				call s:omnisharp_menu_check()
 
 				"The following commands are contextual, based on the current cursor position.
@@ -479,11 +486,8 @@ endif
 			augroup omnisharp_commands
 				autocmd!
 
-				"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
-				autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
-
 				"Set omnisharp key mappings
-				autocmd FileType cs call s:omnisharp_mappings()
+				autocmd FileType cs call s:omnisharp_options()
 
 				"show type information automatically when the cursor stops moving
 				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
@@ -729,6 +733,12 @@ if dein#tap('vim-gitgutter')
 	let g:gitgutter_map_keys = 0
 	nmap [c <Plug>GitGutterPrevHunk
 	nmap ]c <Plug>GitGutterNextHunk
+	let g:gitgutter_async = 1
+	let g:gitgutter_sign_added = '✚'
+	let g:gitgutter_sign_modified = '✹'
+	let g:gitgutter_sign_removed = '✖'
+	let g:gitgutter_sign_removed_first_line = '➜'
+	let g:gitgutter_sign_modified_removed = '✗'
 endif
 " }
 
@@ -768,8 +778,9 @@ if dein#tap('deoplete.nvim')
 	call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
 	call deoplete#custom#source('buffer', 'rank', 100)
 
-	" Csharp options
-	let g:deoplete#omni#input_patterns.cs = ['\.\w*']
+	" C# options
+	let g:deoplete#sources.cs = ['omni']
+	let g:deoplete#omni#input_patterns.cs = ['.*[^=\);]']
 
 	" Javascript options
 	let g:deoplete#sources.javascript = ['tern', 'omni']
@@ -898,6 +909,10 @@ if dein#tap('denite.nvim')
 	let s:menus.t.command_candidates = []
 	call s:leader_bind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'Tags (Buffer)', 'buffer_tag', v:true)
 	call s:leader_bind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'Tags (Global)', 'global_tag', v:true)
+
+	" Cycle through Denite buffer like the Quickfix buffer using Unimpaired
+	nnoremap <silent> [d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=-<C-r>=v:count1<CR><CR>
+	nnoremap <silent> ]d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=+<C-r>=v:count1<CR><CR>
 
 	if dein#tap('vim-fugitive')
 		let s:menus.g = {'description': 'Git'}
