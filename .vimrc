@@ -143,7 +143,7 @@
 			endif
 
 			" omnisharp-vim
-			call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', { 'on_ft': 'cs' })
+			call dein#add('https://github.com/dilberry/omnisharp-vim.git', { 'merged': 0, 'on_ft': 'cs' })
 
 			" deoplete-jedi
 			" Requires jedi package in python install
@@ -256,12 +256,40 @@
 	endfunction
 " }
 
+" Cleanup {
+	function! s:strip_trailing_whitespace()
+		" Preparation: save last search, and cursor position.
+		let _s=@/
+		let l = line(".")
+		let c = col(".")
+		" do the business:
+		%s/\s\+$//e
+		" clean up: restore previous search history, and cursor position
+		let @/=_s
+		call cursor(l, c)
+	endfunction
+
+	function! s:strip_trailing_windows()
+		" Preparation: save last search, and cursor position.
+		let _s=@/
+		let l = line(".")
+		let c = col(".")
+		" do the business:
+		normal mmHmt
+		%s/<C-V><cr>//ge
+		normal 'tzt'm
+		" clean up: restore previous search history, and cursor position
+		let @/=_s
+		call cursor(l, c)
+	endfunction
+" }
+
 " Key Remapping {
 	" Set Leader to Space
 	let mapleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
-	call s:leader_bind('nnoremap', ['b', 'm', 'E'], "mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm", 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
+	call s:leader_bind('nnoremap', ['b', 'm', 'E'], 'call s:strip_trailing_windows()', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
 
 	" Buffer cycle
 	nnoremap <Tab> :bnext<CR>
@@ -360,8 +388,8 @@
 				" wrong
 				set lines=999
 				set columns=9999
-                " Fake Alt+Space+x
-                simalt ~x
+				" Fake Alt+Space+x
+				simalt ~x
 			endfunction
 			set guioptions-=t
 			autocmd GUIEnter * call s:gvim_resize()  " Maximise on GUI entry
@@ -386,6 +414,8 @@ endif
 	" ale settings {
 	if dein#tap('ale')
 		call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', v:true)
+		nmap <silent> [s <Plug>(ale_previous)
+		nmap <silent> ]s <Plug>(ale_next)
 	endif
 	" }
 
@@ -401,6 +431,7 @@ endif
 	" C# {
 		" Omnisharp options {
 		if dein#tap('omnisharp-vim')
+			" FIXME: Running GDiff causes Omnisharp to ask for solution files
 			function! s:omnisharp_menu_check() abort
 				if dein#tap('denite.nvim')
 					if !exists('s:menus.o')
@@ -483,6 +514,14 @@ endif
 				call s:leader_binds_process()
 			endfunction
 
+			function! s:omnisharp_count_code_actions() abort
+				if OmniSharp#CountCodeActions({-> execute('sign unplace 99')})
+					let l = getpos('.')[1]
+					let f = expand('%:p')
+					execute ':sign place 99 line='.l.' name=OmniSharpCodeActions file='.f
+				endif
+			endfunction
+
 			augroup omnisharp_commands
 				autocmd!
 
@@ -491,16 +530,18 @@ endif
 
 				"show type information automatically when the cursor stops moving
 				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+				autocmd CursorHold *.cs call s:omnisharp_count_code_actions()
 			augroup END
 
 			if !executable('OmniSharp')
 				let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
 			endif
 
+			sign define OmniSharpCodeActions text=💡
 			let g:OmniSharp_server_type = 'roslyn'
 			let g:OmniSharp_prefer_global_sln = 0
 			let g:OmniSharp_timeout = 10
-			let g:OmniSharp_selector_ui = 'unite'
+			let g:OmniSharp_selector_ui = ''
 
 		endif
 		" }
