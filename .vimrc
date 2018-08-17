@@ -257,31 +257,35 @@
 " }
 
 " Cleanup {
-	function! s:strip_trailing_whitespace()
+	function! s:strip_save()
 		" Preparation: save last search, and cursor position.
-		let _s=@/
-		let l = line(".")
-		let c = col(".")
-		" do the business:
-		%s/\s\+$//e
-		" clean up: restore previous search history, and cursor position
-		let @/=_s
-		call cursor(l, c)
+		let state = {}
+		let state._s=@/
+		let state.l = line(".")
+		let state.c = col(".")
+
+		return state
 	endfunction
 
-	function! s:strip_trailing_windows()
-		" Preparation: save last search, and cursor position.
-		let _s=@/
-		let l = line(".")
-		let c = col(".")
-		" do the business:
-		normal mmHmt
-		%s/<C-V><cr>//ge
-		normal 'tzt'm
+	function! s:strip_restore(state)
 		" clean up: restore previous search history, and cursor position
-		let @/=_s
-		call cursor(l, c)
+		let @/=a:state._s
+		call cursor(a:state.l, a:state.c)
 	endfunction
+
+	function! s:strip_trailing_whitespace()
+		let state = s:strip_save()
+		%s/\s\+$//e
+		call s:strip_restore(state)
+	endfunction
+	command! FixEndingsWhiteSpace call s:strip_trailing_whitespace()
+
+	function! s:strip_trailing_windows()
+		let state = s:strip_save()
+		%s/<C-V><cr>//ge
+		call s:strip_restore(state)
+	endfunction
+	command! FixEndingsWindows call s:strip_trailing_windows()
 " }
 
 " Key Remapping {
@@ -289,7 +293,10 @@
 	let mapleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
-	call s:leader_bind('nnoremap', ['b', 'm', 'E'], 'call s:strip_trailing_windows()', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
+	call s:leader_bind('nnoremap', ['b', 'm', 'E'], 'FixEndingsWindows', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
+
+	" Remove Trailing whitespace
+	call s:leader_bind('nnoremap', ['b', 'm', 'e'], 'FixEndingsWhiteSpace', 'Fix Line Endings (White Space)', 'fix_line_endings_white_space', v:true)
 
 	" Buffer cycle
 	nnoremap <Tab> :bnext<CR>
@@ -832,8 +839,11 @@ if dein#tap('deoplete.nvim')
 	" Vim options
 	let g:deoplete#sources.vim = ['vim']
 
-	" Select on Tab
-	inoremap <expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
+	" Cycle on Tab
+	inoremap <silent><expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
+
+	" Cycle backwards on Tab
+	inoremap <silent><expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
 endif
 " }
 
