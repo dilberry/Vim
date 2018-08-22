@@ -291,6 +291,7 @@
 " Key Remapping {
 	" Set Leader to Space
 	let mapleader = ' '
+	let maplocalleader = ' '
 
 	" Remove the Windows ^M - when the encodings gets messed up
 	call s:leader_bind('nnoremap', ['b', 'm', 'E'], 'FixEndingsWindows', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
@@ -339,7 +340,7 @@
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
-	set timeoutlen=100             " Navigation character timeout
+	set timeoutlen=200             " Navigation character timeout
 	set ttimeoutlen=100            " Other character timeout
 " }
 
@@ -972,7 +973,7 @@ if dein#tap('denite.nvim')
 
 	if executable('rg')
 		call denite#custom#var('file_rec', 'command', ['rg', '--files', '--no-heading', '--glob', '!.git', ''])
-		call denite#custom#var('grep', 'command', ['rg'])
+		call denite#custom#var('grep', 'command', ['rg', '--smart-case'])
 		call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
 		call denite#custom#var('grep', 'recursive_opts', [])
 		call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
