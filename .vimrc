@@ -178,7 +178,7 @@
 			call dein#add('https://github.com/sheerun/vim-polyglot.git')
 
 			" vim-jsbeautify
-			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css']})
+			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css', 'xml']})
 		" }
 
 		" Check for unmet dependencies
@@ -652,6 +652,10 @@ endif
 		if dein#tap('vim-polyglot')
 			autocmd OmniFuncs FileType html setlocal omnifunc=htmlcomplete#CompleteTags
 		endif
+	" }
+
+	" xml options {
+		autocmd JSBeautify FileType xml call s:formatter_mappings('call HtmlBeautify()')
 	" }
 
 	" css options {
