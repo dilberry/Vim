@@ -619,7 +619,7 @@ endif
 	" }
 
 	" java options {
-		autocmd AStyler FileType java s:formatter_mappings('call g:AstylerCall(' . string('java') . ')')
+		autocmd AStyler FileType java call s:formatter_mappings('call g:AstylerCall(' . string('java') . ')')
 	" }
 
 	if !executable('AStyle')
