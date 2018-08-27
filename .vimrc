@@ -555,22 +555,50 @@ endif
 		" }
 	" }
 
+	" TypeScript {
+		" Tagbar settings {
+		if dein#tap('tagbar')
+			if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
+				let g:tagbar_type_typescript = {
+					\ 'ctagstype' : 'typescript',
+					\ 'deffile' : $VIMHOME.'\utils\ctags\ctags.cfg',
+					\ 'kinds'     : [
+						\ 'c:classes',
+						\ 'c:modules',
+						\ 'n:modules',
+						\ 'f:functions',
+						\ 'v:variables',
+						\ 'v:varlambdas',
+						\ 'm:members',
+						\ 'i:interfaces',
+						\ 't:types',
+						\ 'e:enums',
+						\ 'I:imports',
+					\ ]
+				\ }
+			endif
+		endif
+		" }
+	" }
+
 	" Visual Basic {
 		" Tagbar settings {
 		if dein#tap('tagbar')
-			let g:tagbar_type_vb = {
-				\ 'ctagstype' : 'vb',
-				\ 'deffile' : $VIMHOME.'\utils\ctags\ctags.cfg',
-				\ 'kinds'     : [
-					\ 's:subroutines',
-					\ 'f:functions',
-					\ 'v:variables',
-					\ 'c:constants',
-					\ 'e:enums',
-					\ 'n:names',
-					\ 'l:labels',
-				\ ]
-			\ }
+			if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
+				let g:tagbar_type_vb = {
+					\ 'ctagstype' : 'vb',
+					\ 'deffile' : $VIMHOME.'\utils\ctags\ctags.cfg',
+					\ 'kinds'     : [
+						\ 's:subroutines',
+						\ 'f:functions',
+						\ 'v:variables',
+						\ 'c:constants',
+						\ 'e:enums',
+						\ 'n:names',
+						\ 'l:labels',
+					\ ]
+				\ }
+			endif
 		endif
 		" }
 	" }
@@ -701,11 +729,14 @@ endif
 
 	" Gutentags options {
 	if dein#tap('vim-gutentags')
-		" Include extra defintions for VB6 tags
-		let g:gutentags_ctags_extra_args = ["−−options=".shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
+		if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
+			" Include extra defintions for VB6 and TypeScript
+			" etags format gives better paths on Windows
+			let g:gutentags_ctags_extra_args = ['--output-format=e-ctags', '−−options='.shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
+		endif
 		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
 		" Let Gutentags separate tags based on Visual Studio and VB6 solutions
-		let g:gutentags_project_root = ['.vs', '*.sln', '*.vbp']
+		let g:gutentags_project_root = ['.vs', '.gitignore', '*.sln', '*.vbp']
 	endif
 	" }
 " }
@@ -917,6 +948,11 @@ if dein#tap('denite.nvim')
 	call denite#custom#option('default', 'highlight_mode_normal', 'Cursorline')
 
 	call denite#custom#source('buffer', 'sorters', ['sorter_mru'])
+
+	if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
+		" TODO: The outline source can't handle etags format with options files
+		call denite#custom#var('outline', 'options', ['−−options='.$VIMHOME.'\utils\ctags\ctags.cfg'])
+	endif
 
 	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
 	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
