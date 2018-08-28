@@ -770,6 +770,15 @@ endif
 if dein#tap('vaffle.vim')
 	" Open like vim-vinegar
 	nnoremap <silent> - :Vaffle<CR>
+
+	" Disable the mapping in Fugitive
+	if dein#tap('vim-fugitive')
+		augroup commit_enter
+			autocmd!
+			autocmd BufEnter COMMIT_EDITMSG nmap <buffer> - <Nop>
+		augroup END
+	endif
+
 	let g:vaffle_show_hidden_files = 1 " Show hidden files
 	function! s:vaffle_options() abort
 		" Go up directory like vim-vinegar
@@ -789,6 +798,11 @@ endif
 
 " vim-fugitive options {
 if dein#tap('vim-fugitive')
+	" Enter the commit message as Insert mode
+	augroup commit_enter
+		autocmd BufEnter COMMIT_EDITMSG startinsert
+	augroup END
+
 	call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , v:true)
