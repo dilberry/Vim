@@ -732,11 +732,12 @@ endif
 		if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
 			" Include extra defintions for VB6 and TypeScript
 			" etags format gives better paths on Windows
-			let g:gutentags_ctags_extra_args = ['--output-format=e-ctags', '−−options='.shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
+			let g:gutentags_ctags_extra_args = ['−−options='.shellescape($VIMHOME.'\utils\ctags\ctags.cfg')]
 		endif
 		let g:gutentags_cache_dir = $VIMHOME.'\utils\ctags\cache'
 		" Let Gutentags separate tags based on Visual Studio and VB6 solutions
-		let g:gutentags_project_root = ['.vs', '.gitignore', '*.sln', '*.vbp']
+		let g:gutentags_project_root = ['.vs', 'node_modules', '*.sln', '*.vbp']
+		let g:gutentags_ctags_exclude = ['*.min.js', '*.min.css', '*.assets.json', '*.swagger.json', 'build', 'vendor', '.git', 'node_modules']
 	endif
 	" }
 " }
