@@ -40,6 +40,20 @@
 			" Add ripgrep binary path to PATH
 			let $PATH .= ';'.$VIMHOME.'\utils\rg\'
 		endif
+
+		if !executable('vswhere')
+			" Add vswhere binary path to PATH
+			let $PATH .= ';'.$VIMHOME.'\utils\vswhere\'
+		endif
+
+		if !executable('msbuild') && executable('vswhere')
+			" Add msbuild binary path to PATH
+			" Trim newlines off the end
+			let msbuild_root = system('vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath')[:-2]
+			if executable(msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe')
+				let $PATH .= ';'.msbuild_root.'\MSBuild\15.0\Bin'
+			endif
+		endif
 	endif
 " }
 
@@ -470,17 +484,20 @@ endif
 				endif
 			endfunction
 
+			function! s:msbuild_options() abort
+				" Error format for make
+				setlocal errorformat=\ %#%f(%l\\\,%c):\ %m
+
+				" Msbuild setting for make
+				let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /clp:ErrorsOnly '.shellescape(OmniSharp#FindSolution())
+			endfunction
+
 			function! s:omnisharp_options() abort
 				"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
 				setlocal omnifunc=OmniSharp#Complete
 
-				" Error format for make
-				setlocal errorformat=\ %#%f(%l\\\,%c):\ %m
-
-				" FIXME Need to add correct msbuild to path
-				" May also need to use OmniSharp#FindSolution
-				setlocal makeprg=msbuild\ /nologo\ /v:q\ /property:GenerateFullPaths=true\ /clp:ErrorsOnly\ .
-
+				call s:msbuild_options()
+				command! -buffer -nargs=* MSBuild call s:msbuild_options() | make <args>
 				call s:omnisharp_menu_check()
 
 				"The following commands are contextual, based on the current cursor position.
@@ -510,7 +527,7 @@ endif
 				call s:leader_bind('vnoremap <buffer>', ['o', 'l', 'a'], 'call OmniSharp#GetCodeActions(''visual'')', 'Get Code Actions', 'get_code_actions', v:true)
 
 				" Builds can also run asynchronously with vim-dispatch installed
-				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'b'], 'wa!<cr>:OmniSharpBuildAsync' , 'Build Async'         , 'build_async'         , v:true)
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'b'], 'MSBuild'                     , 'Build'               , 'build'               , v:true)
 				" Force OmniSharp to reload the solution. Useful when switching branches etc.
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'r'], 'OmniSharpRestartServer'      , 'Restart Server'      , 'restart_server'      , v:true)
 
