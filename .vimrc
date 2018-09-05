@@ -46,12 +46,25 @@
 			let $PATH .= ';'.$VIMHOME.'\utils\vswhere\'
 		endif
 
-		if !executable('msbuild') && executable('vswhere')
-			" Add msbuild binary path to PATH
-			" Trim newlines off the end
-			let msbuild_root = system('vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath')[:-2]
-			if executable(msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe')
-				let $PATH .= ';'.msbuild_root.'\MSBuild\15.0\Bin'
+		if executable('vswhere')
+			if !executable('msbuild')
+				" Add msbuild binary path to PATH
+				" Trim newlines off the end
+				let s:msbuild_root = system('vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath')[:-2]
+				let s:msbuild = s:msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe'
+				if executable(s:msbuild)
+					let $PATH .= ';'.s:msbuild_root.'\MSBuild\15.0\Bin'
+				endif
+			endif
+
+			if !executable('devenv')
+				" Finds the devenv binary
+				" Trim newlines off the end
+				let s:devenv_root = system('vswhere -latest -property installationPath')[:-2]
+				let s:devenv = s:devenv_root.'\Common7\IDE\devenv.exe'
+				if executable(s:devenv)
+					let $PATH .= ';'.s:devenv_root.'\Common7\IDE'
+				endif
 			endif
 		endif
 	endif
@@ -106,11 +119,11 @@
 			" Align
 			call dein#add('https://github.com/lboulard/Align.git')
 
+			" vim-sleuth
+			call dein#add('https://github.com/tpope/vim-sleuth.git')
+
 			" vim-surround
 			call dein#add('https://github.com/tpope/vim-surround.git')
-
-			" YAIFA
-			call dein#add('https://github.com/Raimondi/YAIFA.git')
 
 			" vim-repeat
 			call dein#add('https://github.com/tpope/vim-repeat.git')
@@ -492,12 +505,19 @@ endif
 				let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /clp:ErrorsOnly '.shellescape(OmniSharp#FindSolution())
 			endfunction
 
+			function! s:devenv_call() abort
+				" Call Visual Studio with current solution
+				let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(s:devenv).' '.shellescape(OmniSharp#FindSolution()).'"'
+				silent execute l:devenv_cmd
+			endfunction
+
 			function! s:omnisharp_options() abort
 				"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
 				setlocal omnifunc=OmniSharp#Complete
 
 				call s:msbuild_options()
 				command! -buffer -nargs=* MSBuild call s:msbuild_options() | make <args>
+				command! -buffer -nargs=* DevEnv call s:devenv_call()
 				call s:omnisharp_menu_check()
 
 				"The following commands are contextual, based on the current cursor position.
@@ -528,6 +548,8 @@ endif
 
 				" Builds can also run asynchronously with vim-dispatch installed
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'b'], 'MSBuild'                     , 'Build'               , 'build'               , v:true)
+				" Open the current solution in Visual Studio
+				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'v'], 'DevEnv'                      , 'Open Visual Studio'  , 'open_visual_studio'  , v:true)
 				" Force OmniSharp to reload the solution. Useful when switching branches etc.
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'r'], 'OmniSharpRestartServer'      , 'Restart Server'      , 'restart_server'      , v:true)
 
