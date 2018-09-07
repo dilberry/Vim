@@ -483,6 +483,7 @@ if dein#tap('vim-airline')
 
 		"Update the statusline
 		autocmd BufEnter * call airline#update_statusline()
+		autocmd WinEnter * call airline#update_statusline()
 		autocmd CursorHold * call airline#update_statusline()
 	augroup END
 endif
