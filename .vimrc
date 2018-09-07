@@ -455,7 +455,7 @@ if dein#tap('vim-airline')
 		catch
 			return '[' . a:name . ']'
 		endtry
-		
+
 		" In the form of Behind Ahead
 		let l:git_revs = split(l:git_rev[:-2])
 		let l:rev_stats = ''
@@ -477,6 +477,13 @@ if dein#tap('vim-airline')
 			return '[' . a:name . ': '. l:rev_stats . ']'
 		endif
 	endfunction
+
+	augroup airline_commands
+		autocmd!
+
+		"Update the statusline
+		autocmd CursorHold * call airline#update_statusline()
+	augroup END
 endif
 " }
 
