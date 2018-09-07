@@ -442,8 +442,32 @@ if dein#tap('vim-airline')
 	let g:airline#extensions#tagbar#enabled = 1
 	let g:airline#extensions#ale#enabled    = 1
 	let g:airline#extensions#hunks#enabled  = 1
-endif
-" }
+	let g:airline#extensions#branch#enabled = 1
+	let g:airline#extensions#branch#format = 'CustomBranchName'
+
+	function! CustomBranchName(name) abort
+		let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)[:-2]
+		" In the form of Behind Ahead
+		let l:git_revs = split(l:git_rev)
+		let l:rev_stats = ''
+
+		" Check behind and ahead
+		if l:git_revs[0] != '0' && l:git_revs[1] != '0'
+			let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
+		" Check behind
+		elseif l:git_revs[0] != '0'
+			let l:rev_stats = 'Behind ' . l:git_revs[0]
+		" Check ahead
+		elseif l:git_revs[1] != '0'
+			let l:rev_stats = 'Ahead ' . l:git_revs[1]
+		endif
+
+		if l:rev_stats == ''
+			return '[' . a:name . ']'
+		else
+			return '[' . a:name . ': '. l:rev_stats . ']'
+		endif
+	endfunction
 
 " Filetype plugins {
 	" ale settings {
