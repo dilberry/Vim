@@ -482,9 +482,8 @@ if dein#tap('vim-airline')
 		autocmd!
 
 		"Update the statusline
-		autocmd BufEnter * call airline#update_statusline()
-		autocmd WinEnter * call airline#update_statusline()
-		autocmd CursorHold * call airline#update_statusline()
+		autocmd BufEnter * silent execute 'AirlineRefresh'
+		autocmd WinEnter * silent execute 'AirlineRefresh'
 	augroup END
 endif
 " }
