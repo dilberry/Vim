@@ -88,6 +88,9 @@
 			" vim-airline
 			call dein#add('https://github.com/vim-airline/vim-airline.git')
 
+			" vim-airline-themes
+			call dein#add('https://github.com/vim-airline/vim-airline-themes.git')
+
 			" vim-colorschemes
 			call dein#add('https://github.com/flazz/vim-colorschemes.git')
 
@@ -443,12 +446,18 @@ if dein#tap('vim-airline')
 	let g:airline#extensions#ale#enabled    = 1
 	let g:airline#extensions#hunks#enabled  = 1
 	let g:airline#extensions#branch#enabled = 1
-	let g:airline#extensions#branch#format = 'CustomBranchName'
+	let g:airline#extensions#branch#format  = 'CustomBranchName'
 
-	function! CustomBranchName(name) abort
-		let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)[:-2]
+	" TODO: Make the branch section change colour on on ahead condition
+	function! CustomBranchName(name)
+		try
+			let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)
+		catch
+			return '[' . a:name . ']'
+		endtry
+		
 		" In the form of Behind Ahead
-		let l:git_revs = split(l:git_rev)
+		let l:git_revs = split(l:git_rev[:-2])
 		let l:rev_stats = ''
 
 		" Check behind and ahead
@@ -468,6 +477,14 @@ if dein#tap('vim-airline')
 			return '[' . a:name . ': '. l:rev_stats . ']'
 		endif
 	endfunction
+endif
+" }
+
+" vim-airline-themes options {
+if dein#tap('vim-airline-themes')
+	let g:airline_theme = 'wombat'
+endif
+" }
 
 " Filetype plugins {
 	" ale settings {
