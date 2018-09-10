@@ -449,9 +449,9 @@ if dein#tap('vim-airline')
 	let g:airline#extensions#branch#format  = 'CustomBranchName'
 	" FIXME: These should be buffer variables
 	let g:airline_branch_ahead = v:false
-	let g:airline_branch_rendered = v:false
 
 	function! CustomBranchName(name)
+		let g:airline_branch_ahead = v:false
 		try
 			let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)
 		catch
@@ -462,7 +462,6 @@ if dein#tap('vim-airline')
 		let l:git_revs = split(l:git_rev[:-2])
 		let l:rev_stats = ''
 
-		let g:airline_branch_ahead = v:false
 		" Check behind and ahead
 		if l:git_revs[0] != '0' && l:git_revs[1] != '0'
 			let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
@@ -486,15 +485,12 @@ if dein#tap('vim-airline')
 	function! BranchColour()
 		let l:head = airline#extensions#branch#get_head()
 
-		if !g:airline_branch_rendered
-			if g:airline_branch_ahead == v:true
-				call airline#parts#define_accent('branch', 'stale')
-			else
-				call airline#parts#define_accent('branch', 'none')
-			endif
-			let g:airline_branch_rendered = v:true
-			let g:airline_section_b = airline#section#create(['hunks', 'branch'])
+		if g:airline_branch_ahead
+			call airline#parts#define_accent('branch', 'stale')
+		else
+			call airline#parts#define_accent('branch', 'none')
 		endif
+		let g:airline_section_b = airline#section#create(['hunks', 'branch'])
 		return l:head
 	endfunction
 
@@ -512,7 +508,6 @@ if dein#tap('vim-airline')
 	endfunction
 
 	function! s:branch_colour_redraw()
-		let g:airline_branch_rendered = v:false
 		call BranchColour()
 		AirlineRefresh
 	endfunction
