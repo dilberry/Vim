@@ -447,8 +447,10 @@ if dein#tap('vim-airline')
 	let g:airline#extensions#hunks#enabled  = 1
 	let g:airline#extensions#branch#enabled = 1
 	let g:airline#extensions#branch#format  = 'CustomBranchName'
+	" FIXME: These should be buffer variables
+	let g:airline_branch_ahead = v:false
+	let g:airline_branch_rendered = v:false
 
-	" TODO: Make the branch section change colour on on ahead condition
 	function! CustomBranchName(name)
 		try
 			let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)
@@ -460,15 +462,18 @@ if dein#tap('vim-airline')
 		let l:git_revs = split(l:git_rev[:-2])
 		let l:rev_stats = ''
 
+		let g:airline_branch_ahead = v:false
 		" Check behind and ahead
 		if l:git_revs[0] != '0' && l:git_revs[1] != '0'
 			let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
+			let g:airline_branch_ahead = v:true
 		" Check behind
 		elseif l:git_revs[0] != '0'
 			let l:rev_stats = 'Behind ' . l:git_revs[0]
 		" Check ahead
 		elseif l:git_revs[1] != '0'
 			let l:rev_stats = 'Ahead ' . l:git_revs[1]
+			let g:airline_branch_ahead = v:true
 		endif
 
 		if l:rev_stats == ''
@@ -478,12 +483,47 @@ if dein#tap('vim-airline')
 		endif
 	endfunction
 
+	function! BranchColour()
+		let l:head = airline#extensions#branch#get_head()
+
+		if !g:airline_branch_rendered
+			if g:airline_branch_ahead == v:true
+				call airline#parts#define_accent('branch', 'stale')
+			else
+				call airline#parts#define_accent('branch', 'none')
+			endif
+			let g:airline_branch_rendered = v:true
+			let g:airline_section_b = airline#section#create(['hunks', 'branch'])
+		endif
+		return l:head
+	endfunction
+
+	call airline#parts#define_empty(['hunks', 'branch'])
+	call airline#parts#define_function('hunks', 'airline#extensions#hunks#get_hunks')
+	call airline#parts#define_function('branch', 'BranchColour')
+	let g:airline_section_b = airline#section#create(['hunks', 'branch'])
+
+	let g:airline_theme_patch_func = 'AirlineThemePatch'
+	function! AirlineThemePatch(palette)
+		" [ guifg, guibg, ctermfg, ctermbg, opts ].
+		" See "help attr-list" for valid values for the "opt" value.
+		" http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim
+		let a:palette.accents.stale = [ '#ff0000', '' , 'red', '', '' ]
+	endfunction
+
+	function! s:branch_colour_redraw()
+		let g:airline_branch_rendered = v:false
+		call BranchColour()
+		AirlineRefresh
+	endfunction
+	command! -nargs=* BranchColourRedraw call s:branch_colour_redraw()
+
+	" FIXME: This is isn't working when bnexting between changing between git repos
 	augroup airline_commands
 		autocmd!
 
 		"Update the statusline
-		autocmd BufEnter * silent execute 'AirlineRefresh'
-		autocmd WinEnter * silent execute 'AirlineRefresh'
+		autocmd BufEnter * silent execute 'BranchColourRedraw'
 	augroup END
 endif
 " }
