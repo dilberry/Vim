@@ -553,6 +553,7 @@ endif
 			" FIXME: Running GDiff causes Omnisharp to ask for solution files
 			function! s:omnisharp_menu_check() abort
 				if dein#tap('denite.nvim')
+					" FIXME: This denite menu doesn't work
 					if !exists('s:menus.o')
 						let s:menus.o = {'description': 'Omnisharp'}
 						let s:menus.o.command_candidates = []
@@ -930,7 +931,6 @@ if dein#tap('vim-fugitive')
 	call s:leader_bind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , v:true)
-	call s:leader_bind('nnoremap <silent>', ['g', 'C'], 'Gcheckout'    , 'Checkout'             , 'checkout'             , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'   , 'Diff HEAD'            , 'diff HEAD'            , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'd'], 'Gdiff'        , 'Diff'                 , 'diff'                 , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>', 'Move'                 , 'move'                 , v:false)
@@ -1034,6 +1034,12 @@ if dein#tap('vim-leader-guide')
 
 	if dein#tap('vim-fugitive')
 		let g:lmap.g = {'name': 'Git/'}
+
+		" denite-git options {
+		if dein#tap('denite.nvim') && dein#tap('denite-git')
+			let g:lmap.g.g = {'name': 'Denite Git/'}
+		endif
+		" }
 	endif
 
 	let g:lmap.b = {'name': 'Buffer/'}
@@ -1147,6 +1153,16 @@ if dein#tap('denite.nvim')
 	if dein#tap('vim-fugitive')
 		let s:menus.g = {'description': 'Git'}
 		let s:menus.g.command_candidates = []
+
+		" denite-git options {
+		if dein#tap('denite-git')
+			" FIXME: This denite menu doesn't work
+			let s:menus.g.g = {'description': 'Denite Git'}
+			let s:menus.g.g.command_candidates = []
+			call s:leader_bind('nnoremap <silent>', ['g', 'g', 'b'], 'Denite gitbranch', 'Denite Git Branch', 'denite_gitbranch', v:true)
+			call s:leader_bind('nnoremap <silent>', ['g', 'g', 's'], 'Denite gitstatus', 'Denite Git Status', 'denite_gitstatus', v:true)
+		endif
+		" }
 	endif
 
 	if executable('rg')
