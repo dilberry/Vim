@@ -173,7 +173,7 @@
 			endif
 
 			" omnisharp-vim
-			call dein#add('https://github.com/dilberry/omnisharp-vim.git', { 'merged': 0, 'on_ft': 'cs' })
+			call dein#add('https://github.com/dilberry/omnisharp-vim.git', { 'merged': 0, 'on_ft': ['cs', 'csproj', 'sln'] })
 
 			" deoplete-jedi
 			" Requires jedi package in python install
@@ -659,6 +659,8 @@ endif
 
 				"Set omnisharp key mappings
 				autocmd FileType cs call s:omnisharp_options()
+				autocmd FileType csproj call s:omnisharp_options()
+				autocmd FileType sln call s:omnisharp_options()
 
 				"show type information automatically when the cursor stops moving
 				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()

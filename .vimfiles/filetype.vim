@@ -7,4 +7,10 @@ augroup filetypedetect
 
 	" Cake Build scripts
 	au! BufRead,BufNewFile *.cake			setf cs
+
+	" Csproj
+	au! BufRead,BufNewFile *.csproj			setf csproj
+
+	" Sln
+	au! BufRead,BufNewFile *.sln			setf sln
 augroup END
