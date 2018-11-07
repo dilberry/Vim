@@ -444,62 +444,60 @@ if dein#tap('vim-airline')
 	let g:airline_detect_modified           = 1
 	let g:airline#extensions#tagbar#enabled = 1
 	let g:airline#extensions#ale#enabled    = 1
-	let g:airline#extensions#hunks#enabled  = 1
 	let g:airline#extensions#branch#enabled = 1
-	let g:airline#extensions#branch#format  = 'CustomBranchName'
+	let g:airline#extensions#branch#format  = 1
 	" FIXME: These should be buffer variables
-	let g:airline_branch_ahead = v:false
 
-	function! CustomBranchName(name)
-		let g:airline_branch_ahead = v:false
+	function! CustomBranchName(name) abort
+		let b:airline_branch_ahead = v:false
 		try
-			let l:git_rev = system('git rev-list --left-right --count origin/'.a:name.'...'.a:name)
+			let l:git_rev = fugitive#repo().git_chomp('rev-list', '--left-right', '--count', 'origin/'.a:name.'...'.a:name)
+			" In the form of Behind Ahead
+			let l:git_revs = split(l:git_rev, '\D')
+			let l:rev_stats = ''
+
+			" Check behind and ahead
+			if l:git_revs[0] != '0' && l:git_revs[1] != '0'
+				let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
+				let b:airline_branch_ahead = v:true
+			" Check behind
+			elseif l:git_revs[0] != '0'
+				let l:rev_stats = 'Behind ' . l:git_revs[0]
+			" Check ahead
+			elseif l:git_revs[1] != '0'
+				let l:rev_stats = 'Ahead ' . l:git_revs[1]
+				let b:airline_branch_ahead = v:true
+			endif
+
+			if l:rev_stats == ''
+				return '[' . a:name . ']'
+			else
+				return '[' . a:name . ': '. l:rev_stats . ']'
+			endif
 		catch
 			return '[' . a:name . ']'
 		endtry
-
-		" In the form of Behind Ahead
-		let l:git_revs = split(l:git_rev[:-2])
-		let l:rev_stats = ''
-
-		" Check behind and ahead
-		if l:git_revs[0] != '0' && l:git_revs[1] != '0'
-			let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
-			let g:airline_branch_ahead = v:true
-		" Check behind
-		elseif l:git_revs[0] != '0'
-			let l:rev_stats = 'Behind ' . l:git_revs[0]
-		" Check ahead
-		elseif l:git_revs[1] != '0'
-			let l:rev_stats = 'Ahead ' . l:git_revs[1]
-			let g:airline_branch_ahead = v:true
-		endif
-
-		if l:rev_stats == ''
-			return '[' . a:name . ']'
-		else
-			return '[' . a:name . ': '. l:rev_stats . ']'
-		endif
 	endfunction
 
-	function! BranchColour()
-		let l:head = airline#extensions#branch#get_head()
+	function! BranchColour() abort
+		if exists('b:custom_branch') && !empty(b:custom_branch)
+			return b:custom_branch
+		else
+			let l:head = airline#extensions#branch#head()
+			let b:custom_branch = CustomBranchName(l:head)
+		endif
 
-		if g:airline_branch_ahead
+		if b:airline_branch_ahead
 			call airline#parts#define_accent('branch', 'stale')
 		else
 			call airline#parts#define_accent('branch', 'none')
 		endif
-		let g:airline_section_b = airline#section#create(['hunks', 'branch'])
-		return l:head
+
+		let g:airline_section_b = airline#section#create(['branch'])
+
+		return b:custom_branch
 	endfunction
 
-	call airline#parts#define_empty(['hunks', 'branch'])
-	call airline#parts#define_function('hunks', 'airline#extensions#hunks#get_hunks')
-	call airline#parts#define_function('branch', 'BranchColour')
-	let g:airline_section_b = airline#section#create(['hunks', 'branch'])
-
-	let g:airline_theme_patch_func = 'AirlineThemePatch'
 	function! AirlineThemePatch(palette)
 		" [ guifg, guibg, ctermfg, ctermbg, opts ].
 		" See "help attr-list" for valid values for the "opt" value.
@@ -507,19 +505,24 @@ if dein#tap('vim-airline')
 		let a:palette.accents.stale = [ '#ff0000', '' , 'red', '', '' ]
 	endfunction
 
-	function! s:branch_colour_redraw()
-		call BranchColour()
-		AirlineRefresh
-	endfunction
-	command! -nargs=* BranchColourRedraw call s:branch_colour_redraw()
-
-	" FIXME: This is isn't working when bnexting between changing between git repos
-	augroup airline_commands
+	exec 'augroup airline_init-'. bufnr("%")
 		autocmd!
-
-		"Update the statusline
-		autocmd BufEnter * silent execute 'BranchColourRedraw'
+		autocmd User AirlineAfterInit call s:airline_init()
+		autocmd ShellCmdPost,CmdwinLeave * unlet! b:custom_branch
+		autocmd BufLeave <buffer> silent! unlet! b:custom_branch
 	augroup END
+
+	function! s:airline_init()
+		let b:custom_branch = ''
+		let b:airline_branch_ahead = v:false
+		call airline#parts#define_empty(['branch'])
+		call airline#parts#define_function('branch', 'BranchColour')
+		let g:airline_section_b = airline#section#create(['branch'])
+		" TODO: Use the following to check when outside a Git repo
+		" TODO: call airline#parts#define_condition('foo', 'getcwd() =~ work_dir')
+
+		let g:airline_theme_patch_func = 'AirlineThemePatch'
+	endfunction
 endif
 " }
 
