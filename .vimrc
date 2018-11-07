@@ -446,7 +446,6 @@ if dein#tap('vim-airline')
 	let g:airline#extensions#ale#enabled    = 1
 	let g:airline#extensions#branch#enabled = 1
 	let g:airline#extensions#branch#format  = 1
-	" FIXME: These should be buffer variables
 
 	function! CustomBranchName(name) abort
 		let b:airline_branch_ahead = v:false
@@ -650,10 +649,12 @@ endif
 			endfunction
 
 			function! s:omnisharp_count_code_actions() abort
-				if OmniSharp#CountCodeActions({-> execute('sign unplace 99')})
-					let l = getpos('.')[1]
-					let f = expand('%:p')
-					execute ':sign place 99 line='.l.' name=OmniSharpCodeActions file='.f
+				if OmniSharp#IsServerRunning()
+					if OmniSharp#CountCodeActions({-> execute('sign unplace 99')})
+						let l = getpos('.')[1]
+						let f = expand('%:p')
+						execute ':sign place 99 line='.l.' name=OmniSharpCodeActions file='.f
+					endif
 				endif
 			endfunction
 
