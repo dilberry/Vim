@@ -151,6 +151,9 @@
 			" denite-extra
 			call dein#add('https://github.com/neoclide/denite-extra.git')
 
+			" fruzzy
+			call dein#add('https://github.com/raghur/fruzzy.git')
+
 			" neoyank.vim
 			call dein#add('https://github.com/Shougo/neoyank.vim.git')
 
@@ -1098,6 +1101,8 @@ if dein#tap('denite.nvim')
 	call denite#custom#option('default', 'highlight_mode_normal', 'Cursorline')
 
 	call denite#custom#source('buffer', 'sorters', ['sorter_mru'])
+	" A better fuzzy matcher
+	call denite#custom#source('_', 'matchers', ['matcher/fruzzy'])
 
 	if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
 		" TODO: The outline source can't handle etags format with options files
