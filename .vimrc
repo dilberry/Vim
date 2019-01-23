@@ -1101,8 +1101,12 @@ if dein#tap('denite.nvim')
 	call denite#custom#option('default', 'highlight_mode_normal', 'Cursorline')
 
 	call denite#custom#source('buffer', 'sorters', ['sorter_mru'])
-	" A better fuzzy matcher
-	call denite#custom#source('_', 'matchers', ['matcher/fruzzy'])
+
+	" Matchers
+	call denite#custom#source('buffer'      , 'matchers', ['matcher_regexp'                 ])
+	call denite#custom#source('file_mru'    , 'matchers', ['matcher_regexp'                 ])
+	call denite#custom#source('file'        , 'matchers', ['matcher/fruzzy', 'matcher_fuzzy'])
+	call denite#custom#source('file_rec_git', 'matchers', ['matcher/fruzzy'                 ])
 
 	if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
 		" TODO: The outline source can't handle etags format with options files
