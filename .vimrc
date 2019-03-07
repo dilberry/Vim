@@ -83,7 +83,7 @@
 
 		" UI {
 			" ale
-			call dein#add('https://github.com/w0rp/ale.git')
+			call dein#add('https://github.com/w0rp/ale.git', {'rev': '*'})
 
 			" vim-airline
 			call dein#add('https://github.com/vim-airline/vim-airline.git')
@@ -95,7 +95,7 @@
 			call dein#add('https://github.com/flazz/vim-colorschemes.git')
 
 			" colour-schemes
-			call dein#add('https://github.com/daylerees/colour-schemes.git', { 'rtp': 'vim'})
+			call dein#add('https://github.com/daylerees/colour-schemes.git', {'rtp': 'vim'})
 
 			" random-colorscheme-picker
 			call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
@@ -140,7 +140,7 @@
 
 		" Browsing {
 			" denite
-			call dein#add('https://github.com/Shougo/denite.nvim.git')
+			call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': '1.1'})
 
 			" denite-ale
 			call dein#add('https://github.com/iyuuya/denite-ale.git')
@@ -180,19 +180,19 @@
 
 			" deoplete-jedi
 			" Requires jedi package in python install
-			call dein#add('https://github.com/zchee/deoplete-jedi.git', { 'depends': ['deoplete.nvim'], 'on_ft': ['python', 'python3', 'djangohtml']})
+			call dein#add('https://github.com/zchee/deoplete-jedi.git', {'depends': ['deoplete.nvim'], 'on_ft': ['python', 'python3', 'djangohtml']})
 
 			" neco-vim
-			call dein#add('https://github.com/Shougo/neco-vim.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+			call dein#add('https://github.com/Shougo/neco-vim.git', {'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
 
 			" neco-syntax
-			call dein#add('https://github.com/Shougo/neco-syntax.git', { 'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+			call dein#add('https://github.com/Shougo/neco-syntax.git', {'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
 
 			" deoplete-ternjs
-			call dein#add('https://github.com/carlitux/deoplete-ternjs.git', { 'depends': ['deoplete.nvim'], 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
+			call dein#add('https://github.com/carlitux/deoplete-ternjs.git', {'depends': ['deoplete.nvim'], 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
 
 			" jspc.vim
-			call dein#add('https://github.com/othree/jspc.vim.git', { 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
+			call dein#add('https://github.com/othree/jspc.vim.git', {'on_ft': ['javascript', 'javascript.jsx', 'vue']})
 		" }
 
 		" Tags {
@@ -205,13 +205,13 @@
 
 		" File types{
 			" vim-csharp
-			call dein#add('https://github.com/OrangeT/vim-csharp.git', { 'on_ft': 'cs' })
+			call dein#add('https://github.com/OrangeT/vim-csharp.git', {'on_ft': 'cs' })
 
 			" vim-polyglot
 			call dein#add('https://github.com/sheerun/vim-polyglot.git')
 
 			" vim-jsbeautify
-			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', { 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css', 'xml']})
+			call dein#add('https://github.com/maksimr/vim-jsbeautify.git', {'on_ft': ['javascript', 'json', 'jsx', 'html', 'css', 'xml']})
 		" }
 
 		" Check for unmet dependencies
@@ -440,6 +440,13 @@
 	endif
 " }
 
+" Quickfix options {
+	augroup DragQuickfixWindowDown
+		autocmd!
+		autocmd FileType qf wincmd J
+	augroup end
+" }
+
 " vim-airline options {
 if dein#tap('vim-airline')
 	set laststatus=2 " Show 2 lines of status
@@ -540,6 +547,8 @@ endif
 		call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', v:true)
 		nmap <silent> [s <Plug>(ale_previous)
 		nmap <silent> ]s <Plug>(ale_next)
+		" FIXME: The Omnisharp linter is broken producing errors about duplicate definitions
+		let g:ale_linters = { 'cs': ['mcs'] }
 	endif
 	" }
 
@@ -669,7 +678,7 @@ endif
 				autocmd FileType csproj call s:omnisharp_options()
 				autocmd FileType sln call s:omnisharp_options()
 
-				"show type information automatically when the cursor stops moving
+				"Show type information automatically when the cursor stops moving
 				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 				autocmd CursorHold *.cs call s:omnisharp_count_code_actions()
 			augroup END
@@ -681,9 +690,8 @@ endif
 			sign define OmniSharpCodeActions text=💡
 			let g:OmniSharp_server_type = 'roslyn'
 			let g:OmniSharp_prefer_global_sln = 0
-			let g:OmniSharp_timeout = 10
+			let g:OmniSharp_timeout = 5
 			let g:OmniSharp_selector_ui = ''
-
 		endif
 		" }
 	" }
