@@ -79,6 +79,7 @@
 	if dein#load_state(g:dein_plugins_dir)
 		call dein#begin(g:dein_plugins_dir)
 
+		" dein
 		call dein#add(g:dein_plugins_dir)
 
 		" UI {
@@ -176,7 +177,7 @@
 			endif
 
 			" omnisharp-vim
-			call dein#add('https://github.com/dilberry/omnisharp-vim.git', { 'merged': 0, 'on_ft': ['cs', 'csproj', 'sln'] })
+			call dein#add('https://github.com/OmniSharp/omnisharp-vim.git', {'merged': 0, 'on_ft': ['cs', 'csproj', 'sln']})
 
 			" deoplete-jedi
 			" Requires jedi package in python install
@@ -547,8 +548,10 @@ endif
 		call s:leader_bind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', v:true)
 		nmap <silent> [s <Plug>(ale_previous)
 		nmap <silent> ]s <Plug>(ale_next)
-		" FIXME: The Omnisharp linter is broken producing errors about duplicate definitions
-		let g:ale_linters = { 'cs': ['mcs'] }
+
+		if dein#tap('omnisharp-vim')
+			let g:ale_linters = { 'cs': ['Omnisharp'] }
+		endif
 	endif
 	" }
 
@@ -601,12 +604,12 @@ endif
 				setlocal errorformat=\ %#%f(%l\\\,%c):\ %m
 
 				" Msbuild setting for make
-				let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /clp:ErrorsOnly '.shellescape(OmniSharp#FindSolution())
+				let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /clp:ErrorsOnly '.shellescape(OmniSharp#FindSolutionOrDir())
 			endfunction
 
 			function! s:devenv_call() abort
 				" Call Visual Studio with current solution
-				let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(s:devenv).' '.shellescape(OmniSharp#FindSolution()).'"'
+				let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(s:devenv).' '.shellescape(OmniSharp#FindSolutionOrDir()).'"'
 				silent execute l:devenv_cmd
 			endfunction
 
