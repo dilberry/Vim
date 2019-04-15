@@ -141,7 +141,7 @@
 
 		" Browsing {
 			" denite
-			call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': '1.1'})
+			call dein#add('https://github.com/Shougo/denite.nvim.git')
 
 			" denite-ale
 			call dein#add('https://github.com/iyuuya/denite-ale.git')
@@ -660,7 +660,14 @@ endif
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'p'], 'OmniSharpStopServer'         , 'Stop Server'         , 'stop_server'         , v:true)
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'h'], 'OmniSharpHighlightTypes'     , 'Highlight Types'     , 'highlight_types'     , v:true)
 
+				" Search for files from the Solution Directory
+				call s:leader_bind('nnoremap <silent>', ['f', 'p'], 'call SolutionFileList()', 'Files (Solution Recursive)', 'file_rec_git', v:true)
+
 				call s:leader_binds_process()
+			endfunction
+
+			function! SolutionFileList()
+				call denite#start([{'name': 'file_rec_git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(), ':h')]}])
 			endfunction
 
 			function! s:omnisharp_count_code_actions() abort
