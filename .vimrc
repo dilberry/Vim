@@ -966,6 +966,7 @@ if dein#tap('vim-fugitive')
 	call s:leader_bind('nnoremap <silent>', ['g', 'r'], 'Gread'        , 'Checkout current file', 'checkout-current-file', v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 's'], 'Gstatus'      , 'Status'               , 'status'               , v:true)
 	call s:leader_bind('nnoremap <silent>', ['g', 'w'], 'Gwrite'       , 'Write'                , 'write'                , v:true)
+	call s:leader_bind('nnoremap <silent>', ['g', 'u'], 'Git add -u'   , 'Update'               , 'update'               , v:true)
 endif
 " }
 
