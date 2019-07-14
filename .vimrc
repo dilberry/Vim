@@ -661,13 +661,13 @@ endif
 				call s:leader_bind('nnoremap <buffer>', ['o', 's', 'h'], 'OmniSharpHighlightTypes'     , 'Highlight Types'     , 'highlight_types'     , v:true)
 
 				" Search for files from the Solution Directory
-				call s:leader_bind('nnoremap <silent>', ['f', 'p'], 'call SolutionFileList()', 'Files (Solution Recursive)', 'file_rec_git', v:true)
+				call s:leader_bind('nnoremap <silent>', ['f', 'p'], 'call SolutionFileList()', 'Files (Solution Recursive)', 'file/rec/git', v:true)
 
 				call s:leader_binds_process()
 			endfunction
 
 			function! SolutionFileList()
-				call denite#start([{'name': 'file_rec_git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(), ':h')]}])
+				call denite#start([{'name': 'file/rec/git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(), ':h')]}])
 			endfunction
 
 			function! s:omnisharp_count_code_actions() abort
@@ -1113,40 +1113,66 @@ if dein#tap('denite.nvim')
 			\'winheight', winheight(0) / 2)
 	augroup end
 
-	call denite#custom#option('default', 'prompt', 'λ')
-	call denite#custom#option('default', 'auto_resize', v:true)
-	call denite#custom#option('default', 'smartcase', v:true)
-	call denite#custom#option('default', 'highlight_mode_insert', 'Pmenu')
-	call denite#custom#option('default', 'highlight_mode_normal', 'Cursorline')
+	" Options
+	let s:denite_options = {
+	\ 'prompt'                      : 'λ',
+	\ 'start_filter'                : v:true,
+	\ 'auto_resize'                 : v:true,
+	\ 'smartcase'                   : v:true,
+	\ 'source_names'                : 'short',
+	\ 'highlight_filter_background' : 'CursorLine',
+	\ 'highlight_matched_char'      : 'Type',
+	\ }
 
-	call denite#custom#source('buffer', 'sorters', ['sorter_mru'])
+	call denite#custom#option('default', s:denite_options)
+
+	" Sorters
+	call denite#custom#source('file',         'sorters', ['sorter/sublime'])
+	call denite#custom#source('file/rec/git', 'sorters', ['sorter/sublime'])
 
 	" Matchers
-	call denite#custom#source('buffer'      , 'matchers', ['matcher_regexp'                 ])
-	call denite#custom#source('file_mru'    , 'matchers', ['matcher_regexp'                 ])
-	call denite#custom#source('file'        , 'matchers', ['matcher/fruzzy', 'matcher_fuzzy'])
-	call denite#custom#source('file_rec_git', 'matchers', ['matcher/fruzzy'                 ])
+	call denite#custom#source('buffer'      , 'matchers', ['matcher/regexp'])
+	call denite#custom#source('file_mru'    , 'matchers', ['matcher/regexp'])
+	call denite#custom#source('file'        , 'matchers', ['matcher/fuzzy' ])
+	call denite#custom#source('file/rec/git', 'matchers', ['matcher/fuzzy' ])
+
+	" Converters
+	call denite#custom#source('file/old', 'converters', ['converter/relative_word'])
+	call denite#custom#source('gitstatus', 'converters', ['converter/relative_word'])
 
 	if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
 		" TODO: The outline source can't handle etags format with options files
 		call denite#custom#var('outline', 'options', ['−−options='.$VIMHOME.'\utils\ctags\ctags.cfg'])
 	endif
 
-	call denite#custom#map('insert', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
-	call denite#custom#map('insert', '<C-P>' , '<denite:move_to_previous_line>'         , 'noremap')
-	call denite#custom#map('insert', '<C-N>' , '<denite:move_to_next_line>'             , 'noremap')
-	call denite#custom#map('insert', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
-	call denite#custom#map('insert', '<C-G>' , '<denite:assign_next_txt>'               , 'noremap')
-	call denite#custom#map('insert', '<C-T>' , '<denite:assign_previous_line>'          , 'noremap')
-	call denite#custom#map('insert', '<C-h>' , '<denite:smart_delete_char_before_caret>', 'noremap')
-	call denite#custom#map('insert', '<Esc>' , '<denite:enter_mode:normal>'             , 'noremap')
-	call denite#custom#map('normal', '/'     , '<denite:enter_mode:insert>'             , 'noremap')
-	call denite#custom#map('normal', '<Esc>' , '<denite:quit>'                          , 'noremap')
-	call denite#custom#map('normal', '<Up>'  , '<denite:move_to_previous_line>'         , 'noremap')
-	call denite#custom#map('normal', '<Down>', '<denite:move_to_next_line>'             , 'noremap')
-	call denite#custom#map('normal', 'yy'    , '<denite:do_action:yank>'                , 'noremap')
-	call denite#custom#map('normal', '<C-a>' , '<denite:multiple_mappings:denite:toggle_select_all>', 'noremap')
-	call denite#custom#map('normal', 'q'     , '<denite:do_action:quickfix>'            , 'noremap')
+	call denite#custom#var('outline', 'file_opt', '-f')
+
+	autocmd FileType denite call s:denite_normal_mappings()
+	function! s:denite_normal_mappings() abort
+		nnoremap <silent><buffer><expr> <Esc>   denite#do_map('quit')
+		nnoremap <silent><buffer><expr> <Tab>   denite#do_map('choose_action')
+		nnoremap <silent><buffer><expr> <CR>    denite#do_map('do_action')
+		nnoremap <silent><buffer><expr> /       denite#do_map('open_filter_buffer')
+		nnoremap <silent><buffer><expr> i       denite#do_map('open_filter_buffer')
+		nnoremap <silent><buffer><expr> <Up>    'k'
+		nnoremap <silent><buffer><expr> <Down>  'j'
+		nnoremap <silent><buffer><expr> yy      denite#do_map('do_action', 'yank')
+		nnoremap <silent><buffer><expr> d       denite#do_map('do_action', 'delete')
+		nnoremap <silent><buffer><expr> <C-a>   denite#do_map('toggle_select_all')
+		nnoremap <silent><buffer><expr> <Space> denite#do_map('toggle_select').'j'
+		nnoremap <silent><buffer><expr> q       denite#do_map('do_action', 'quickfix')
+	endfunction
+
+	autocmd FileType denite-filter call s:denite_filter_mappings()
+	function! s:denite_filter_mappings() abort
+		imap     <silent><buffer>       <Esc>  <Plug>(denite_filter_quit)
+		inoremap <silent><buffer><expr> <Tab>  denite#do_map('choose_action')
+		inoremap <silent><buffer>       <Up>   <Esc><C-w>p:call cursor(line('.')-1,0)<CR>
+		inoremap <silent><buffer>       <Down> <Esc><C-w>p:call cursor(line('.')+1,0)<CR>
+		inoremap <silent><buffer><expr> <C-t>  denite#do_map('do_action', 'tabopen')
+		inoremap <silent><buffer><expr> <C-v>  denite#do_map('do_action', 'vsplit')
+		inoremap <silent><buffer><expr> <C-x>  denite#do_map('do_action', 'split')
+	endfunction
 
 	let s:menus.b = {'description': 'Buffer'}
 	let s:menus.b.command_candidates = []
@@ -1171,9 +1197,9 @@ if dein#tap('denite.nvim')
 	let s:menus.f = {'description': 'Files'}
 	let s:menus.f.command_candidates = []
 	call s:leader_bind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'Files'                , 'file'        , v:true)
-	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file_mru'              , 'Files (Most Used)'    , 'file_mru'    , v:true)
-	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file_rec'              , 'Files (Recursive)'    , 'file_rec'    , v:true)
-	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file_rec_git', 'Files (Git Recursive)', 'file_rec_git', v:true)
+	call s:leader_bind('nnoremap <silent>', ['f', 'm'], 'Denite file/old'              , 'Files (Most Used)'    , 'file/old'    , v:true)
+	call s:leader_bind('nnoremap <silent>', ['f', 'r'], 'Denite file/rec'              , 'Files (Recursive)'    , 'file/rec'    , v:true)
+	call s:leader_bind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file/rec/git', 'Files (Git Recursive)', 'file/rec/git', v:true)
 
 	let s:menus.t = {'description': 'Tags'}
 	let s:menus.t.command_candidates = []
@@ -1200,7 +1226,7 @@ if dein#tap('denite.nvim')
 	endif
 
 	if executable('rg')
-		call denite#custom#var('file_rec', 'command', ['rg', '--files', '--no-heading', '--glob', '!.git', ''])
+		call denite#custom#var('file/rec', 'command', ['rg', '--files', '--no-heading', '--glob', '!.git', ''])
 		call denite#custom#var('grep', 'command', ['rg', '--smart-case'])
 		call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
 		call denite#custom#var('grep', 'recursive_opts', [])
@@ -1210,8 +1236,8 @@ if dein#tap('denite.nvim')
 	endif
 
 	if executable('git')
-		call denite#custom#alias('source', 'file_rec_git', 'file_rec')
-		call denite#custom#var('file_rec_git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
+		call denite#custom#alias('source', 'file/rec/git', 'file/rec')
+		call denite#custom#var('file/rec/git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
 	endif
 endif
 " }
