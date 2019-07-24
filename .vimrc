@@ -667,15 +667,17 @@ endif
 			endfunction
 
 			function! SolutionFileList()
-				call denite#start([{'name': 'file/rec/git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(), ':h')]}])
+				call denite#start([{'name': 'file/rec/git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(1, 0), ':h')]}])
 			endfunction
 
 			function! s:omnisharp_count_code_actions() abort
-				if OmniSharp#IsServerRunning()
-					if OmniSharp#CountCodeActions({-> execute('sign unplace 99')})
-						let l = getpos('.')[1]
-						let f = expand('%:p')
-						execute ':sign place 99 line='.l.' name=OmniSharpCodeActions file='.f
+				if OmniSharp#FindSolutionOrDir(1, 0)
+					if OmniSharp#IsServerRunning()
+						if OmniSharp#CountCodeActions({-> execute('sign unplace 99')})
+							let l = getpos('.')[1]
+							let f = expand('%:p')
+							execute ':sign place 99 line='.l.' name=OmniSharpCodeActions file='.f
+						endif
 					endif
 				endif
 			endfunction
@@ -689,7 +691,6 @@ endif
 				autocmd FileType sln call s:omnisharp_options()
 
 				"Show type information automatically when the cursor stops moving
-				autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
 				autocmd CursorHold *.cs call s:omnisharp_count_code_actions()
 			augroup END
 
@@ -700,6 +701,13 @@ endif
 			sign define OmniSharpCodeActions text=💡
 			let g:OmniSharp_server_type = 'roslyn'
 			let g:OmniSharp_prefer_global_sln = 0
+			let g:OmniSharp_highlight_groups = {
+				\ 'csUserIdentifier': [ 'constant name', 'enum member name', 'field name', 'identifier', 'local name', 'parameter name', 'property name', 'static symbol'],
+				\ 'csUserInterface': ['interface name'],
+				\ 'csUserMethod': ['extension method name', 'method name'],
+				\ 'csUserType': ['class name', 'enum name', 'namespace name', 'struct name']
+			\}
+			let g:OmniSharp_highlight_types = 2
 			let g:OmniSharp_timeout = 5
 			let g:OmniSharp_selector_ui = ''
 		endif
