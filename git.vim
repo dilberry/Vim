@@ -58,11 +58,11 @@ endfunction
 
 " vim-fugitive
 call dein#add('https://github.com/tpope/vim-fugitive.git')
-call dein#config('vim-fugitive', {'hook_source': function('ConfigureFugitive')})
+call dein#config('vim-fugitive', {'hook_post_source': function('ConfigureFugitive')})
 
 " gitv
 call dein#add('https://github.com/gregsexton/gitv.git')
-call dein#config('gitv', {'hook_source': function('ConfigureGitv'), 'depends': 'vim-fugitive'})
+call dein#config('gitv', {'hook_post_source': function('ConfigureGitv'), 'depends': 'vim-fugitive'})
 
 " vim-gitgutter
 call dein#add('https://github.com/airblade/vim-gitgutter.git')
