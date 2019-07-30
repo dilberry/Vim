@@ -228,20 +228,20 @@ if has('python3') && executable('python')
 	" deoplete-jedi
 	" Requires jedi package in python install
 	call dein#add('https://github.com/zchee/deoplete-jedi.git')
-	call dein#config('deoplete-jedi', {'depends': ['deoplete.nvim'], 'on_ft': ['python', 'python3', 'djangohtml']})
+	call dein#config('deoplete-jedi', {'depends': 'deoplete.nvim', 'on_ft': ['python', 'python3', 'djangohtml']})
 
 	" neco-vim
 	call dein#add('https://github.com/Shougo/neco-vim.git')
-	call dein#config('neco-vim', {'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+	call dein#config('neco-vim', {'depends': 'deoplete.nvim', 'on_source': 'deoplete.nvim', 'on_ft': 'vim'})
 
 	" neco-syntax
 	call dein#add('https://github.com/Shougo/neco-syntax.git')
-	call dein#config('neco-syntax', {'depends': ['deoplete.nvim'], 'on_source': ['deoplete.nvim'], 'on_ft': 'vim'})
+	call dein#config('neco-syntax', {'depends': 'deoplete.nvim', 'on_source': 'deoplete.nvim', 'on_ft': 'vim'})
 
 	if executable('node')
 		" deoplete-ternjs
 		call dein#add('https://github.com/carlitux/deoplete-ternjs.git')
-		call dein#config('deoplete-ternjs', {'depends': ['deoplete.nvim'], 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
+		call dein#config('deoplete-ternjs', {'depends': 'deoplete.nvim', 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
 	endif
 endif
 

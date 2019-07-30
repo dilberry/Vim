@@ -146,11 +146,11 @@ endfunction
 
 " vim-airline
 call dein#add('https://github.com/vim-airline/vim-airline.git')
-call dein#config('vim-airline', {'hook_source': function('ConfigureAirline')})
+call dein#config('vim-airline', {'hook_source': function('ConfigureAirline'), 'on_event': 'VimEnter'})
 
 " vim-airline-themes
 call dein#add('https://github.com/vim-airline/vim-airline-themes.git')
-call dein#config('vim-airline-themes', {'hook_source': function('ConfigureAirlineThemes'), 'depends': ['vim-airline'], 'on_source': ['vim-airline']})
+call dein#config('vim-airline-themes', {'hook_source': function('ConfigureAirlineThemes'), 'depends': 'vim-airline', 'on_source': 'vim-airline'})
 
 " vim-colorschemes
 call dein#add('https://github.com/flazz/vim-colorschemes.git')

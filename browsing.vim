@@ -236,19 +236,19 @@ if has('python3') && executable('python')
 
 	" denite-ale
 	call dein#add('https://github.com/iyuuya/denite-ale.git')
-	call dein#config('denite-ale', {'depends': ['ale', 'denite.nvim'], 'on_source': ['denite.nvim']})
+	call dein#config('denite-ale', {'depends': ['ale', 'denite.nvim'], 'on_source': 'denite.nvim'})
 
 	" denite-git
 	call dein#add('https://github.com/neoclide/denite-git.git')
-	call dein#config('denite-git', {'depends': ['denite.nvim'], 'on_source': ['denite.nvim']})
+	call dein#config('denite-git', {'depends': 'denite.nvim', 'on_source': 'denite.nvim'})
 
 	" denite-extra
 	call dein#add('https://github.com/neoclide/denite-extra.git')
-	call dein#config('denite-extra', {'depends': ['denite.nvim'], 'on_source': ['denite.nvim']})
+	call dein#config('denite-extra', {'depends': 'denite.nvim', 'on_source': 'denite.nvim'})
 
 	" fruzzy
 	call dein#add('https://github.com/raghur/fruzzy.git')
-	call dein#config('fruzzy', {'depends': ['denite.nvim'], 'on_source': ['denite.nvim']})
+	call dein#config('fruzzy', {'depends': 'denite.nvim', 'on_source': 'denite.nvim'})
 
 	" neoyank.vim
 	call dein#add('https://github.com/Shougo/neoyank.vim.git')

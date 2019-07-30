@@ -168,6 +168,41 @@ endif
 	endfunction
 " }
 
+" Key Remapping {
+	" Set Leader to Space
+	let mapleader = ' '
+	let maplocalleader = ' '
+
+	" Remove the Windows ^M - when the encodings gets messed up
+	call LeaderBind('nnoremap', ['b', 'm', 'E'], 'FixEndingsWindows', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
+
+	" Remove Trailing whitespace
+	call LeaderBind('nnoremap', ['b', 'm', 'e'], 'FixEndingsWhiteSpace', 'Fix Line Endings (White Space)', 'fix_line_endings_white_space', v:true)
+
+	" Buffer cycle
+	nnoremap <Tab> :bnext<CR>
+	nnoremap <S-Tab> :bprevious<CR>
+
+	" Increment/Decrement remapping
+	noremap <C-kPlus> <C-A>
+	noremap <C-kMinus> <C-X>
+
+	" Swap Normal and Visual mode semicolon and colon
+	nnoremap ; :
+	nnoremap : ;
+	vnoremap ; :
+	vnoremap : ;
+
+	" Retain selection after shift operations
+	" Taken from http://vimbits.com/bits/20
+	vnoremap < <gv
+	vnoremap > >gv
+
+	" Yank to EOL, making Y behave more like the other capitals (C and D).
+	" Taken from http://vimbits.com/bits/11
+	noremap Y y$
+" }
+
 " Plug {
 	let g:dein_plugins_dir = fnamemodify($VIMHOME.'\plugins', ':p:h')
 	let g:dein_dir = fnamemodify(g:dein_plugins_dir.'\repos\github.com\Shougo\dein.vim', ':p:h')
@@ -259,41 +294,6 @@ endif
 		call s:strip_restore(state)
 	endfunction
 	command! FixEndingsWindows call s:strip_trailing_windows()
-" }
-
-" Key Remapping {
-	" Set Leader to Space
-	let mapleader = ' '
-	let maplocalleader = ' '
-
-	" Remove the Windows ^M - when the encodings gets messed up
-	call LeaderBind('nnoremap', ['b', 'm', 'E'], 'FixEndingsWindows', 'Fix Line Endings (Windows)', 'fix_line_endings_windows', v:true)
-
-	" Remove Trailing whitespace
-	call LeaderBind('nnoremap', ['b', 'm', 'e'], 'FixEndingsWhiteSpace', 'Fix Line Endings (White Space)', 'fix_line_endings_white_space', v:true)
-
-	" Buffer cycle
-	nnoremap <Tab> :bnext<CR>
-	nnoremap <S-Tab> :bprevious<CR>
-
-	" Increment/Decrement remapping
-	noremap <C-kPlus> <C-A>
-	noremap <C-kMinus> <C-X>
-
-	" Swap Normal and Visual mode semicolon and colon
-	nnoremap ; :
-	nnoremap : ;
-	vnoremap ; :
-	vnoremap : ;
-
-	" Retain selection after shift operations
-	" Taken from http://vimbits.com/bits/20
-	vnoremap < <gv
-	vnoremap > >gv
-
-	" Yank to EOL, making Y behave more like the other capitals (C and D).
-	" Taken from http://vimbits.com/bits/11
-	noremap Y y$
 " }
 
 " Misc options {
