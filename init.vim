@@ -93,6 +93,10 @@ endif
 
 	function! s:leader_bind_process(map, keys, value, long_name, short_name, is_cmd) abort
 		let l:key_combo = join(a:keys, '')
+		let l:value = ''
+		let l:long_name = ''
+		let l:cmd_value = ''
+		let l:short_name = ''
 		if index(g:leader_binds_processed.base, l:key_combo) == -1
 			if a:is_cmd
 				" If a:value is a complete command e.g. :Gblame<CR>

@@ -157,7 +157,9 @@ endfunction
 " vim-leader-guide options {
 function! ConfigureLeaderGuide()
 	if dein#tap('vim-leader-guide')
-		let g:lmap = {}
+		if !exists('g:lmap')
+			let g:lmap = {}
+		endif
 		let g:leaderGuide_vertical = 0
 		let g:leaderGuide_position = 'botright'
 		let g:leaderGuide_max_size = 30
@@ -167,22 +169,57 @@ function! ConfigureLeaderGuide()
 		vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
 
 		if dein#tap('vim-fugitive')
-			let g:lmap.g = {'name': 'Git/'}
+			if !exists('g:lmap.g')
+				let g:lmap.g = {'name': 'Git/'}
+			else
+				let g:lmap.g.name = 'Git/'
+			endif
 
 			" denite-git options {
 			if dein#tap('denite.nvim') && dein#tap('denite-git')
-				let g:lmap.g.g = {'name': 'Denite Git/'}
+				if !exists('g:lmap.g.g')
+					let g:lmap.g.g = {'name': 'Denite Git/'}
+				else
+					let g:lmap.g.g.name = 'Denite Git/'
+				endif
 			endif
 			" }
 		endif
 
-		let g:lmap.b = {'name': 'Buffer/'}
-		let g:lmap.b.m = {'name': 'Modify/'}
-		let g:lmap.f = {'name': 'Files/'}
-		let g:lmap.t = {'name': 'Tags/'}
+		if !exists('g:lmap.b')
+			let g:lmap.b = {'name': 'Buffer/'}
+		else
+			let g:lmap.b.name = 'Buffer/'
+		endif
+
+		if !exists('g:lmap.b.m')
+			let g:lmap.b.m = {'name': 'Modify/'}
+		else
+			let g:lmap.b.m.name = 'Modify/'
+		endif
 
 		if dein#tap('denite.nvim')
-			let g:lmap.d = {'name': 'Denite/'}
+			if !exists('g:lmap.f')
+				let g:lmap.f = {'name': 'Files/'}
+			else
+				let g:lmap.f.name = 'Files/'
+			endif
+		endif
+
+		if executable('ctags')
+			if !exists('g:lmap.t')
+				let g:lmap.t = {'name': 'Tags/'}
+			else
+				let g:lmap.t.name = 'Tags/'
+			endif
+		endif
+
+		if dein#tap('denite.nvim')
+			if !exists('g:lmap.d')
+				let g:lmap.d = {'name': 'Denite/'}
+			else
+				let g:lmap.d.name = 'Denite/'
+			endif
 		endif
 
 		function! s:add_leader_guide_item(keys, name, cmd) abort
@@ -256,7 +293,7 @@ endif
 
 " vim-leader-guide
 call dein#add('https://github.com/hecal3/vim-leader-guide.git')
-call dein#config('vim-leader-guide', {'hook_post_source': function('ConfigureLeaderGuide')})
+call dein#config('vim-leader-guide', {'hook_source': function('ConfigureLeaderGuide'), 'on_event': 'VimEnter'})
 
 " vaffle.vim
 call dein#add('https://github.com/cocopon/vaffle.vim.git')
