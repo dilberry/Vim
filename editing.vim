@@ -11,7 +11,7 @@ endfunction
 
 " Align
 call dein#add('https://github.com/lboulard/Align.git')
-call dein#config('Align', {'hook_post_source': function('ConfigureAlign') })
+call dein#config('Align', {'hook_source': function('ConfigureAlign') })
 
 " vim-sleuth
 call dein#add('https://github.com/tpope/vim-sleuth.git')
