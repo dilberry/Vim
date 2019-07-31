@@ -8,7 +8,7 @@ function! ConfigureTagbar()
 		" Tagbar Toggle
 		call LeaderBind('nnoremap', ['b', 't'], 'TagbarToggle', 'Tagbar Toggle', 'tagbar_toggle', v:true)
 		let l:ctags_home = expand('~\utils\ctags')
-		let g:tagbar_ctags_bin = l:ctags_home.'\ctags.exe'
+		let g:tagbar_ctags_bin = exepath('ctags')
 		autocmd VimEnter * nested :call tagbar#autoopen(1)
 
 		if filereadable(l:ctags_home.'\ctags.cfg')

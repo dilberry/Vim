@@ -64,30 +64,30 @@ function! ConfigureOmnisharp()
 		function! s:omnisharp_menu_check() abort
 			if dein#tap('denite.nvim')
 				" FIXME: This denite menu doesn't work
-				if !exists('s:menus.o')
-					let s:menus.o = {'description': 'Omnisharp'}
-					let s:menus.o.command_candidates = []
-					let s:menus.o.f = {'description': 'Find'}
-					let s:menus.o.f.command_candidates = []
-					let s:menus.o.g = {'description': 'Goto'}
-					let s:menus.o.g.command_candidates = []
-					let s:menus.o.m = {'description': 'Modify'}
-					let s:menus.o.m.command_candidates = []
-					let s:menus.o.l = {'description': 'Lookup'}
-					let s:menus.o.l.command_candidates = []
-					let s:menus.o.s = {'description': 'Solution'}
-					let s:menus.o.s.command_candidates = []
+				if !exists('g:denite_menu.o')
+					let g:denite_menu.o = {'description': 'Omnisharp'}
+					let g:denite_menu.o.command_candidates = []
+					let g:denite_menu.o.f = {'description': 'Find'}
+					let g:denite_menu.o.f.command_candidates = []
+					let g:denite_menu.o.g = {'description': 'Goto'}
+					let g:denite_menu.o.g.command_candidates = []
+					let g:denite_menu.o.m = {'description': 'Modify'}
+					let g:denite_menu.o.m.command_candidates = []
+					let g:denite_menu.o.l = {'description': 'Lookup'}
+					let g:denite_menu.o.l.command_candidates = []
+					let g:denite_menu.o.s = {'description': 'Solution'}
+					let g:denite_menu.o.s.command_candidates = []
 				endif
 			endif
 
 			if dein#tap('vim-leader-guide')
-				if !exists('g:lmap.o')
-					let g:lmap.o = {'name': 'Omnisharp/'}
-					let g:lmap.o.f = {'name': 'Find/'}
-					let g:lmap.o.g = {'name': 'Goto/'}
-					let g:lmap.o.m = {'name': 'Modify/'}
-					let g:lmap.o.l = {'name': 'Lookup/'}
-					let g:lmap.o.s = {'name': 'Solution/'}
+				if !exists('g:leader_guide_map.o')
+					let g:leader_guide_map.o = {'name': 'Omnisharp/'}
+					let g:leader_guide_map.o.f = {'name': 'Find/'}
+					let g:leader_guide_map.o.g = {'name': 'Goto/'}
+					let g:leader_guide_map.o.m = {'name': 'Modify/'}
+					let g:leader_guide_map.o.l = {'name': 'Lookup/'}
+					let g:leader_guide_map.o.s = {'name': 'Solution/'}
 				endif
 			endif
 		endfunction
@@ -188,7 +188,7 @@ function! ConfigureOmnisharp()
 		augroup END
 
 		if !executable('OmniSharp')
-			let g:OmniSharp_server_path = $VIMHOME.'\utils\omnisharp.http-win-x64\OmniSharp.exe'
+			let g:OmniSharp_server_path = expand('~\utils\omnisharp.http-win-x64\OmniSharp.exe')
 		endif
 
 		sign define OmniSharpCodeActions text=💡

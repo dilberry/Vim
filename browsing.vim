@@ -3,22 +3,22 @@ function! ConfigureDenite()
 	if dein#tap('denite.nvim')
 		" Add custom menus
 		" TODO: Denite menus don't work
-		let s:denite_menu = {}
-		call denite#custom#var('menu', 'menus', s:denite_menu)
+		let g:denite_menu = {}
+		call denite#custom#var('menu', 'menus', g:denite_menu)
 
 		function! s:add_denite_item(keys, name, cmd) abort
 			let l:local_keys = deepcopy(a:keys)
 			for current_range in range(0, len(l:local_keys) - 2)
 				let l:key = join(l:local_keys[:current_range], '.')
-				if !exists('s:denite_menu.' . l:key)
-					execute 'let s:denite_menu.' . l:key . ' = ' . '{"command_candidates": []}'
+				if !exists('g:denite_menu.' . l:key)
+					execute 'let g:denite_menu.' . l:key . ' = ' . '{"command_candidates": []}'
 				endif
 			endfor
 
-			if exists('s:denite_menu.' . join(a:keys[:-2], '.'))
-				execute 'call add(s:denite_menu.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
+			if exists('g:denite_menu.' . join(a:keys[:-2], '.'))
+				execute 'call add(g:denite_menu.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
 			else
-				execute 'let s:denite_menu.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
+				execute 'let g:denite_menu.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
 			endif
 		endfunction
 
@@ -91,29 +91,29 @@ function! ConfigureDenite()
 			inoremap <silent><buffer><expr> <C-x>  denite#do_map('do_action', 'split')
 		endfunction
 
-		if !exists('s:denite_menu.b')
-			let s:denite_menu.b = {'description': 'Buffer'}
-			let s:denite_menu.b.command_candidates = []
+		if !exists('g:denite_menu.b')
+			let g:denite_menu.b = {'description': 'Buffer'}
+			let g:denite_menu.b.command_candidates = []
 		else
-			let s:denite_menu.b.description = 'Buffer'
+			let g:denite_menu.b.description = 'Buffer'
 		endif
 
-		if !exists('s:denite_menu.b.m')
-			let s:denite_menu.b.m = {'description': 'Modify'}
-			let s:denite_menu.b.m.command_candidates = []
+		if !exists('g:denite_menu.b.m')
+			let g:denite_menu.b.m = {'description': 'Modify'}
+			let g:denite_menu.b.m.command_candidates = []
 		else
-			let s:denite_menu.b.m.description = 'Modify'
+			let g:denite_menu.b.m.description = 'Modify'
 		endif
 
 		if dein#tap('denite-ale')
 			call LeaderBind('nnoremap <silent>', ['b', 's'], 'Denite ale', 'Syntax Errors', 'syntax_errors', v:true)
 		endif
 
-		if !exists('s:denite_menu.d')
-			let s:denite_menu.d = {'description': 'Denite'}
-			let s:denite_menu.d.command_candidates = []
+		if !exists('g:denite_menu.d')
+			let g:denite_menu.d = {'description': 'Denite'}
+			let g:denite_menu.d.command_candidates = []
 		else
-			let s:denite_menu.d.description = 'Denite'
+			let g:denite_menu.d.description = 'Denite'
 		endif
 
 		call LeaderBind('nnoremap <silent>', ['d', 'b'], 'Denite buffer'     , 'Buffers', 'buffers', v:true)
@@ -126,22 +126,22 @@ function! ConfigureDenite()
 		call LeaderBind('nnoremap <silent>', ['d', 'r'], 'Denite -resume'    , 'Resume' , 'resume' , v:true)
 		call LeaderBind('nnoremap <silent>', ['d', 'y'], 'Denite neoyank'    , 'Yanks'  , 'yanks'  , v:true)
 
-		if !exists('s:denite_menu.f')
-			let s:denite_menu.f = {'description': 'Files'}
-			let s:denite_menu.f.command_candidates = []
+		if !exists('g:denite_menu.f')
+			let g:denite_menu.f = {'description': 'Files'}
+			let g:denite_menu.f.command_candidates = []
 		else
-			let s:denite_menu.f.description = 'Files'
+			let g:denite_menu.f.description = 'Files'
 		endif
 		call LeaderBind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'Files'                , 'file'        , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'm'], 'Denite file/old'              , 'Files (Most Used)'    , 'file/old'    , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'r'], 'Denite file/rec'              , 'Files (Recursive)'    , 'file/rec'    , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file/rec/git', 'Files (Git Recursive)', 'file/rec/git', v:true)
 
-		if !exists('s:denite_menu.t')
-			let s:denite_menu.t = {'description': 'Tags'}
-			let s:denite_menu.t.command_candidates = []
+		if !exists('g:denite_menu.t')
+			let g:denite_menu.t = {'description': 'Tags'}
+			let g:denite_menu.t.command_candidates = []
 		else
-			let s:denite_menu.t.description = 'Tags'
+			let g:denite_menu.t.description = 'Tags'
 		endif
 		call LeaderBind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'Tags (Buffer)', 'buffer_tag', v:true)
 		call LeaderBind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'Tags (Global)', 'global_tag', v:true)
@@ -151,21 +151,21 @@ function! ConfigureDenite()
 		nnoremap <silent> ]d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=+<C-r>=v:count1<CR><CR>
 
 		if dein#tap('vim-fugitive')
-			if !exists('s:denite_menu.g')
-				let s:denite_menu.g = {'description': 'Git'}
-				let s:denite_menu.g.command_candidates = []
+			if !exists('g:denite_menu.g')
+				let g:denite_menu.g = {'description': 'Git'}
+				let g:denite_menu.g.command_candidates = []
 			else
-				let s:denite_menu.g.description = 'Git'
+				let g:denite_menu.g.description = 'Git'
 			endif
 
 			" denite-git options {
 			if dein#tap('denite-git')
 				" FIXME: This denite menu doesn't work
-				if !exists('s:denite_menu.g.g')
-					let s:denite_menu.g.g = {'description': 'Denite Git'}
-					let s:denite_menu.g.g.command_candidates = []
+				if !exists('g:denite_menu.g.g')
+					let g:denite_menu.g.g = {'description': 'Denite Git'}
+					let g:denite_menu.g.g.command_candidates = []
 				else
-					let s:denite_menu.g.g.description = 'Git'
+					let g:denite_menu.g.g.description = 'Git'
 				endif
 				call LeaderBind('nnoremap <silent>', ['g', 'g', 'b'], 'Denite gitbranch', 'Denite Git Branch', 'denite_gitbranch', v:true)
 				call LeaderBind('nnoremap <silent>', ['g', 'g', 's'], 'Denite gitstatus', 'Denite Git Status', 'denite_gitstatus', v:true)

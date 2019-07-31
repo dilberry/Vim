@@ -78,9 +78,9 @@ endif
 " Formatter Menus and Mappings {
 	function! s:formatter_menu_check() abort
 		if dein#tap('denite.nvim')
-			if !exists('s:menus.m')
-				let s:menus.m = {'description': 'Modify'}
-				let s:menus.m.command_candidates = []
+			if !exists('s:denite_menu.m')
+				let s:denite_menu.m = {'description': 'Modify'}
+				let s:denite_menu.m.command_candidates = []
 			endif
 		endif
 
