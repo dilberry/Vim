@@ -27,27 +27,27 @@ endif
 
 		if !executable('xmllint')
 			" Add xmllint binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\xmllint\bin\'
+			let $PATH .= ';'.expand('~\utils\xmllint\bin\')
 		endif
 
 		if !executable('AStyle')
 			" Add AStyle binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\AStyle\bin\'
+			let $PATH .= ';'.expand('~\utils\AStyle\bin\')
 		endif
 
 		if !executable('ctags')
 			" Add ctags binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\ctags\'
+			let $PATH .= ';'.expand('~\utils\ctags\')
 		endif
 
 		if !executable('rg')
 			" Add ripgrep binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\rg\'
+			let $PATH .= ';'.expand('~\utils\rg\')
 		endif
 
 		if !executable('vswhere')
 			" Add vswhere binary path to PATH
-			let $PATH .= ';'.$VIMHOME.'\utils\vswhere\'
+			let $PATH .= ';'.expand('~\utils\vswhere\')
 		endif
 
 		if executable('vswhere')

@@ -2,14 +2,23 @@
 function! ConfigureDenite()
 	if dein#tap('denite.nvim')
 		" Add custom menus
-		let s:menus = {}
-		call denite#custom#var('menu', 'menus', s:menus)
+		" TODO: Denite menus don't work
+		let s:denite_menu = {}
+		call denite#custom#var('menu', 'menus', s:denite_menu)
 
 		function! s:add_denite_item(keys, name, cmd) abort
-			if exists('s:menus.' . join(a:keys[:-2], '.'))
-				execute 'call add(s:menus.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
+			let l:local_keys = deepcopy(a:keys)
+			for current_range in range(0, len(l:local_keys) - 2)
+				let l:key = join(l:local_keys[:current_range], '.')
+				if !exists('s:denite_menu.' . l:key)
+					execute 'let s:denite_menu.' . l:key . ' = ' . '{"command_candidates": []}'
+				endif
+			endfor
+
+			if exists('s:denite_menu.' . join(a:keys[:-2], '.'))
+				execute 'call add(s:denite_menu.' . join(a:keys[:-2], '.') . '.command_candidates,'. '[' . shellescape(a:name) . ',' . shellescape(a:cmd) . '])'
 			else
-				execute 'let s:menus.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
+				execute 'let s:denite_menu.' . join(a:keys[:-1], '.') . ' = '. '{"command_candidates": [' . shellescape(a:name) . ',' . shellescape(a:cmd) . ']}'
 			endif
 		endfunction
 
@@ -50,7 +59,6 @@ function! ConfigureDenite()
 		call denite#custom#source('gitstatus', 'converters', ['converter/relative_word'])
 
 		if filereadable($VIMHOME.'\utils\ctags\ctags.cfg')
-			" TODO: The outline source can't handle etags format with options files
 			call denite#custom#var('outline', 'options', ['−−options='.$VIMHOME.'\utils\ctags\ctags.cfg'])
 		endif
 
@@ -83,16 +91,31 @@ function! ConfigureDenite()
 			inoremap <silent><buffer><expr> <C-x>  denite#do_map('do_action', 'split')
 		endfunction
 
-		let s:menus.b = {'description': 'Buffer'}
-		let s:menus.b.command_candidates = []
-		let s:menus.b.m = {'description': 'Modify'}
-		let s:menus.b.m.command_candidates = []
+		if !exists('s:denite_menu.b')
+			let s:denite_menu.b = {'description': 'Buffer'}
+			let s:denite_menu.b.command_candidates = []
+		else
+			let s:denite_menu.b.description = 'Buffer'
+		endif
+
+		if !exists('s:denite_menu.b.m')
+			let s:denite_menu.b.m = {'description': 'Modify'}
+			let s:denite_menu.b.m.command_candidates = []
+		else
+			let s:denite_menu.b.m.description = 'Modify'
+		endif
+
 		if dein#tap('denite-ale')
 			call LeaderBind('nnoremap <silent>', ['b', 's'], 'Denite ale', 'Syntax Errors', 'syntax_errors', v:true)
 		endif
 
-		let s:menus.d = {'description': 'Denite'}
-		let s:menus.d.command_candidates = []
+		if !exists('s:denite_menu.d')
+			let s:denite_menu.d = {'description': 'Denite'}
+			let s:denite_menu.d.command_candidates = []
+		else
+			let s:denite_menu.d.description = 'Denite'
+		endif
+
 		call LeaderBind('nnoremap <silent>', ['d', 'b'], 'Denite buffer'     , 'Buffers', 'buffers', v:true)
 		call LeaderBind('nnoremap <silent>', ['d', 'c'], 'Denite colorscheme', 'Colours', 'colours', v:true)
 		call LeaderBind('nnoremap <silent>', ['d', 'd'], 'Denite menu'       , 'Menu'   , 'menu'   , v:true)
@@ -103,15 +126,23 @@ function! ConfigureDenite()
 		call LeaderBind('nnoremap <silent>', ['d', 'r'], 'Denite -resume'    , 'Resume' , 'resume' , v:true)
 		call LeaderBind('nnoremap <silent>', ['d', 'y'], 'Denite neoyank'    , 'Yanks'  , 'yanks'  , v:true)
 
-		let s:menus.f = {'description': 'Files'}
-		let s:menus.f.command_candidates = []
+		if !exists('s:denite_menu.f')
+			let s:denite_menu.f = {'description': 'Files'}
+			let s:denite_menu.f.command_candidates = []
+		else
+			let s:denite_menu.f.description = 'Files'
+		endif
 		call LeaderBind('nnoremap <silent>', ['f', 'f'], 'Denite file'                  , 'Files'                , 'file'        , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'm'], 'Denite file/old'              , 'Files (Most Used)'    , 'file/old'    , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'r'], 'Denite file/rec'              , 'Files (Recursive)'    , 'file/rec'    , v:true)
 		call LeaderBind('nnoremap <silent>', ['f', 'g'], 'DeniteProjectDir file/rec/git', 'Files (Git Recursive)', 'file/rec/git', v:true)
 
-		let s:menus.t = {'description': 'Tags'}
-		let s:menus.t.command_candidates = []
+		if !exists('s:denite_menu.t')
+			let s:denite_menu.t = {'description': 'Tags'}
+			let s:denite_menu.t.command_candidates = []
+		else
+			let s:denite_menu.t.description = 'Tags'
+		endif
 		call LeaderBind('nnoremap <silent>', ['t', 'b'], 'Denite outline', 'Tags (Buffer)', 'buffer_tag', v:true)
 		call LeaderBind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'Tags (Global)', 'global_tag', v:true)
 
@@ -120,14 +151,22 @@ function! ConfigureDenite()
 		nnoremap <silent> ]d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=+<C-r>=v:count1<CR><CR>
 
 		if dein#tap('vim-fugitive')
-			let s:menus.g = {'description': 'Git'}
-			let s:menus.g.command_candidates = []
+			if !exists('s:denite_menu.g')
+				let s:denite_menu.g = {'description': 'Git'}
+				let s:denite_menu.g.command_candidates = []
+			else
+				let s:denite_menu.g.description = 'Git'
+			endif
 
 			" denite-git options {
 			if dein#tap('denite-git')
 				" FIXME: This denite menu doesn't work
-				let s:menus.g.g = {'description': 'Denite Git'}
-				let s:menus.g.g.command_candidates = []
+				if !exists('s:denite_menu.g.g')
+					let s:denite_menu.g.g = {'description': 'Denite Git'}
+					let s:denite_menu.g.g.command_candidates = []
+				else
+					let s:denite_menu.g.g.description = 'Git'
+				endif
 				call LeaderBind('nnoremap <silent>', ['g', 'g', 'b'], 'Denite gitbranch', 'Denite Git Branch', 'denite_gitbranch', v:true)
 				call LeaderBind('nnoremap <silent>', ['g', 'g', 's'], 'Denite gitstatus', 'Denite Git Status', 'denite_gitstatus', v:true)
 			endif
@@ -157,76 +196,84 @@ endfunction
 " vim-leader-guide options {
 function! ConfigureLeaderGuide()
 	if dein#tap('vim-leader-guide')
-		if !exists('g:lmap')
-			let g:lmap = {}
+		if !exists('g:leader_guide_map')
+			let g:leader_guide_map = {}
 		endif
 		let g:leaderGuide_vertical = 0
 		let g:leaderGuide_position = 'botright'
 		let g:leaderGuide_max_size = 30
 
-		call leaderGuide#register_prefix_descriptions("<Space>", "g:lmap")
+		call leaderGuide#register_prefix_descriptions("<Space>", "g:leader_guide_map")
 		nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
 		vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
 
 		if dein#tap('vim-fugitive')
-			if !exists('g:lmap.g')
-				let g:lmap.g = {'name': 'Git/'}
+			if !exists('g:leader_guide_map.g')
+				let g:leader_guide_map.g = {'name': 'Git/'}
 			else
-				let g:lmap.g.name = 'Git/'
+				let g:leader_guide_map.g.name = 'Git/'
 			endif
 
 			" denite-git options {
 			if dein#tap('denite.nvim') && dein#tap('denite-git')
-				if !exists('g:lmap.g.g')
-					let g:lmap.g.g = {'name': 'Denite Git/'}
+				if !exists('g:leader_guide_map.g.g')
+					let g:leader_guide_map.g.g = {'name': 'Denite Git/'}
 				else
-					let g:lmap.g.g.name = 'Denite Git/'
+					let g:leader_guide_map.g.g.name = 'Denite Git/'
 				endif
 			endif
 			" }
 		endif
 
-		if !exists('g:lmap.b')
-			let g:lmap.b = {'name': 'Buffer/'}
+		if !exists('g:leader_guide_map.b')
+			let g:leader_guide_map.b = {'name': 'Buffer/'}
 		else
-			let g:lmap.b.name = 'Buffer/'
+			let g:leader_guide_map.b.name = 'Buffer/'
 		endif
 
-		if !exists('g:lmap.b.m')
-			let g:lmap.b.m = {'name': 'Modify/'}
+		if !exists('g:leader_guide_map.b.m')
+			let g:leader_guide_map.b.m = {'name': 'Modify/'}
 		else
-			let g:lmap.b.m.name = 'Modify/'
+			let g:leader_guide_map.b.m.name = 'Modify/'
 		endif
 
 		if dein#tap('denite.nvim')
-			if !exists('g:lmap.f')
-				let g:lmap.f = {'name': 'Files/'}
+			if !exists('g:leader_guide_map.f')
+				let g:leader_guide_map.f = {'name': 'Files/'}
 			else
-				let g:lmap.f.name = 'Files/'
+				let g:leader_guide_map.f.name = 'Files/'
 			endif
 		endif
 
 		if executable('ctags')
-			if !exists('g:lmap.t')
-				let g:lmap.t = {'name': 'Tags/'}
+			if !exists('g:leader_guide_map.t')
+				let g:leader_guide_map.t = {'name': 'Tags/'}
 			else
-				let g:lmap.t.name = 'Tags/'
+				let g:leader_guide_map.t.name = 'Tags/'
 			endif
 		endif
 
 		if dein#tap('denite.nvim')
-			if !exists('g:lmap.d')
-				let g:lmap.d = {'name': 'Denite/'}
+			if !exists('g:leader_guide_map.d')
+				let g:leader_guide_map.d = {'name': 'Denite/'}
 			else
-				let g:lmap.d.name = 'Denite/'
+				let g:leader_guide_map.d.name = 'Denite/'
 			endif
 		endif
 
 		function! s:add_leader_guide_item(keys, name, cmd) abort
 			let l:local_keys = deepcopy(a:keys)
+
+			for current_range in range(0, len(l:local_keys) - 1)
+				let l:key = '[' . join(map(l:local_keys[:current_range], 'shellescape(v:val)'), '][') . ']'
+				if !exists('g:leader_guide_map' . l:key)
+					execute 'let g:leader_guide_map' . l:key . ' = ' . '{}'
+				endif
+			endfor
+
 			let l:key = '[' . join(map(l:local_keys, 'shellescape(v:val)'), '][') . ']'
 
-			execute 'let g:lmap' . l:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
+			execute 'let g:leader_guide_map' . l:key . ' = '. '[' . shellescape(a:cmd) . ',' . shellescape(a:name) . ']'
 		endfunction
 
 		call LeaderBindsAddCallback(function('s:add_leader_guide_item'))
