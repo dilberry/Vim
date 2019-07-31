@@ -16,4 +16,4 @@ endfunction
 
 " ale
 call dein#add('https://github.com/w0rp/ale.git')
-call dein#config('ale', {'hook_post_source': function('ConfigureAle'), 'rev': '*'})
+call dein#config('ale', {'hook_source': function('ConfigureAle')})
