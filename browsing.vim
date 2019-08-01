@@ -38,6 +38,7 @@ function! ConfigureDenite()
 		\ 'auto_resize'                 : v:true,
 		\ 'smartcase'                   : v:true,
 		\ 'source_names'                : 'short',
+		\ 'sorter'                      : 'sorter/word',
 		\ 'highlight_filter_background' : 'CursorLine',
 		\ 'highlight_matched_char'      : 'Type',
 		\ }
@@ -78,6 +79,7 @@ function! ConfigureDenite()
 			nnoremap <silent><buffer><expr> <C-a>   denite#do_map('toggle_select_all')
 			nnoremap <silent><buffer><expr> <Space> denite#do_map('toggle_select').'j'
 			nnoremap <silent><buffer><expr> q       denite#do_map('do_action', 'quickfix')
+			nnoremap <silent><buffer><expr> qf      denite#do_map('do_action', 'qfreplace')
 		endfunction
 
 		autocmd FileType denite-filter call s:denite_filter_mappings()
@@ -174,18 +176,40 @@ function! ConfigureDenite()
 		endif
 
 		if executable('rg')
-			call denite#custom#var('file/rec', 'command', ['rg', '--files', '--no-heading', '--glob', '!.git', ''])
-			call denite#custom#var('grep', 'command', ['rg', '--smart-case'])
-			call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+			call denite#custom#var('file/rec', 'command', ['rg', '--files', '--mmap', '--threads=12', '--hidden', '--smart-case', '--no-ignore-vcs', '--no-heading', '--glob', '!.git', '--glob', ''])
+			call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
+			call denite#custom#source('file/rec', 'max_candidates', 10000)
+
+			call denite#custom#var('grep', 'command', ['rg'])
+			call denite#custom#var('grep', 'default_opts', ['--mmap', '--threads=12', '--hidden', '--smart-case', '--vimgrep', '--no-ignore-vcs', '--no-heading'])
 			call denite#custom#var('grep', 'recursive_opts', [])
 			call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
 			call denite#custom#var('grep', 'separator', ['--'])
 			call denite#custom#var('grep', 'final_opts', [])
+			call denite#custom#source('grep', 'matchers', ['matcher_fuzzy', 'matcher/regexp'])
 		endif
 
 		if executable('git')
 			call denite#custom#alias('source', 'file/rec/git', 'file/rec')
 			call denite#custom#var('file/rec/git', 'command', ['git', 'ls-files', '-co', '--exclude-standard'])
+		endif
+
+		if dein#tap('vim-qfreplace')
+			function! DeniteQfreplace(context)
+				let qflist = []
+				for target in a:context['targets']
+					if !has_key(target, 'action__path') | continue | endif
+					if !has_key(target, 'action__line') | continue | endif
+					if !has_key(target, 'action__text') | continue | endif
+
+					call add(qflist, {'filename': target['action__path'], 'lnum': target['action__line'], 'text': target['word']})
+				endfor
+
+				call setqflist(qflist)
+				call qfreplace#start('tabnew')
+			endfunction
+
+			call denite#custom#action('file', 'qfreplace', function('DeniteQfreplace'))
 		endif
 
 		call LeaderBindsProcess()
