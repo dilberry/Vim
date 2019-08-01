@@ -1,5 +1,5 @@
 " denite options {
-function! ConfigureDenite()
+function! browsing#ConfigureDenite()
 	if dein#tap('denite.nvim')
 		" Add custom menus
 		" TODO: Denite menus don't work
@@ -218,7 +218,7 @@ endfunction
 " }
 
 " vim-leader-guide options {
-function! ConfigureLeaderGuide()
+function! browsing#ConfigureLeaderGuide()
 	if dein#tap('vim-leader-guide')
 		if !exists('g:leader_guide_map')
 			let g:leader_guide_map = {}
@@ -306,7 +306,7 @@ endfunction
 " }
 
 " vaffle.vim options {
-function! ConfigureVaffle()
+function! browsing#ConfigureVaffle()
 	if dein#tap('vaffle.vim')
 		" Open like vim-vinegar
 		nnoremap <silent> - :Vaffle<CR>
@@ -340,7 +340,7 @@ endfunction
 if has('python3') && executable('python')
 	" denite
 	call dein#add('https://github.com/Shougo/denite.nvim.git')
-	call dein#config('denite.nvim', {'hook_post_source': function('ConfigureDenite')})
+	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()'})
 
 	" denite-ale
 	call dein#add('https://github.com/iyuuya/denite-ale.git')
@@ -364,8 +364,8 @@ endif
 
 " vim-leader-guide
 call dein#add('https://github.com/hecal3/vim-leader-guide.git')
-call dein#config('vim-leader-guide', {'hook_source': function('ConfigureLeaderGuide'), 'on_event': 'VimEnter'})
+call dein#config('vim-leader-guide', {'hook_source': 'call browsing#ConfigureLeaderGuide()', 'on_event': 'VimEnter'})
 
 " vaffle.vim
 call dein#add('https://github.com/cocopon/vaffle.vim.git')
-call dein#config('vaffle.vim', {'hook_post_source': function('ConfigureVaffle')})
+call dein#config('vaffle.vim', {'hook_post_source': 'call browsing#ConfigureVaffle()'})

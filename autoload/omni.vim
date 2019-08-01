@@ -1,5 +1,5 @@
 " deoplete options {
-function! ConfigurePreDeoplete()
+function! omni#ConfigurePreDeoplete()
 	if dein#tap('deoplete.nvim')
 		" General options
 		let g:deoplete#enable_at_startup = 1
@@ -50,7 +50,7 @@ function! ConfigurePreDeoplete()
 	endif
 endfunction
 
-function! ConfigureDeoplete()
+function! omni#ConfigureDeoplete()
 	if dein#tap('deoplete.nvim')
 		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 		call deoplete#custom#source('_', 'matchers', ['matcher_head'])
@@ -68,7 +68,7 @@ endfunction
 " }
 
 " Omnisharp options {
-function! ConfigureOmnisharp()
+function! omni#ConfigureOmnisharp()
 	if dein#tap('omnisharp-vim')
 		" FIXME: Running GDiff causes Omnisharp to ask for solution files
 		function! s:omnisharp_menu_check() abort
@@ -218,7 +218,7 @@ endfunction
 " }
 
 " jspc options {
-function! ConfigureJspc()
+function! omni#ConfigureJspc()
 	if dein#tap('jspc.vim')
 		autocmd OmniFuncs FileType javascript setlocal omnifunc=jspc#omni
 	endif
@@ -229,7 +229,7 @@ endfunction
 " This needs python3 neovim package to be installed
 if has('python3') && executable('python')
 	call dein#add('https://github.com/Shougo/deoplete.nvim.git')
-	call dein#config('deoplete.nvim', {'hook_add': function('ConfigurePreDeoplete'), 'hook_source': function('ConfigureDeoplete'), 'on_event': 'InsertCharPre'})
+	call dein#config('deoplete.nvim', {'hook_add': 'call omni#ConfigurePreDeoplete()', 'hook_source': 'call omni#ConfigureDeoplete()', 'on_event': 'InsertCharPre'})
 	if !has('nvim')
 		call dein#add('https://github.com/roxma/nvim-yarp.git')
 		call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
@@ -257,8 +257,8 @@ endif
 
 " omnisharp-vim
 call dein#add('https://github.com/OmniSharp/omnisharp-vim.git')
-call dein#config('omnisharp-vim', {'hook_post_source': function('ConfigureOmnisharp'), 'merged': 0, 'on_ft': ['cs', 'csproj', 'sln']})
+call dein#config('omnisharp-vim', {'hook_post_source': 'call omni#ConfigureOmnisharp()', 'merged': 0, 'on_ft': ['cs', 'csproj', 'sln']})
 
 " jspc.vim
 call dein#add('https://github.com/othree/jspc.vim.git')
-call dein#config('jspc.vim', {'hook_post_source': function('ConfigureJspc'), 'on_ft': ['javascript', 'javascript.jsx', 'vue']})
+call dein#config('jspc.vim', {'hook_post_source': 'call omni#ConfigureJspc()', 'on_ft': ['javascript', 'javascript.jsx', 'vue']})

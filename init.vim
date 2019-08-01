@@ -223,45 +223,49 @@ endif
 			" dein
 			call dein#add(g:dein_dir)
 
-			if filereadable(expand('$VIMHOME\browsing.vim'))
-				source $VIMHOME\browsing.vim
+			if filereadable(expand('$VIMHOME\autoload\browsing.vim'))
+				source $VIMHOME\autoload\browsing.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\editing.vim'))
-				source $VIMHOME\editing.vim
+			if filereadable(expand('$VIMHOME\autoload\editing.vim'))
+				source $VIMHOME\autoload\editing.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\files.vim'))
-				source $VIMHOME\files.vim
+			if filereadable(expand('$VIMHOME\autoload\files.vim'))
+				source $VIMHOME\autoload\files.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\git.vim'))
-				source $VIMHOME\git.vim
+			if filereadable(expand('$VIMHOME\autoload\git.vim'))
+				source $VIMHOME\autoload\git.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\linting.vim'))
-				source $VIMHOME\linting.vim
+			if filereadable(expand('$VIMHOME\autoload\linting.vim'))
+				source $VIMHOME\autoload\linting.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\omni.vim'))
-				source $VIMHOME\omni.vim
+			if filereadable(expand('$VIMHOME\autoload\omni.vim'))
+				source $VIMHOME\autoload\omni.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\tag.vim'))
-				source $VIMHOME\tag.vim
+			if filereadable(expand('$VIMHOME\autoload\tag.vim'))
+				source $VIMHOME\autoload\tag.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\ui.vim'))
-				source $VIMHOME\ui.vim
+			if filereadable(expand('$VIMHOME\autoload\ui.vim'))
+				source $VIMHOME\autoload\ui.vim
 			endif
 
 			" Initialise plugin system
 			call dein#end()
 			call dein#save_state()
 
+		endif
+
+		augroup DeinConfig
+			autocmd!
 			autocmd VimEnter * call dein#call_hook('source')
 			autocmd VimEnter * call dein#call_hook('post_source')
-		endif
+		augroup end
 " }
 
 " Encoding {

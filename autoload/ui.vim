@@ -1,5 +1,5 @@
 " vim-airline options {
-function! ConfigureAirline()
+function! ui#ConfigureAirline()
 	if dein#tap('vim-airline')
 		set laststatus=2 " Show 2 lines of status
 		set noshowmode   " Don't show mode on statusline, let airline do it instead
@@ -89,7 +89,7 @@ endfunction
 " }
 
 " vim-airline-themes options {
-function! ConfigureAirlineThemes()
+function! ui#ConfigureAirlineThemes()
 	if dein#tap('vim-airline-themes')
 		let g:airline_theme = 'wombat'
 	endif
@@ -97,7 +97,7 @@ endfunction
 " }
 
 " indent-guides options {
-function! ConfigureIndentGuides()
+function! ui#ConfigureIndentGuides()
 	if dein#tap('vim-indent-guides')
 		let g:indent_guides_enable_on_vim_startup = 1
 		let g:indent_guides_default_mapping = 0 " Disable leader mapping
@@ -111,13 +111,13 @@ endfunction
 " }
 
 " Rainbow options {
-function! ConfigurePreRainbow()
+function! ui#ConfigurePreRainbow()
 	if dein#tap('rainbow')
 		let g:rainbow_active = 1 " Enable rainbow by default
 	endif
 endfunction
 
-function! ConfigurePostRainbow()
+function! ui#ConfigurePostRainbow()
 	if dein#tap('rainbow')
 		let g:rainbow_conf = {
 		\	'guifgs': ['deepskyblue3', 'seagreen3', 'darkorchid3', 'firebrick3', 'steelblue3', 'chartreuse3', 'violetred3', 'orangered3'],
@@ -146,11 +146,11 @@ endfunction
 
 " vim-airline
 call dein#add('https://github.com/vim-airline/vim-airline.git')
-call dein#config('vim-airline', {'hook_source': function('ConfigureAirline'), 'on_event': 'VimEnter'})
+call dein#config('vim-airline', {'hook_source': 'call ui#ConfigureAirline()', 'on_event': 'VimEnter'})
 
 " vim-airline-themes
 call dein#add('https://github.com/vim-airline/vim-airline-themes.git')
-call dein#config('vim-airline-themes', {'hook_source': function('ConfigureAirlineThemes'), 'depends': 'vim-airline', 'on_source': 'vim-airline'})
+call dein#config('vim-airline-themes', {'hook_source': 'call ui#ConfigureAirlineThemes()', 'depends': 'vim-airline', 'on_source': 'vim-airline'})
 
 " vim-colorschemes
 call dein#add('https://github.com/flazz/vim-colorschemes.git')
@@ -164,8 +164,8 @@ call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
 
 " vim-indent-guides
 call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
-call dein#config('vim-indent-guides', {'hook_add': function('ConfigureIndentGuides')})
+call dein#config('vim-indent-guides', {'hook_add': 'call ui#ConfigureIndentGuides()'})
 
 " rainbow
 call dein#add('https://github.com/luochen1990/rainbow.git')
-call dein#config('rainbow', {'hook_add': function('ConfigurePreRainbow'), 'hook_post_source': function('ConfigurePostRainbow')})
+call dein#config('rainbow', {'hook_add': 'call ui#ConfigurePreRainbow()', 'hook_post_source': 'call ui#ConfigurePostRainbow()'})

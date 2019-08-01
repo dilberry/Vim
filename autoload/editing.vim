@@ -1,5 +1,5 @@
 " Align options {
-function! ConfigureAlign()
+function! editing#ConfigureAlign()
 	if dein#tap('Align')
 		" Prevent mappings
 		let g:loaded_AlignMaps = 'v43'
@@ -11,7 +11,7 @@ endfunction
 
 " Align
 call dein#add('https://github.com/lboulard/Align.git')
-call dein#config('Align', {'hook_source': function('ConfigureAlign') })
+call dein#config('Align', {'hook_source': 'call editing#ConfigureAlign()'})
 
 " vim-sleuth
 call dein#add('https://github.com/tpope/vim-sleuth.git')

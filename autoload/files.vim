@@ -1,5 +1,5 @@
 " polyglot options {
-function! ConfigurePolyglot()
+function! files#ConfigurePolyglot()
 	if dein#tap('vim-polyglot')
 		let g:polyglot_disabled = ['graphql']
 		augroup OmniFuncs
@@ -18,7 +18,7 @@ endfunction
 " }
 
 " JSBeautify {
-function! ConfigureJsbeautify()
+function! files#ConfigureJsbeautify()
 	if dein#tap('vim-jsbeautify')
 		augroup JSBeautify
 			autocmd!
@@ -51,6 +51,7 @@ function! ConfigureJsbeautify()
 endfunction
 " }
 
+" TODO: This will not be called after dein is cached
 " AStyler {
 if executable('AStyle')
 	augroup AStyler
@@ -102,14 +103,14 @@ endif
 
 " vim-csharp
 call dein#add('https://github.com/OrangeT/vim-csharp.git')
-call dein#config('vim-csharp', {'on_ft': 'cs' })
+call dein#config('vim-csharp', {'on_ft': 'cs'})
 
 " vim-polyglot
 call dein#add('https://github.com/sheerun/vim-polyglot.git')
-call dein#config('vim-polyglot', {'hook_post_source': function('ConfigurePolyglot')})
+call dein#config('vim-polyglot', {'hook_post_source': 'call files#ConfigurePolyglot()'})
 
 " vim-jsbeautify
 if executable('node')
 	call dein#add('https://github.com/maksimr/vim-jsbeautify.git')
-	call dein#config('vim-jsbeautify', {'hook_post_source': function('ConfigureJsbeautify'), 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css', 'xml']})
+	call dein#config('vim-jsbeautify', {'hook_post_source': 'call files#ConfigureJsbeautify()', 'on_ft': ['javascript', 'json', 'jsx', 'html', 'css', 'xml']})
 endif

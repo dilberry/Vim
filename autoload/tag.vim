@@ -3,7 +3,7 @@ if !executable('ctags')
 endif
 
 " Tagbar options {
-function! ConfigureTagbar()
+function! tag#ConfigureTagbar()
 	if dein#tap('tagbar')
 		" Tagbar Toggle
 		call LeaderBind('nnoremap', ['b', 't'], 'TagbarToggle', 'Tagbar Toggle', 'tagbar_toggle', v:true)
@@ -54,7 +54,7 @@ endfunction
 " }
 
 " Gutentags options {
-function! ConfigureGutentags()
+function! tag#ConfigureGutentags()
 	if dein#tap('vim-gutentags')
 		let l:ctags_home = expand('~\utils\ctags')
 		if filereadable(l:ctags_home.'\ctags.cfg')
@@ -64,7 +64,7 @@ function! ConfigureGutentags()
 		endif
 		let g:gutentags_cache_dir = l:ctags_home.'\cache'
 		" Let Gutentags separate tags based on Visual Studio and VB6 solutions
-		let g:gutentags_project_root = ['.vs', 'node_modules', '*.sln', '*.vbp']
+		let g:gutentags_project_root = ['.git', '.vs', 'node_modules', '*.sln', '*.vbp']
 		let g:gutentags_ctags_exclude = ['*.min.js', '*.min.css', '*.assets.json', '*.swagger.json', 'build', 'vendor', '.git', 'node_modules']
 	endif
 endfunction
@@ -72,8 +72,8 @@ endfunction
 
 " tagbar
 call dein#add('https://github.com/majutsushi/tagbar.git')
-call dein#config('tagbar', {'hook_source': function('ConfigureTagbar') })
+call dein#config('tagbar', {'hook_source': 'call tag#ConfigureTagbar()'})
 
 " vim-gutentags
 call dein#add('https://github.com/ludovicchabant/vim-gutentags.git')
-call dein#config('vim-gutentags', {'hook_source': function('ConfigureGutentags') })
+call dein#config('vim-gutentags', {'hook_source': 'call tag#ConfigureGutentags()'})

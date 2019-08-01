@@ -1,5 +1,5 @@
 " ale settings {
-function! ConfigureAle()
+function! linting#ConfigureAle()
 	if dein#tap('ale')
 		call LeaderBind('nnoremap', ['b', 'l'], 'ALEToggle', 'Linting Toggle', 'linting_toggle', v:true)
 		nmap <silent> [s <Plug>(ale_previous)
@@ -16,4 +16,4 @@ endfunction
 
 " ale
 call dein#add('https://github.com/w0rp/ale.git')
-call dein#config('ale', {'hook_source': function('ConfigureAle')})
+call dein#config('ale', {'hook_source': 'call linting#ConfigureAle()'})

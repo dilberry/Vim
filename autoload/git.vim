@@ -3,7 +3,7 @@ if !executable('git')
 endif
 
 " vim-fugitive options {
-function! ConfigureFugitive()
+function! git#ConfigureFugitive()
 	if dein#tap('vim-fugitive')
 		" Enter the commit message as Insert mode
 		augroup commit_enter
@@ -29,7 +29,7 @@ endfunction
 " }
 
 " gitv options {
-function! ConfigureGitv()
+function! git#ConfigureGitv()
 	if dein#tap('gitv')
 		call LeaderBind('nnoremap <silent>', ['g', 'v'], 'Gitv'         , 'Version (Commits)'    , 'version_commits'      , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'V'], 'Gitv!'        , 'Version (Files)'      , 'version_files'        , v:true)
@@ -40,7 +40,7 @@ endfunction
 " }
 
 " vim-gitgutter options {
-function! ConfigureGitGutter()
+function! git#ConfigureGitGutter()
 	if dein#tap('vim-gitgutter')
 		" Disable leader mappings
 		let g:gitgutter_map_keys = 0
@@ -58,12 +58,12 @@ endfunction
 
 " vim-fugitive
 call dein#add('https://github.com/tpope/vim-fugitive.git')
-call dein#config('vim-fugitive', {'hook_post_source': function('ConfigureFugitive')})
+call dein#config('vim-fugitive', {'hook_post_source': 'call git#ConfigureFugitive()'})
 
 " gitv
 call dein#add('https://github.com/gregsexton/gitv.git')
-call dein#config('gitv', {'hook_post_source': function('ConfigureGitv'), 'depends': 'vim-fugitive'})
+call dein#config('gitv', {'hook_post_source': 'call git#ConfigureGitv()', 'depends': 'vim-fugitive'})
 
 " vim-gitgutter
 call dein#add('https://github.com/airblade/vim-gitgutter.git')
-call dein#config('vim-gitgutter', {'hook_post_source': function('ConfigureGitGutter')})
+call dein#config('vim-gitgutter', {'hook_post_source': 'call git#ConfigureGitGutter()'})
