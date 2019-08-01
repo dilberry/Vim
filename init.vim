@@ -3,15 +3,15 @@ if &compatible
 endif
 
 " Platform detection {
-	let s:is_windows = has('win16') || has('win32') || has('win64')
-	let s:is_cygwin  = has('win32unix')
-	let s:is_mac     = !s:is_windows && !s:is_cygwin
+	let g:is_windows = has('win16') || has('win32') || has('win64')
+	let g:is_cygwin  = has('win32unix')
+	let g:is_mac     = !g:is_windows && !g:is_cygwin
 						\ && (has('mac') || has('macunix') || has('gui_macvim') ||
 						\    (!executable('xdg-open') && system('uname') =~? '^darwin'))
 " }
 
 " Windows defaults {
-	if s:is_windows
+	if g:is_windows
 		source $VIMRUNTIME/mswin.vim
 	endif
 " }
@@ -21,7 +21,7 @@ endif
 	" Set the VIMHOME path variable to where this vimrc is sourced
 	let $VIMHOME = expand('<sfile>:p:h')
 
-	if s:is_windows
+	if g:is_windows
 		let g:python_host_prog = 'C:\Python27\python.exe'
 		let g:python3_host_prog = 'C:\Python37\python.exe'
 
@@ -210,7 +210,7 @@ endif
 " Plug {
 	let g:dein_plugins_dir = fnamemodify($VIMHOME.'\plugins', ':p:h')
 	let g:dein_dir = fnamemodify(g:dein_plugins_dir.'\repos\github.com\Shougo\dein.vim', ':p:h')
-	exec 'set runtimepath+='.g:dein_dir
+	exec 'set runtimepath^='.g:dein_dir
 
 	" Specify a directory for plugins
 	try

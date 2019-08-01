@@ -78,15 +78,15 @@ endif
 " Formatter Menus and Mappings {
 	function! s:formatter_menu_check() abort
 		if dein#tap('denite.nvim')
-			if !exists('s:denite_menu.m')
-				let s:denite_menu.m = {'description': 'Modify'}
-				let s:denite_menu.m.command_candidates = []
+			if !exists('g:denite_menu.m')
+				let g:denite_menu.m = {'description': 'Modify'}
+				let g:denite_menu.m.command_candidates = []
 			endif
 		endif
 
 		if dein#tap('vim-leader-guide')
-			if !exists('g:lmap.m')
-				let g:lmap.m = {'name': 'Modify/'}
+			if !exists('g:leader_guide_map.m')
+				let g:leader_guide_map.m = {'name': 'Modify/'}
 			endif
 		endif
 	endfunction
