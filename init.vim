@@ -365,22 +365,10 @@ endif
 " GUI options {
 	set nolazyredraw " Don't redraw while executing macros
 
-	if has('gui_running')
-		if s:is_windows
-			function! s:gvim_resize()
-				" simalt appears to happen after VimEnter
-				" Variables set, during startup, from winheight() will be
-				" wrong
-				set lines=999
-				set columns=9999
-				" Fake Alt+Space+x
-				simalt ~x
-			endfunction
-			set guioptions-=t
-			autocmd GUIEnter * call s:gvim_resize()  " Maximise on GUI entry
-			set guifont=PragmataPro:h10:cANSI:qDRAFT " Select GUI font
+	if !has('nvim') && has('gui_running') " gVim
+		if filereadable(expand('$VIMHOME\ginit.vim'))
+			source $VIMHOME\ginit.vim
 		endif
-		autocmd GUIEnter * set vb t_vb=              " Disable audible bell
 	endif
 " }
 
