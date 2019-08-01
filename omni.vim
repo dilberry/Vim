@@ -1,5 +1,5 @@
 " deoplete options {
-function! ConfigureDeoplete()
+function! ConfigurePreDeoplete()
 	if dein#tap('deoplete.nvim')
 		" General options
 		let g:deoplete#enable_at_startup = 1
@@ -7,7 +7,9 @@ function! ConfigureDeoplete()
 		let g:deoplete#auto_completion_start_length = 2
 		let g:deoplete#manual_completion_start_length = 1
 		let g:deoplete#sources#syntax#min_keyword_length = 3
-		let g:deoplete#auto_complete_delay = 0
+		let g:deoplete#auto_complete_delay = 5
+		let g:deoplete#auto_refresh_delay = 30
+		let g:deoplete#refresh_always = v:false
 
 		let g:deoplete#enable_smart_case = 1
 		let g:deoplete#enable_ignore_case = 1
@@ -31,9 +33,7 @@ function! ConfigureDeoplete()
 
 		let g:deoplete#sources._ = ['omni', 'buffer', 'file']
 		let g:deoplete#ignore_sources._ = ['around']
-		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
-		call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
-		call deoplete#custom#source('buffer', 'rank', 100)
+		let g:deoplete#ignore_sources.denite = ['around', 'omni', 'buffer', 'file']
 
 		" C# options
 		let g:deoplete#sources.cs = ['omni']
@@ -47,6 +47,16 @@ function! ConfigureDeoplete()
 
 		" Vim options
 		let g:deoplete#sources.vim = ['vim']
+	endif
+endfunction
+
+function! ConfigureDeoplete()
+	if dein#tap('deoplete.nvim')
+		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
+		call deoplete#custom#source('_', 'matchers', ['matcher_head'])
+		call deoplete#custom#source('omni', 'matchers', ['matcher_head'])
+		call deoplete#custom#source('buffer', 'rank', 100)
+		call deoplete#custom#source('buffer', 'disabled_syntaxes', ['Comment', 'String'])
 
 		" Cycle on Tab
 		inoremap <silent><expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
@@ -219,7 +229,7 @@ endfunction
 " This needs python3 neovim package to be installed
 if has('python3') && executable('python')
 	call dein#add('https://github.com/Shougo/deoplete.nvim.git')
-	call dein#config('deoplete.nvim', {'hook_post_source': function('ConfigureDeoplete')})
+	call dein#config('deoplete.nvim', {'hook_add': function('ConfigurePreDeoplete'), 'hook_source': function('ConfigureDeoplete'), 'on_event': 'InsertCharPre'})
 	if !has('nvim')
 		call dein#add('https://github.com/roxma/nvim-yarp.git')
 		call dein#add('https://github.com/roxma/vim-hug-neovim-rpc.git')
@@ -232,11 +242,11 @@ if has('python3') && executable('python')
 
 	" neco-vim
 	call dein#add('https://github.com/Shougo/neco-vim.git')
-	call dein#config('neco-vim', {'depends': 'deoplete.nvim', 'on_source': 'deoplete.nvim', 'on_ft': 'vim'})
+	call dein#config('neco-vim', {'depends': 'deoplete.nvim', 'on_ft': 'vim'})
 
 	" neco-syntax
 	call dein#add('https://github.com/Shougo/neco-syntax.git')
-	call dein#config('neco-syntax', {'depends': 'deoplete.nvim', 'on_source': 'deoplete.nvim', 'on_ft': 'vim'})
+	call dein#config('neco-syntax', {'depends': 'deoplete.nvim', 'on_ft': 'vim'})
 
 	if executable('node')
 		" deoplete-ternjs
