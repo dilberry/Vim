@@ -9,7 +9,7 @@ function! omni#ConfigurePreDeoplete()
 		let g:deoplete#sources#syntax#min_keyword_length = 3
 		let g:deoplete#auto_complete_delay = 5
 		let g:deoplete#auto_refresh_delay = 30
-		let g:deoplete#refresh_always = v:false
+		let g:deoplete#refresh_always = v:true
 
 		let g:deoplete#enable_smart_case = 1
 		let g:deoplete#enable_ignore_case = 1
@@ -33,7 +33,6 @@ function! omni#ConfigurePreDeoplete()
 
 		let g:deoplete#sources._ = ['omni', 'buffer', 'file']
 		let g:deoplete#ignore_sources._ = ['around']
-		let g:deoplete#ignore_sources.denite = ['around', 'omni', 'buffer', 'file']
 
 		" C# options
 		let g:deoplete#sources.cs = ['omni']
@@ -63,6 +62,13 @@ function! omni#ConfigureDeoplete()
 
 		" Cycle backwards on Tab
 		inoremap <silent><expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
+
+		if dein#tap('denite.nvim')
+			autocmd FileType denite-filter call s:denite_filter_deoplete_settings()
+			function! s:denite_filter_deoplete_settings() abort
+				call deoplete#custom#buffer_option('auto_complete', v:false)
+			endfunction
+		endif
 	endif
 endfunction
 " }
