@@ -118,7 +118,7 @@ function! omni#ConfigureOmnisharp()
 
 		function! s:devenv_call() abort
 			" Call Visual Studio with current solution
-			let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(s:devenv).' '.shellescape(OmniSharp#FindSolutionOrDir()).'"'
+			let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(g:devenv).' '.shellescape(OmniSharp#FindSolutionOrDir()).'"'
 			silent execute l:devenv_cmd
 		endfunction
 

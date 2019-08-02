@@ -65,8 +65,8 @@ endif
 				" Finds the devenv binary
 				" Trim newlines off the end
 				let s:devenv_root = system('vswhere -latest -property installationPath')[:-2]
-				let s:devenv = s:devenv_root.'\Common7\IDE\devenv.exe'
-				if executable(s:devenv)
+				let g:devenv = s:devenv_root.'\Common7\IDE\devenv.exe'
+				if executable(g:devenv)
 					let $PATH .= ';'.s:devenv_root.'\Common7\IDE'
 				endif
 			endif
@@ -323,6 +323,9 @@ endif
 	set nofoldenable               " Disable folding
 	set timeoutlen=200             " Navigation character timeout
 	set ttimeoutlen=100            " Other character timeout
+	if has('nvim')
+		autocmd FocusGained * :checktime
+	endif
 " }
 
 " Saving options {
