@@ -159,6 +159,9 @@ call dein#add('https://github.com/flazz/vim-colorschemes.git')
 call dein#add('https://github.com/daylerees/colour-schemes.git')
 call dein#config('colour-schemes', {'rtp': 'vim'})
 
+" vim-colorscheme-metroid
+call dein#add('https://github.com/shinespark/vim-colorscheme-metroid.git')
+
 " random-colorscheme-picker
 call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
 
