@@ -1,111 +1,14 @@
-" vim-airline options {
-function! ui#ConfigureAirline()
-	if dein#tap('vim-airline')
-		set laststatus=2 " Show 2 lines of status
-		set noshowmode   " Don't show mode on statusline, let airline do it instead
-		let g:airline_detect_modified           = 1
-		let g:airline#extensions#tagbar#enabled = 1
-		let g:airline#extensions#ale#enabled    = 1
-		let g:airline#extensions#branch#enabled = 1
-		let g:airline#extensions#branch#format  = 1
-
-		function! CustomBranchName(name) abort
-			let b:airline_branch_ahead = v:false
-			try
-				let l:git_rev = fugitive#repo().git_chomp('rev-list', '--left-right', '--count', 'origin/'.a:name.'...'.a:name)
-				" In the form of Behind Ahead
-				let l:git_revs = split(l:git_rev, '\D')
-				let l:rev_stats = ''
-
-				" Check behind and ahead
-				if l:git_revs[0] != '0' && l:git_revs[1] != '0'
-					let l:rev_stats = 'Behind ' . l:git_revs[0] . ' , ' . 'Ahead ' . l:git_revs[1]
-					let b:airline_branch_ahead = v:true
-				" Check behind
-				elseif l:git_revs[0] != '0'
-					let l:rev_stats = 'Behind ' . l:git_revs[0]
-				" Check ahead
-				elseif l:git_revs[1] != '0'
-					let l:rev_stats = 'Ahead ' . l:git_revs[1]
-					let b:airline_branch_ahead = v:true
-				endif
-
-				if l:rev_stats == ''
-					return '[' . a:name . ']'
-				else
-					return '[' . a:name . ': '. l:rev_stats . ']'
-				endif
-			catch
-				return '[' . a:name . ']'
-			endtry
-		endfunction
-
-		function! BranchColour() abort
-			if exists('b:custom_branch') && !empty(b:custom_branch)
-				return b:custom_branch
-			else
-				let l:head = airline#extensions#branch#head()
-				let b:custom_branch = CustomBranchName(l:head)
-			endif
-
-			if b:airline_branch_ahead
-				call airline#parts#define_accent('branch', 'stale')
-			else
-				call airline#parts#define_accent('branch', 'none')
-			endif
-
-			let g:airline_section_b = airline#section#create(['branch'])
-
-			return b:custom_branch
-		endfunction
-
-		function! AirlineThemePatch(palette)
-			" [ guifg, guibg, ctermfg, ctermbg, opts ].
-			" See "help attr-list" for valid values for the "opt" value.
-			" http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim
-			let a:palette.accents.stale = [ '#ff0000', '' , 'red', '', '' ]
-		endfunction
-
-		exec 'augroup airline_init-'. bufnr("%")
-			autocmd!
-			autocmd User AirlineAfterInit call s:airline_init()
-			autocmd ShellCmdPost,CmdwinLeave * unlet! b:custom_branch
-			autocmd BufLeave <buffer> silent! unlet! b:custom_branch
-		augroup END
-
-		function! s:airline_init()
-			let b:custom_branch = ''
-			let b:airline_branch_ahead = v:false
-			call airline#parts#define_empty(['branch'])
-			call airline#parts#define_function('branch', 'BranchColour')
-			let g:airline_section_b = airline#section#create(['branch'])
-			" TODO: Use the following to check when outside a Git repo
-			" TODO: call airline#parts#define_condition('foo', 'getcwd() =~ work_dir')
-
-			let g:airline_theme_patch_func = 'AirlineThemePatch'
-		endfunction
-	endif
-endfunction
-" }
-
-" vim-airline-themes options {
-function! ui#ConfigureAirlineThemes()
-	if dein#tap('vim-airline-themes')
-		let g:airline_theme = 'wombat'
-	endif
-endfunction
-" }
-
 " lightline.vim options {
 function! ui#ConfigureLightline()
 	if dein#tap('lightline.vim')
+		set noshowmode " Don't show mode on statusline, let lightline do it instead
 		let s:enable = {}
 		let s:enable.tabline = 0
 		let s:enable.statusline = 1
 		let s:active = {}
 		let s:active.left = [
 		      \ ['mode'],
-		      \ ['fugitive'],
+		      \ ['fugitive', 'git_ahead'],
 		      \ ['filepath', 'readonly'],
 		      \ ['filename', 'modified']
 		      \ ]
@@ -131,15 +34,16 @@ function! ui#ConfigureLightline()
 		let s:component_function.filetype = 'LightlineFiletype'
 		let s:component_function.fileformat = 'LightlineFileformat'
 		let s:component_function.fileencoding = 'LightlineFileencoding'
-		let s:component_function.pwd = 'LightlineWorkingDirectory'
 		let s:component_function.tags = 'LightlineTags'
 		let s:component_expand = {
+		      \     'git_ahead': 'LightlineGitAhead',
 		      \     'linter_ok': 'lightline#ale#ok',
 		      \     'linter_checking': 'lightline#ale#checking',
 		      \     'linter_warnings': 'lightline#ale#warnings',
 		      \     'linter_errors': 'lightline#ale#errors',
 		      \ }
 		let s:component_type = {
+		      \     'git_ahead': 'error',
 		      \     'linter_ok': 'left',
 		      \     'linter_checking': 'left',
 		      \     'linter_warnings': 'warning',
@@ -161,10 +65,7 @@ function! ui#ConfigureLightline()
 		let s:help_glyph = "\uf128" " 
 		let s:ale_linting_glyph = " \uf250  " " 
 		let s:ro_glyph = "\ue0a2" " 
-
-		function! LightlineWorkingDirectory()
-			return &ft =~ 'help\|qf' ? '' : fnamemodify(getcwd(), ":~:.")
-		endfunction
+		let s:ahead_glyph = "\ue009" " 
 
 		function! LightlineMode() abort
 			if &filetype ==# 'denite'
@@ -187,6 +88,25 @@ function! ui#ConfigureLightline()
 				endif
 			catch
 			endtry
+			return ''
+		endfunction
+
+		function! LightlineGitAhead() abort
+			try
+				if exists('*fugitive#head')
+					let l:branch_name = fugitive#head()
+					let l:git_rev = fugitive#repo().git_chomp('rev-list', '--left-right', '--count', 'origin/'.l:branch_name.'...'.l:branch_name)
+					" In the form of Behind Ahead
+					let l:git_revs = split(l:git_rev, '\D')
+
+					" Check ahead; only allow numbers
+					if l:git_revs[1] =~# '^\d\+$' && l:git_revs[1] != '0'
+						return s:ahead_glyph . l:git_revs[1]
+					endif
+				endif
+			catch
+			endtry
+
 			return ''
 		endfunction
 
@@ -234,7 +154,7 @@ function! ui#ConfigureLightline()
 
 		function! LightlineFilename() abort
 			return (&buftype ==# 'terminal' ? has('nvim') ? b:term_title . ' (' . b:terminal_job_pid . ')' : '' :
-				\ &filetype ==# 'denite' ? denite#get_status('sources') :
+				\ &filetype =~# 'denite\|denite-filter' ? denite#get_status('sources') :
 				\ &filetype ==# 'tagbar' ? get(g:lightline, 'fname', '') :
 				\ '' !=# expand('%:t') ? expand('%:t') : '[No Name]')
 		endfunction
@@ -275,7 +195,7 @@ function! ui#ConfigureLightline()
 		let s:magenta = ['#8181A6', 13    ] 
 		let s:orange  = ['#7A7A57', 3     ] 
 		let s:red     = ['#5F8787', 12    ] 
-		let s:yellow  = ['#7A7A57', 11    ] 
+		let s:yellow  = ['#FFEF00', 11    ] 
 		let s:none    = ['none'   , 'none'] 
 
 		let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
