@@ -31,7 +31,7 @@
 		endfunction
 		autocmd GUIEnter * call s:gvim_options() " Maximise on GUI entry
 	elseif has('nvim') && exists('g:GuiLoaded')
-		Guifont! PragmataPro:h10:l
+		GuiFont! Iosevka NF:h10
 		GuiPopupmenu v:false
 		GuiTabline v:false
 		call GuiWindowMaximized(v:true)
