@@ -325,6 +325,9 @@ endif
 	set ttimeoutlen=100            " Other character timeout
 	if has('nvim')
 		autocmd FocusGained * :checktime
+		" A cleaner diff using built-in xdiff
+		" Taken from https://vimways.org/2018/the-power-of-diff/
+		set diffopt+=algorithm:patience
 	endif
 " }
 
