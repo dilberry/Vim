@@ -255,6 +255,10 @@ endif
 				source $VIMHOME\autoload\ui.vim
 			endif
 
+			if filereadable(expand('$VIMHOME\autoload\private.vim'))
+				source $VIMHOME\autoload\private.vim
+			endif
+
 			" Initialise plugin system
 			call dein#end()
 			call dein#save_state()
