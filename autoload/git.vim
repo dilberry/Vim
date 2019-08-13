@@ -10,18 +10,19 @@ function! git#ConfigureFugitive()
 			autocmd BufEnter COMMIT_EDITMSG startinsert
 		augroup END
 
-		call LeaderBind('nnoremap <silent>', ['g', 'b'], 'Gblame'       , 'Blame'                , 'blame'                , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'      , 'Browse'               , 'browse'               , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'c'], 'Gcommit'      , 'Commit'               , 'commit'               , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'D'], 'Gdiff HEAD'   , 'Diff HEAD'            , 'diff HEAD'            , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'd'], 'Gdiff'        , 'Diff'                 , 'diff'                 , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>', 'Move'                 , 'move'                 , v:false)
-		call LeaderBind('nnoremap <silent>', ['g', 'p'], 'Gpull'        , 'Pull'                 , 'pull'                 , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'P'], 'Gpush'        , 'Push'                 , 'push'                 , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'r'], 'Gread'        , 'Checkout current file', 'checkout-current-file', v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 's'], 'Gstatus'      , 'Status'               , 'status'               , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'w'], 'Gwrite'       , 'Write'                , 'write'                , v:true)
-		call LeaderBind('nnoremap <silent>', ['g', 'u'], 'Git add -u'   , 'Update'               , 'update'               , v:true)
+		command! Gupdate silent execute 'Git add -u'
+		call LeaderBind('nnoremap <silent>', ['g', 'b'], 'Gblame'          , 'Blame'                , 'blame'                , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'         , 'Browse'               , 'browse'               , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'c'], 'Gcommit'         , 'Commit'               , 'commit'               , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'D'], 'Gdiffsplit! HEAD', 'Diff HEAD'            , 'diff HEAD'            , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'd'], 'Gdiffsplit!'     , 'Diff'                 , 'diff'                 , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>'   , 'Move'                 , 'move'                 , v:false)
+		call LeaderBind('nnoremap <silent>', ['g', 'p'], 'Gpull'           , 'Pull'                 , 'pull'                 , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'P'], 'Gpush'           , 'Push'                 , 'push'                 , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'r'], 'Gread'           , 'Checkout current file', 'checkout-current-file', v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 's'], 'Gstatus'         , 'Status'               , 'status'               , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'w'], 'Gwrite'          , 'Write'                , 'write'                , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'u'], 'Gupdate'         , 'Update'               , 'update'               , v:true)
 
 		call LeaderBindsProcess()
 	endif
