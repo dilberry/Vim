@@ -61,11 +61,12 @@ function! ui#ConfigureLightline()
 		      \ 'component_type': s:component_type
 		      \ }
 
-		let s:mo_glyph = "\uf040 " " 
-		let s:help_glyph = "\uf128" " 
-		let s:ale_linting_glyph = " \uf250  " " 
-		let s:ro_glyph = "\ue0a2" " 
 		let s:ahead_glyph = "\ue009" " 
+		let s:ale_linting_glyph = " \uf250  " " 
+		let s:git_glyph = "\ue0a0" " 
+		let s:help_glyph = "\uf128" " 
+		let s:mo_glyph = "\uf040 " " 
+		let s:ro_glyph = "\ue0a2" " 
 
 		function! LightlineMode() abort
 			if &filetype ==# 'denite'
@@ -82,9 +83,9 @@ function! ui#ConfigureLightline()
 				return ''
 			endif
 			try
-				if &filetype !~? 'denite\|denite-filter\|tagbar' && exists('*fugitive#head')
+				if &filetype !~? 'denite\|denite-filter\|help\|tagbar' && exists('*fugitive#head')
 					let branch = fugitive#head()
-					return branch !=# '' ? "\ue0a0" .branch : ''
+					return branch !=# '' ? s:git_glyph.branch : ''
 				endif
 			catch
 			endtry
@@ -114,6 +115,7 @@ function! ui#ConfigureLightline()
 			return &buftype ==# 'terminal' ? '' :
 			\ &filetype ==# 'vaffle' ? '' :
 			\ &filetype ==# 'help' ? s:help_glyph :
+			\ &filetype =~# 'fugitive' ? s:git_glyph :
 			\ &filetype !~# 'tagbar' && &readonly ? s:ro_glyph :
 			\ ''
 		endfunction
