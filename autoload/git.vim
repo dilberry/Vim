@@ -23,8 +23,6 @@ function! git#ConfigureFugitive()
 		call LeaderBind('nnoremap <silent>', ['g', 's'], 'Gstatus'         , 'Status'               , 'status'               , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'w'], 'Gwrite'          , 'Write'                , 'write'                , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'u'], 'Gupdate'         , 'Update'               , 'update'               , v:true)
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }
@@ -34,8 +32,6 @@ function! git#ConfigureGitv()
 	if dein#tap('gitv')
 		call LeaderBind('nnoremap <silent>', ['g', 'v'], 'Gitv'         , 'Version (Commits)'    , 'version_commits'      , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'V'], 'Gitv!'        , 'Version (Files)'      , 'version_files'        , v:true)
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }

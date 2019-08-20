@@ -89,6 +89,7 @@ endif
 		let l:args.short_name = a:short_name
 		let l:args.is_cmd     = a:is_cmd
 		call add(g:leader_binds, l:args)
+		call s:leader_bind_process(l:args.map, l:args.keys, l:args.value, l:args.long_name, l:args.short_name, l:args.is_cmd)
 	endfunction
 
 	function! s:leader_bind_process(map, keys, value, long_name, short_name, is_cmd) abort
@@ -130,12 +131,6 @@ endif
 				call add(g:leader_binds_processed[l:callback_name], l:key_combo)
 				call Callback(a:keys, l:long_name, l:cmd_value)
 			endif
-		endfor
-	endfunction
-
-	function! LeaderBindsProcess() abort
-		for args in g:leader_binds
-			call s:leader_bind_process(args.map, args.keys, args.value, args.long_name, args.short_name, args.is_cmd)
 		endfor
 	endfunction
 

@@ -171,8 +171,6 @@ function! omni#ConfigureOmnisharp()
 
 			" Search for files from the Solution Directory
 			call LeaderBind('nnoremap <silent>', ['f', 'p'], 'call SolutionFileList()', 'Files (Solution Recursive)', 'file/rec/git', v:true)
-
-			call LeaderBindsProcess()
 		endfunction
 
 		function! SolutionFileList()

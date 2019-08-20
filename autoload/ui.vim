@@ -236,8 +236,6 @@ function! ui#ConfigureIndentGuides()
 
 		" indent-guides toggle
 		call LeaderBind('nnoremap', ['b', 'g'], 'IndentGuidesToggle', 'Indent Guides Toggle', 'indent_guides_toggle', v:true)
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }
@@ -270,8 +268,6 @@ function! ui#ConfigurePostRainbow()
 
 		" rainbow_parentheses toggle
 		call LeaderBind('nnoremap', ['b', 'r'], 'RainbowToggle', 'Rainbow Toggle', 'rainbow_toggle', v:true)
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }

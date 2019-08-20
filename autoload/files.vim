@@ -96,8 +96,6 @@ endif
 		call s:formatter_menu_check()
 
 		call LeaderBind('nnoremap <buffer>', ['m' , 'a'], a:format_cmd, 'Auto format', 'auto_format', v:true)
-
-		call LeaderBindsProcess()
 	endfunction
 " }
 

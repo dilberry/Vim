@@ -211,8 +211,6 @@ function! browsing#ConfigureDenite()
 
 			call denite#custom#action('file', 'qfreplace', function('DeniteQfreplace'))
 		endif
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }

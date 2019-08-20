@@ -8,8 +8,6 @@ function! linting#ConfigureAle()
 		if dein#tap('omnisharp-vim')
 			let g:ale_linters = { 'cs': ['Omnisharp'] }
 		endif
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }

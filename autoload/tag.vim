@@ -47,8 +47,6 @@ function! tag#ConfigureTagbar()
 			\ }
 			" }
 		endif
-
-		call LeaderBindsProcess()
 	endif
 endfunction
 " }
