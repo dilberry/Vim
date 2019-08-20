@@ -302,7 +302,7 @@ endif
 
 	function! s:strip_trailing_windows()
 		let state = s:strip_save()
-		%s/<C-V><cr>//ge
+		%s/$//ge
 		call s:strip_restore(state)
 	endfunction
 	command! FixEndingsWindows call s:strip_trailing_windows()
