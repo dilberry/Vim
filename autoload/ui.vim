@@ -62,6 +62,8 @@ function! ui#ConfigureLightline()
 		      \ }
 
 		let s:ahead_glyph = "\ue009" " 
+		let s:ahead_up_glyph = "\ue353" " 
+		let s:ahead_down_glyph = "\ue340" " 
 		let s:ale_linting_glyph = " \uf250  " " 
 		let s:git_glyph = "\ue0a0" " 
 		let s:help_glyph = "\uf128" " 
@@ -100,9 +102,15 @@ function! ui#ConfigureLightline()
 					" In the form of Behind Ahead
 					let l:git_revs = split(l:git_rev, '\D')
 
+					" Check ahead and behind; only allow numbers
+					if l:git_revs[0] =~# '^\d\+$' && l:git_revs[1] =~# '^\d\+$' && l:git_revs[0] != '0' && l:git_revs[1] != '0'
+						return s:ahead_glyph . ' ' . s:ahead_up_glyph . l:git_revs[1] . s:ahead_down_glyph . l:git_revs[0]
 					" Check ahead; only allow numbers
-					if l:git_revs[1] =~# '^\d\+$' && l:git_revs[1] != '0'
-						return s:ahead_glyph . l:git_revs[1]
+					elseif l:git_revs[1] =~# '^\d\+$' && l:git_revs[1] != '0'
+						return s:ahead_glyph . ' ' . s:ahead_up_glyph . l:git_revs[1]
+					" Check behind; only allow numbers
+					elseif l:git_revs[0] =~# '^\d\+$' && l:git_revs[0] != '0'
+						return s:ahead_glyph . ' ' . s:ahead_down_glyph . l:git_revs[0]
 					endif
 				endif
 			catch
