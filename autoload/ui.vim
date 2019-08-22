@@ -8,7 +8,7 @@ function! ui#ConfigureLightline()
 		let s:active = {}
 		let s:active.left = [
 		      \ ['mode'],
-		      \ ['fugitive', 'git_ahead'],
+		      \ ['fugitive', 'git_dirty', 'git_ahead'],
 		      \ ['filepath', 'readonly'],
 		      \ ['filename', 'modified']
 		      \ ]
@@ -36,6 +36,7 @@ function! ui#ConfigureLightline()
 		let s:component_function.fileencoding = 'LightlineFileencoding'
 		let s:component_function.tags = 'LightlineTags'
 		let s:component_expand = {
+		      \     'git_dirty': 'LightlineGitDirty',
 		      \     'git_ahead': 'LightlineGitAhead',
 		      \     'linter_ok': 'lightline#ale#ok',
 		      \     'linter_checking': 'lightline#ale#checking',
@@ -43,6 +44,7 @@ function! ui#ConfigureLightline()
 		      \     'linter_errors': 'lightline#ale#errors',
 		      \ }
 		let s:component_type = {
+		      \     'git_dirty': 'warning',
 		      \     'git_ahead': 'error',
 		      \     'linter_ok': 'left',
 		      \     'linter_checking': 'left',
@@ -66,6 +68,7 @@ function! ui#ConfigureLightline()
 		let s:ahead_down_glyph = "\ue340" " 
 		let s:ale_linting_glyph = " \uf250  " " 
 		let s:git_glyph = "\ue0a0" " 
+		let s:git_dirty_glyph = "\ue7c4" " 
 		let s:help_glyph = "\uf128" " 
 		let s:mo_glyph = "\uf040 " " 
 		let s:ro_glyph = "\ue0a2" " 
@@ -91,6 +94,21 @@ function! ui#ConfigureLightline()
 				endif
 			catch
 			endtry
+			return ''
+		endfunction
+
+		function! LightlineGitDirty() abort
+			try
+				if exists('*fugitive#repo')
+					let l:git_status = fugitive#repo().git_chomp_in_tree('status', '--porcelain')
+
+					if l:git_status =~# '^.\+$'
+						return s:git_dirty_glyph
+					endif
+				endif
+			catch
+			endtry
+
 			return ''
 		endfunction
 
