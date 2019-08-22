@@ -83,12 +83,21 @@ function! ui#ConfigureLightline()
 			return &filetype ==# 'tagbar' ? 'Tagbar' : winwidth(0) > 60 ? lightline#mode() : ''
 		endfunction
 
+		let s:git_visible = v:false
+		function! s:git_visible_check() abort
+			if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar' && exists('*fugitive#head')
+				let s:git_visible = v:true
+			else
+				let s:git_visible = v:false
+			endif
+		endfunction
+
 		function! LightlineFugitive() abort
 			if &buftype ==# 'terminal' || winwidth(0) < 100
 				return ''
 			endif
 			try
-				if &filetype !~? 'denite\|denite-filter\|help\|tagbar' && exists('*fugitive#head')
+				if s:git_visible
 					let branch = fugitive#head()
 					return branch !=# '' ? s:git_glyph.branch : ''
 				endif
@@ -99,16 +108,21 @@ function! ui#ConfigureLightline()
 
 		let s:git_dirty = v:false
 		function! LightlineGitDirty() abort
-			if &filetype !~? 'denite\|denite-filter\|help\|tagbar' && s:git_dirty
-				return s:git_dirty_glyph
-			else
+			if &buftype ==# 'terminal' || winwidth(0) < 100
 				return ''
 			endif
+			try
+				if s:git_visible && s:git_dirty
+					return s:git_dirty_glyph
+				endif
+			catch
+			endtry
+			return ''
 		endfunction
 
 		function! s:git_dirty_check() abort
 			try
-				if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar' && exists('*fugitive#repo')
+				if s:git_visible
 					let l:git_status = fugitive#repo().git_chomp_in_tree('status', '--porcelain')
 
 					if l:git_status =~# '^.\+$'
@@ -130,7 +144,7 @@ function! ui#ConfigureLightline()
 
 		function! LightlineGitAhead() abort
 			try
-				if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar' && exists('*fugitive#head')
+				if s:git_visible
 					let l:branch_name = fugitive#head()
 					let l:git_rev = fugitive#repo().git_chomp('rev-list', '--left-right', '--count', 'origin/'.l:branch_name.'...'.l:branch_name)
 					" In the form of Behind Ahead
@@ -267,10 +281,10 @@ function! ui#ConfigureLightline()
 		let g:lightline#ale#indicator_errors = "\uf05e"
 		let g:lightline#ale#indicator_ok = "\uf00c"
 
-		augroup LightLineGitDirty
+		augroup LightLineGit
 			autocmd!
-			autocmd BufReadPost * call s:git_dirty_update()
-			autocmd BufWritePost * call s:git_dirty_update()
+			autocmd BufWinEnter,BufEnter,BufRead * call s:git_visible_check()
+			autocmd BufReadPost,BufWritePost  * call s:git_dirty_update()
 		augroup end
 	endif
 endfunction
