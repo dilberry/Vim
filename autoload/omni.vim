@@ -174,7 +174,7 @@ function! omni#ConfigureOmnisharp()
 		endfunction
 
 		function! SolutionFileList()
-			call denite#start([{'name': 'file/rec/git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(1, 0), ':h')]}])
+			call denite#start([{'name': 'file/rec/git', 'args': [fnamemodify(OmniSharp#FindSolutionOrDir(), ':h')]}])
 		endfunction
 
 		function! s:omnisharp_count_code_actions() abort
