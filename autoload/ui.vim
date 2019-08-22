@@ -97,24 +97,40 @@ function! ui#ConfigureLightline()
 			return ''
 		endfunction
 
+		let s:git_dirty = v:false
 		function! LightlineGitDirty() abort
+			if &filetype !~? 'denite\|denite-filter\|help\|tagbar' && s:git_dirty
+				return s:git_dirty_glyph
+			else
+				return ''
+			endif
+		endfunction
+
+		function! s:git_dirty_check() abort
 			try
-				if exists('*fugitive#repo')
+				if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar' && exists('*fugitive#repo')
 					let l:git_status = fugitive#repo().git_chomp_in_tree('status', '--porcelain')
 
 					if l:git_status =~# '^.\+$'
-						return s:git_dirty_glyph
+						let s:git_dirty = v:true
+						return
 					endif
 				endif
 			catch
 			endtry
 
-			return ''
+			let s:git_dirty = v:false
+			return
+		endfunction
+
+		function! s:git_dirty_update() abort
+			call s:git_dirty_check()
+			call lightline#update()
 		endfunction
 
 		function! LightlineGitAhead() abort
 			try
-				if exists('*fugitive#head')
+				if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar' && exists('*fugitive#head')
 					let l:branch_name = fugitive#head()
 					let l:git_rev = fugitive#repo().git_chomp('rev-list', '--left-right', '--count', 'origin/'.l:branch_name.'...'.l:branch_name)
 					" In the form of Behind Ahead
@@ -250,6 +266,12 @@ function! ui#ConfigureLightline()
 		let g:lightline#ale#indicator_warnings = "\uf071"
 		let g:lightline#ale#indicator_errors = "\uf05e"
 		let g:lightline#ale#indicator_ok = "\uf00c"
+
+		augroup LightLineGitDirty
+			autocmd!
+			autocmd BufReadPost * call s:git_dirty_update()
+			autocmd BufWritePost * call s:git_dirty_update()
+		augroup end
 	endif
 endfunction
 " }
