@@ -52,8 +52,15 @@ function! browsing#ConfigureDenite()
 		" Matchers
 		call denite#custom#source('buffer'      , 'matchers', ['matcher/regexp'])
 		call denite#custom#source('file_mru'    , 'matchers', ['matcher/regexp'])
-		call denite#custom#source('file'        , 'matchers', ['matcher/fuzzy' ])
-		call denite#custom#source('file/rec/git', 'matchers', ['matcher/fuzzy' ])
+		if dein#tap('fruzzy')
+			call denite#custom#source('file'        , 'matchers', ['matcher/fruzzy'])
+			call denite#custom#source('file/rec'    , 'matchers', ['matcher/fruzzy'])
+			call denite#custom#source('file/rec/git', 'matchers', ['matcher/fruzzy'])
+		else
+			call denite#custom#source('file'        , 'matchers', ['matcher/fuzzy'])
+			call denite#custom#source('file/rec'    , 'matchers', ['matcher/fuzzy'])
+			call denite#custom#source('file/rec/git', 'matchers', ['matcher/fuzzy'])
+		end
 
 		" Converters
 		call denite#custom#source('file/old', 'converters', ['converter/relative_word'])
@@ -335,6 +342,14 @@ function! browsing#ConfigureVaffle()
 endfunction
 " }
 
+" fruzzy options {
+function! browsing#ConfigureFruzzy()
+	if dein#tap('fruzzy')
+		let g:fruzzy#usenative = 1
+	endif
+endfunction
+" }
+
 if has('python3') && executable('python')
 	" denite
 	call dein#add('https://github.com/Shougo/denite.nvim.git')
@@ -354,7 +369,7 @@ if has('python3') && executable('python')
 
 	" fruzzy
 	call dein#add('https://github.com/raghur/fruzzy.git')
-	call dein#config('fruzzy', {'depends': 'denite.nvim'})
+	call dein#config('fruzzy', {'depends': 'denite.nvim', 'hook_post_source': 'call browsing#ConfigureFruzzy()'})
 
 	" neoyank.vim
 	call dein#add('https://github.com/Shougo/neoyank.vim.git')
