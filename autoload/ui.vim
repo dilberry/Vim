@@ -13,7 +13,7 @@ function! ui#ConfigureLightline()
 		      \ ['filename', 'modified']
 		      \ ]
 		let s:active.right = [
-		      \ ['linter_ok', 'linter_checking', 'linter_errors', 'linter_warnings'],
+		      \ ['trailing', 'linter_ok', 'linter_checking', 'linter_errors', 'linter_warnings'],
 		      \ ['filetype', 'fileformat', 'fileencoding', 'lineinfo'],
 		      \ ['tags']
 		      \ ]
@@ -42,6 +42,7 @@ function! ui#ConfigureLightline()
 		      \     'linter_checking': 'lightline#ale#checking',
 		      \     'linter_warnings': 'lightline#ale#warnings',
 		      \     'linter_errors': 'lightline#ale#errors',
+		      \     'trailing': 'LightlineTrailingWhitespace',
 		      \ }
 		let s:component_type = {
 		      \     'git_dirty': 'warning',
@@ -50,6 +51,7 @@ function! ui#ConfigureLightline()
 		      \     'linter_checking': 'left',
 		      \     'linter_warnings': 'warning',
 		      \     'linter_errors': 'error',
+		      \     'trailing': 'warning',
 		      \ }
 		let g:lightline = {
 		      \ 'enable': s:enable,
@@ -72,6 +74,7 @@ function! ui#ConfigureLightline()
 		let s:help_glyph = "\uf128" " 
 		let s:mo_glyph = "\uf040 " " 
 		let s:ro_glyph = "\ue0a2" " 
+		let s:whitespace_glyph = "\u233d" " ⌽
 
 		function! LightlineMode() abort
 			if &filetype ==# 'denite'
@@ -239,22 +242,44 @@ function! ui#ConfigureLightline()
 			return ''
 		endfunction
 
+		let s:whitespace_dirty = v:false
+		function! LightlineTrailingWhitespace() abort
+			if &filetype !~? 'denite\|denite-filter\|vaffle\|help\|tagbar\|fugitive' && s:whitespace_dirty
+				return s:whitespace_glyph
+			else
+				return ''
+			endif
+		endfunction
+
+		function! s:whitespace_dirty_check() abort
+			if search('\s$', 'nw') != 0
+				let s:whitespace_dirty = v:true
+			else
+				let s:whitespace_dirty = v:false
+			endif
+		endfunction
+
+		function! s:whitespace_dirty_update() abort
+			call s:whitespace_dirty_check()
+			call lightline#update()
+		endfunction
+
 		let g:lightline.colorscheme = 'nord'
-		let s:base0   = ['#808070', 244   ] 
-		let s:base00  = ['#666656', 242   ] 
-		let s:base01  = ['#4e4e43', 239   ] 
-		let s:base02  = ['#303030', 230   ] 
-		let s:base03  = ['#151513', 233   ] 
-		let s:base1   = ['#949484', 242   ] 
-		let s:base2   = ['#a8a897', 248   ] 
-		let s:base3   = ['#e8e8d3', 253   ] 
-		let s:cyan    = ['#87ceeb', 12    ] 
-		let s:green   = ['#7A7A57', 3     ] 
-		let s:magenta = ['#8181A6', 13    ] 
-		let s:orange  = ['#7A7A57', 3     ] 
-		let s:red     = ['#5F8787', 12    ] 
-		let s:yellow  = ['#FFEF00', 11    ] 
-		let s:none    = ['none'   , 'none'] 
+		let s:base0   = ['#808070', 244   ]
+		let s:base00  = ['#666656', 242   ]
+		let s:base01  = ['#4e4e43', 239   ]
+		let s:base02  = ['#303030', 230   ]
+		let s:base03  = ['#151513', 233   ]
+		let s:base1   = ['#949484', 242   ]
+		let s:base2   = ['#a8a897', 248   ]
+		let s:base3   = ['#e8e8d3', 253   ]
+		let s:cyan    = ['#87ceeb', 12    ]
+		let s:green   = ['#7A7A57', 3     ]
+		let s:magenta = ['#8181A6', 13    ]
+		let s:orange  = ['#7A7A57', 3     ]
+		let s:red     = ['#5F8787', 12    ]
+		let s:yellow  = ['#FFEF00', 11    ]
+		let s:none    = ['none'   , 'none']
 
 		let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 		let s:p.normal.left     = [[s:base02, s:cyan   ], [s:base3 , s:base00], [s:base3, s:base01], [s:base3, s:base02]]
@@ -284,7 +309,12 @@ function! ui#ConfigureLightline()
 		augroup LightLineGit
 			autocmd!
 			autocmd BufWinEnter,BufEnter,BufRead * call s:git_visible_check()
-			autocmd BufReadPost,BufWritePost  * call s:git_dirty_update()
+			autocmd BufReadPost,BufWritePost * call s:git_dirty_update()
+		augroup end
+
+		augroup LightLineWhitespace
+			autocmd!
+			autocmd CursorHold,BufWritePost * call s:whitespace_dirty_update()
 		augroup end
 	endif
 endfunction
