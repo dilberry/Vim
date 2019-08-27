@@ -346,6 +346,10 @@ endfunction
 function! browsing#ConfigureFruzzy()
 	if dein#tap('fruzzy')
 		let g:fruzzy#usenative = 1
+		let l:version = fruzzy#version()
+		if l:version =~# 'modnotfound'
+			call fruzzy#install()
+		endif
 	endif
 endfunction
 " }
