@@ -381,6 +381,10 @@ endif
 	endif
 " }
 
+" Fold options {
+	set foldmethod=syntax " Fold on Syntax definition
+" }
+
 " Quickfix options {
 	augroup DragQuickfixWindowDown
 		autocmd!
