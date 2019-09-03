@@ -320,8 +320,8 @@ endif
 	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
-	set timeoutlen=200             " Navigation character timeout
-	set ttimeoutlen=100            " Other character timeout
+	set timeoutlen=100             " Navigation character timeout
+	set ttimeoutlen=50             " Other character timeout
 	if has('nvim')
 		autocmd FocusGained * :checktime
 		" A cleaner diff using built-in xdiff

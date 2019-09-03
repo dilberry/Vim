@@ -10,6 +10,12 @@ function! git#ConfigureFugitive()
 			autocmd BufEnter COMMIT_EDITMSG startinsert
 		augroup END
 
+		augroup fugitive_key_timeout
+			autocmd!
+			autocmd BufEnter * if &filetype ==# 'fugitive' | set timeoutlen=2000 | endif
+			autocmd BufLeave * if &filetype ==# 'fugitive' | set timeoutlen=100 | endif
+		augroup END
+
 		command! Gupdate silent execute 'Git add -u'
 		call LeaderBind('nnoremap <silent>', ['g', 'b'], 'Gblame'          , 'Blame'                , 'blame'                , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'         , 'Browse'               , 'browse'               , v:true)
