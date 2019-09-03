@@ -318,7 +318,7 @@ function! browsing#ConfigureVaffle()
 
 		" Disable the mapping in Fugitive
 		if dein#tap('vim-fugitive')
-			augroup commit_enter
+			augroup vaffle_commit_enter
 				autocmd!
 				autocmd BufEnter COMMIT_EDITMSG nmap <buffer> - <Nop>
 			augroup END

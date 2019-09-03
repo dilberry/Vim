@@ -6,7 +6,8 @@ endif
 function! git#ConfigureFugitive()
 	if dein#tap('vim-fugitive')
 		" Enter the commit message as Insert mode
-		augroup commit_enter
+		augroup fugitive_commit_enter
+			autocmd!
 			autocmd BufEnter COMMIT_EDITMSG startinsert
 		augroup END
 
