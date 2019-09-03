@@ -11,6 +11,8 @@ function! git#ConfigureFugitive()
 			autocmd BufEnter COMMIT_EDITMSG startinsert
 		augroup END
 
+		" 3 key combos are too difficult with a short timeoutlen
+		" This is important for stash key combos
 		augroup fugitive_key_timeout
 			autocmd!
 			autocmd BufEnter * if &filetype ==# 'fugitive' | set timeoutlen=2000 | endif
