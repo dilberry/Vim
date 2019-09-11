@@ -200,10 +200,6 @@ endif
 	" Yank to EOL, making Y behave more like the other capitals (C and D).
 	" Taken from http://vimbits.com/bits/11
 	noremap Y y$
-
-	" Increment and Decrement to Plus and Minus
-	nnoremap <C--> <C-x>
-	nnoremap <C-+> <C-a>
 " }
 
 " Plug {

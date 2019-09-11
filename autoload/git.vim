@@ -50,8 +50,8 @@ function! git#ConfigureGitGutter()
 	if dein#tap('vim-gitgutter')
 		" Disable leader mappings
 		let g:gitgutter_map_keys = 0
-		nmap [c <Plug>GitGutterPrevHunk
-		nmap ]c <Plug>GitGutterNextHunk
+		nmap [c <Plug>(GitGutterPrevHunk)
+		nmap ]c <Plug>(GitGutterNextHunk)
 		let g:gitgutter_async = 1
 		let g:gitgutter_sign_added = '✚'
 		let g:gitgutter_sign_modified = '✹'
