@@ -55,9 +55,15 @@ endif
 				" Add msbuild binary path to PATH
 				" Trim newlines off the end
 				let s:msbuild_root = system('vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath')[:-2]
-				let s:msbuild = s:msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe'
-				if executable(s:msbuild)
+
+				let s:msbuild_2017 = s:msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe'
+				if executable(s:msbuild_2017)
 					let $PATH .= ';'.s:msbuild_root.'\MSBuild\15.0\Bin'
+				endif
+
+				let s:msbuild_2019 = s:msbuild_root.'\MSBuild\Current\Bin\MSBuild.exe'
+				if executable(s:msbuild_2019)
+					let $PATH .= ';'.s:msbuild_root.'\MSBuild\Current\Bin'
 				endif
 			endif
 
