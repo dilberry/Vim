@@ -323,7 +323,7 @@ endif
 	set autoread                   " Auto-reload files, if there's no conflict
 	set shortmess+=IA              " No intro message, no swap-file message
 	set updatetime=500             " This setting controls how long to wait (in ms) before fetching type / symbol information.
-	set cmdheight=2                " Remove 'Press Enter to continue' message when type information is longer than one line.
+	set cmdheight=1                " Remove 'Press Enter to continue' message when type information is longer than one line.
 	set nrformats-=octal           " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it confusing.
 	set nofoldenable               " Disable folding
 	set timeoutlen=100             " Navigation character timeout
