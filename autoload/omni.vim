@@ -116,6 +116,14 @@ function! omni#ConfigureOmnisharp()
 			let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /clp:ErrorsOnly '.shellescape(OmniSharp#FindSolutionOrDir())
 		endfunction
 
+		function! s:msbuild_withwarnings_options() abort
+			" Error format for make
+			setlocal errorformat=\ %#%f(%l\\\,%c):\ %m
+
+			" Msbuild setting for make
+			let &l:makeprg='msbuild /nologo /v:q /property:GenerateFullPaths=true /t:Rebuild '.shellescape(OmniSharp#FindSolutionOrDir())
+		endfunction
+
 		function! s:devenv_call() abort
 			" Call Visual Studio with current solution
 			let l:devenv_cmd = '!start /b cmd /c '.'"'.shellescape(g:devenv).' '.shellescape(OmniSharp#FindSolutionOrDir()).'"'
@@ -126,8 +134,8 @@ function! omni#ConfigureOmnisharp()
 			"Set autocomplete function to OmniSharp (if not using YouCompleteMe completion plugin)
 			setlocal omnifunc=OmniSharp#Complete
 
-			call s:msbuild_options()
 			command! -buffer -nargs=* MSBuild call s:msbuild_options() | make <args>
+			command! -buffer -nargs=* MSBuildWithWarnings call s:msbuild_withwarnings_options() | make <args>
 			command! -buffer -nargs=* DevEnv call s:devenv_call()
 			call s:omnisharp_menu_check()
 
