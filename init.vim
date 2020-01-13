@@ -198,10 +198,10 @@ endif
 	vnoremap ; :
 	vnoremap : ;
 
-	" Retain selection after shift operations
-	" Taken from http://vimbits.com/bits/20
-	vnoremap < <gv
-	vnoremap > >gv
+	" Retain selection after visual indentation
+	" Taken from https://vim.fandom.com/wiki/Shifting_blocks_visually
+	vnoremap <Tab> >gv
+	vnoremap <S-Tab> <gv
 
 	" Yank to EOL, making Y behave more like the other capitals (C and D).
 	" Taken from http://vimbits.com/bits/11
