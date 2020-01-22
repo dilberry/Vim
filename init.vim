@@ -22,32 +22,32 @@ endif
 	let $VIMHOME = expand('<sfile>:p:h')
 
 	if g:is_windows
-		let g:python_host_prog = 'C:\Python27\python.exe'
-		let g:python3_host_prog = 'C:\Python37\python.exe'
+		let g:python_host_prog = 'C:/Python27/python.exe'
+		let g:python3_host_prog = 'C:/Python37/python.exe'
 
 		if !executable('xmllint')
 			" Add xmllint binary path to PATH
-			let $PATH .= ';'.expand('~\utils\xmllint\bin\')
+			let $PATH .= ';'.expand('~/utils/xmllint/bin/')
 		endif
 
 		if !executable('AStyle')
 			" Add AStyle binary path to PATH
-			let $PATH .= ';'.expand('~\utils\AStyle\bin\')
+			let $PATH .= ';'.expand('~/utils/AStyle/bin/')
 		endif
 
 		if !executable('ctags')
 			" Add ctags binary path to PATH
-			let $PATH .= ';'.expand('~\utils\ctags\')
+			let $PATH .= ';'.expand('~/utils/ctags/')
 		endif
 
 		if !executable('rg')
 			" Add ripgrep binary path to PATH
-			let $PATH .= ';'.expand('~\utils\rg\')
+			let $PATH .= ';'.expand('~/utils/rg/')
 		endif
 
 		if !executable('vswhere')
 			" Add vswhere binary path to PATH
-			let $PATH .= ';'.expand('~\utils\vswhere\')
+			let $PATH .= ';'.expand('~/utils/vswhere/')
 		endif
 
 		if executable('vswhere')
@@ -56,14 +56,14 @@ endif
 				" Trim newlines off the end
 				let s:msbuild_root = system('vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath')[:-2]
 
-				let s:msbuild_2017 = s:msbuild_root.'\MSBuild\15.0\Bin\MSBuild.exe'
+				let s:msbuild_2017 = s:msbuild_root.'/MSBuild/15.0/Bin/MSBuild.exe'
 				if executable(s:msbuild_2017)
-					let $PATH .= ';'.s:msbuild_root.'\MSBuild\15.0\Bin'
+					let $PATH .= ';'.s:msbuild_root.'/MSBuild/15.0/Bin'
 				endif
 
-				let s:msbuild_2019 = s:msbuild_root.'\MSBuild\Current\Bin\MSBuild.exe'
+				let s:msbuild_2019 = s:msbuild_root.'/MSBuild/Current/Bin/MSBuild.exe'
 				if executable(s:msbuild_2019)
-					let $PATH .= ';'.s:msbuild_root.'\MSBuild\Current\Bin'
+					let $PATH .= ';'.s:msbuild_root.'/MSBuild/Current/Bin'
 				endif
 			endif
 
@@ -71,9 +71,9 @@ endif
 				" Finds the devenv binary
 				" Trim newlines off the end
 				let s:devenv_root = system('vswhere -latest -property installationPath')[:-2]
-				let g:devenv = s:devenv_root.'\Common7\IDE\devenv.exe'
+				let g:devenv = s:devenv_root.'/Common7/IDE/devenv.exe'
 				if executable(g:devenv)
-					let $PATH .= ';'.s:devenv_root.'\Common7\IDE'
+					let $PATH .= ';'.s:devenv_root.'/Common7/IDE'
 				endif
 			endif
 		endif
@@ -209,14 +209,12 @@ endif
 " }
 
 " Plug {
-	let g:dein_plugins_dir = fnamemodify($VIMHOME.'\plugins', ':p:h')
-	let g:dein_dir = fnamemodify(g:dein_plugins_dir.'\repos\github.com\Shougo\dein.vim', ':p:h')
+	let g:dein_plugins_dir = fnamemodify($VIMHOME.'/plugins', ':p:h')
+	let g:dein_dir = fnamemodify(g:dein_plugins_dir.'/repos/github.com/Shougo/dein.vim', ':p:h')
 	exec 'set runtimepath^='.g:dein_dir
 
 	" Specify a directory for plugins
 	try
-	catch
-	endtry
 		silent! let s:dein_state = dein#load_state(g:dein_plugins_dir)
 		if s:dein_state
 			call dein#begin(g:dein_plugins_dir)
@@ -224,40 +222,40 @@ endif
 			" dein
 			call dein#add(g:dein_dir)
 
-			if filereadable(expand('$VIMHOME\autoload\browsing.vim'))
-				source $VIMHOME\autoload\browsing.vim
+			if filereadable(expand('$VIMHOME/autoload/browsing.vim'))
+				source $VIMHOME/autoload/browsing.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\editing.vim'))
-				source $VIMHOME\autoload\editing.vim
+			if filereadable(expand('$VIMHOME/autoload/editing.vim'))
+				source $VIMHOME/autoload/editing.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\files.vim'))
-				source $VIMHOME\autoload\files.vim
+			if filereadable(expand('$VIMHOME/autoload/files.vim'))
+				source $VIMHOME/autoload/files.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\git.vim'))
-				source $VIMHOME\autoload\git.vim
+			if filereadable(expand('$VIMHOME/autoload/git.vim'))
+				source $VIMHOME/autoload/git.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\linting.vim'))
-				source $VIMHOME\autoload\linting.vim
+			if filereadable(expand('$VIMHOME/autoload/linting.vim'))
+				source $VIMHOME/autoload/linting.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\omni.vim'))
-				source $VIMHOME\autoload\omni.vim
+			if filereadable(expand('$VIMHOME/autoload/omni.vim'))
+				source $VIMHOME/autoload/omni.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\tag.vim'))
-				source $VIMHOME\autoload\tag.vim
+			if filereadable(expand('$VIMHOME/autoload/tag.vim'))
+				source $VIMHOME/autoload/tag.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\ui.vim'))
-				source $VIMHOME\autoload\ui.vim
+			if filereadable(expand('$VIMHOME/autoload/ui.vim'))
+				source $VIMHOME/autoload/ui.vim
 			endif
 
-			if filereadable(expand('$VIMHOME\autoload\private.vim'))
-				source $VIMHOME\autoload\private.vim
+			if filereadable(expand('$VIMHOME/autoload/private.vim'))
+				source $VIMHOME/autoload/private.vim
 			endif
 
 			" Initialise plugin system
@@ -271,6 +269,8 @@ endif
 			autocmd VimEnter * call dein#call_hook('source')
 			autocmd VimEnter * call dein#call_hook('post_source')
 		augroup end
+	catch
+	endtry
 " }
 
 " Encoding {
@@ -381,8 +381,8 @@ endif
 	set nolazyredraw " Don't redraw while executing macros
 
 	if !has('nvim') && has('gui_running') " gVim
-		if filereadable(expand('$VIMHOME\ginit.vim'))
-			source $VIMHOME\ginit.vim
+		if filereadable(expand('$VIMHOME/ginit.vim'))
+			source $VIMHOME/ginit.vim
 		endif
 	endif
 " }
