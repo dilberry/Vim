@@ -156,8 +156,8 @@ function! browsing#ConfigureDenite()
 		call LeaderBind('nnoremap <silent>', ['t', 'g'], 'Denite tag'    , 'Tags (Global)', 'global_tag', v:true)
 
 		" Cycle through Denite buffer like the Quickfix buffer using Unimpaired
-		nnoremap <silent> [d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=-<C-r>=v:count1<CR><CR>
-		nnoremap <silent> ]d :<C-u>Denite -resume -immediately -force-quit -cursor-pos=+<C-r>=v:count1<CR><CR>
+		nnoremap <silent> [d :<C-u>Denite -resume -immediately -cursor-pos=-<C-r>=v:count1<CR><CR>
+		nnoremap <silent> ]d :<C-u>Denite -resume -immediately -cursor-pos=+<C-r>=v:count1<CR><CR>
 
 		if dein#tap('vim-fugitive')
 			if !exists('g:denite_menu.g')
@@ -356,7 +356,7 @@ endfunction
 
 if has('python3') && executable('python')
 	" denite
-	call dein#add('https://github.com/Shougo/denite.nvim.git')
+	call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': 'a74d60e74d0f70fe53fa7e67bce63dbeda923581'})
 	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()'})
 
 	" denite-ale
