@@ -99,6 +99,18 @@ endif
 	endfunction
 " }
 
+" XAML Options {
+	augroup XamlOptions
+		autocmd!
+	augroup END
+
+	function! g:TidyCall() abort
+		execute "%!tidy -xml -q --show-errors 0 --show-warnings 0 --indent auto --indent-spaces 4 --indent-attributes 1 " . '"'.expand('%').'"'
+	endfunction
+
+	autocmd XamlOptions FileType xaml call s:formatter_mappings('call g:TidyCall()')
+" }
+
 " vim-csharp
 call dein#add('https://github.com/OrangeT/vim-csharp.git')
 call dein#config('vim-csharp', {'on_ft': 'cs'})
