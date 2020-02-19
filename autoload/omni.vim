@@ -31,7 +31,7 @@ function! omni#ConfigurePreDeoplete()
 			let g:deoplete#ignore_sources = {}
 		endif
 
-		let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+		let g:deoplete#sources._ = ['buffer', 'file']
 		let g:deoplete#ignore_sources._ = ['around']
 
 		" C# options
@@ -53,7 +53,9 @@ function! omni#ConfigureDeoplete()
 	if dein#tap('deoplete.nvim')
 		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 		call deoplete#custom#source('_', 'matchers', ['matcher_head'])
-		call deoplete#custom#source('omni', 'matchers', ['matcher_head'])
+		call deoplete#custom#source('_', 'sorters', [])
+		call deoplete#custom#source('omni', 'matchers', ['matcher_full_fuzzy'])
+		call deoplete#custom#source('omni', 'sorters', ['sorter_rank'])
 		call deoplete#custom#source('buffer', 'rank', 100)
 		call deoplete#custom#source('buffer', 'disabled_syntaxes', ['Comment', 'String'])
 

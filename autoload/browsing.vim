@@ -47,11 +47,12 @@ function! browsing#ConfigureDenite()
 
 		" Sorters
 		call denite#custom#source('file',         'sorters', ['sorter/sublime'])
+		call denite#custom#source('file/old',     'sorters', ['sorter/sublime'])
 		call denite#custom#source('file/rec/git', 'sorters', ['sorter/sublime'])
 
 		" Matchers
 		call denite#custom#source('buffer'      , 'matchers', ['matcher/regexp'])
-		call denite#custom#source('file_mru'    , 'matchers', ['matcher/regexp'])
+		call denite#custom#source('file/old'    , 'matchers', ['matcher/regexp'])
 		if dein#tap('fruzzy')
 			call denite#custom#source('file'        , 'matchers', ['converter/tail_path', 'matcher/fruzzy'])
 			call denite#custom#source('file/rec'    , 'matchers', ['converter/tail_path', 'matcher/fruzzy'])
