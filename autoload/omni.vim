@@ -85,8 +85,6 @@ function! omni#ConfigureDeoplete()
 		call deoplete#custom#source('buffer', 'rank', 100)
 		call deoplete#custom#source('buffer', 'disabled_syntaxes', ['Comment', 'String'])
 
-		imap <silent><expr><cr> pumvisible() ? deoplete#close_popup() : "\<cr>"
-
 		if dein#tap('denite.nvim')
 			autocmd FileType denite-filter call s:denite_filter_deoplete_settings()
 			function! s:denite_filter_deoplete_settings() abort

@@ -273,6 +273,10 @@ endif
 			autocmd VimEnter * call dein#call_hook('source')
 			autocmd VimEnter * call dein#call_hook('post_source')
 		augroup end
+
+		if filereadable(expand('$VIMHOME/autoload/mapping.vim'))
+			source $VIMHOME/autoload/mapping.vim
+		endif
 	catch
 	endtry
 " }
