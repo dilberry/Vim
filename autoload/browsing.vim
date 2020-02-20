@@ -358,7 +358,7 @@ endfunction
 if has('python3') && executable('python')
 	" denite
 	call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': 'a74d60e74d0f70fe53fa7e67bce63dbeda923581'})
-	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()'})
+	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()', 'rev': '*'})
 
 	" denite-ale
 	call dein#add('https://github.com/iyuuya/denite-ale.git')
