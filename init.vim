@@ -246,6 +246,10 @@ endif
 				source $VIMHOME/autoload/omni.vim
 			endif
 
+			if filereadable(expand('$VIMHOME/autoload/snippet.vim'))
+				source $VIMHOME/autoload/snippet.vim
+			endif
+
 			if filereadable(expand('$VIMHOME/autoload/tag.vim'))
 				source $VIMHOME/autoload/tag.vim
 			endif

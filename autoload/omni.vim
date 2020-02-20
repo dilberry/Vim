@@ -31,21 +31,41 @@ function! omni#ConfigurePreDeoplete()
 			let g:deoplete#ignore_sources = {}
 		endif
 
-		let g:deoplete#sources._ = ['buffer', 'file']
+		if dein#tap('neosnippet.vim')
+			let g:deoplete#sources._ = ['omni', 'buffer', 'file', 'neosnippet']
+
+			" C# options
+			let g:deoplete#sources.cs = ['neosnippet', 'omni']
+
+			" Javascript options
+			let g:deoplete#sources.javascript = ['neosnippet', 'tern', 'omni']
+
+			" Python options
+			let g:deoplete#sources.python = ['neosnippet', 'jedi']
+
+			" Vim options
+			let g:deoplete#sources.vim = ['neosnippet', 'vim']
+		else
+			let g:deoplete#sources._ = ['omni', 'buffer', 'file']
+
+			" C# options
+			let g:deoplete#sources.cs = ['omni']
+
+			" Javascript options
+			let g:deoplete#sources.javascript = ['tern', 'omni']
+
+			" Python options
+			let g:deoplete#sources.python = ['jedi']
+
+			" Vim options
+			let g:deoplete#sources.vim = ['vim']
+		endif
+
 		let g:deoplete#ignore_sources._ = ['around']
 
 		" C# options
-		let g:deoplete#sources.cs = ['omni']
 		let g:deoplete#omni#input_patterns.cs = ['.*[^=\);]']
 
-		" Javascript options
-		let g:deoplete#sources.javascript = ['tern', 'omni']
-
-		" Python options
-		let g:deoplete#sources.python = ['jedi']
-
-		" Vim options
-		let g:deoplete#sources.vim = ['vim']
 	endif
 endfunction
 
@@ -56,14 +76,16 @@ function! omni#ConfigureDeoplete()
 		call deoplete#custom#source('_', 'sorters', [])
 		call deoplete#custom#source('omni', 'matchers', ['matcher_full_fuzzy'])
 		call deoplete#custom#source('omni', 'sorters', ['sorter_rank'])
+
+		" Snippets should get preference over other sources
+		if dein#tap('neosnippet.vim')
+			call deoplete#custom#source('neosnippet', 'rank', 1000)
+		endif
+
 		call deoplete#custom#source('buffer', 'rank', 100)
 		call deoplete#custom#source('buffer', 'disabled_syntaxes', ['Comment', 'String'])
 
-		" Cycle on Tab
-		inoremap <silent><expr><tab> pumvisible()? "\<c-n>" : "\<tab>"
-
-		" Cycle backwards on Tab
-		inoremap <silent><expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
+		imap <silent><expr><cr> pumvisible() ? deoplete#close_popup() : "\<cr>"
 
 		if dein#tap('denite.nvim')
 			autocmd FileType denite-filter call s:denite_filter_deoplete_settings()
