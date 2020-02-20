@@ -56,7 +56,7 @@ function! s:EnterInsertModeNeoSnippet()
 		endif
 	endif
 
-	" if no previous option worked, just use regular tab
+	" if no previous option worked, just use Enter
 	return "\<cr>"
 endfunction
 

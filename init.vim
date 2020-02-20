@@ -185,8 +185,8 @@ endif
 	call LeaderBind('nnoremap', ['b', 'm', 'e'], 'FixEndingsWhiteSpace', 'Fix Line Endings (White Space)', 'fix_line_endings_white_space', v:true)
 
 	" Buffer cycle
-	nnoremap <Tab> :bnext<CR>
-	nnoremap <S-Tab> :bprevious<CR>
+	nnoremap <silent><Tab> :bnext<CR>
+	nnoremap <silent><S-Tab> :bprevious<CR>
 
 	" Increment/Decrement remapping
 	noremap <C-kPlus> <C-A>
