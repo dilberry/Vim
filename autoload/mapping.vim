@@ -50,7 +50,7 @@ function! s:EnterInsertModeNeoSnippet()
 	" is completion menu open? cycle to next item
 	if pumvisible()
 		if neosnippet#expandable()
-			return "\<right>" . "\<Plug>(neosnippet_expand_or_jump)"
+			return "\<Plug>(neosnippet_expand_or_jump)"
 		else
 			return deoplete#close_popup()
 		endif
@@ -62,4 +62,10 @@ endfunction
 
 if dein#tap('deoplete.nvim') && dein#tap('neosnippet.vim')
 	imap <silent><expr><cr> <SID>EnterInsertModeNeoSnippet()
+endif
+
+if dein#tap('neosnippet.vim')
+	imap <C-j>     <Plug>(neosnippet_expand_or_jump)
+	smap <C-j>     <Plug>(neosnippet_expand_or_jump)
+	xmap <C-j>     <Plug>(neosnippet_expand_target)
 endif
