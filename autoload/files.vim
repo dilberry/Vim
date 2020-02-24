@@ -115,6 +115,9 @@ endif
 call dein#add('https://github.com/OrangeT/vim-csharp.git')
 call dein#config('vim-csharp', {'on_ft': 'cs'})
 
+" vim-jumpmethod
+call dein#add('https://github.com/RobertCWebb/vim-jumpmethod.git')
+
 " vim-polyglot
 call dein#add('https://github.com/sheerun/vim-polyglot.git')
 call dein#config('vim-polyglot', {'hook_post_source': 'call files#ConfigurePolyglot()'})
