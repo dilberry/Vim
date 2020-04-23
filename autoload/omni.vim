@@ -71,6 +71,7 @@ endfunction
 
 function! omni#ConfigureDeoplete()
 	if dein#tap('deoplete.nvim')
+		call deoplete#custom#var('buffer', 'require_same_filetype', v:false)
 		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 		call deoplete#custom#source('_', 'matchers', ['matcher_head'])
 		call deoplete#custom#source('_', 'sorters', [])

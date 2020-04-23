@@ -357,7 +357,7 @@ endfunction
 
 if has('python3') && executable('python')
 	" denite
-	call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': 'a74d60e74d0f70fe53fa7e67bce63dbeda923581'})
+	call dein#add('https://github.com/Shougo/denite.nvim.git')
 	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()', 'rev': '*'})
 
 	" denite-ale
@@ -365,7 +365,7 @@ if has('python3') && executable('python')
 	call dein#config('denite-ale', {'depends': ['ale', 'denite.nvim']})
 
 	" denite-git
-	call dein#add('https://github.com/neoclide/denite-git.git')
+	call dein#add('https://github.com/dilberry/denite-git.git')
 	call dein#config('denite-git', {'depends': 'denite.nvim'})
 
 	" denite-extra
