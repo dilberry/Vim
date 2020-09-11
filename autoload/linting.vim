@@ -6,12 +6,12 @@ function! linting#ConfigureAle()
 		nmap <silent> ]s <Plug>(ale_next)
 
 		if dein#tap('omnisharp-vim')
-			let g:ale_linters = { 'cs': ['Omnisharp'] }
+			let g:ale_linters = { 'cs': ['omnisharp'] }
 		endif
 	endif
 endfunction
 " }
 
 " ale
-call dein#add('https://github.com/w0rp/ale.git')
-call dein#config('ale', {'hook_source': 'call linting#ConfigureAle()'})
+call dein#add('https://github.com/dense-analysis/ale.git', { 'rev' : 'v2.6.0' })
+call dein#config('ale', {'hook_source': 'call linting#ConfigureAle()', 'depends': 'omnisharp-vim'})
