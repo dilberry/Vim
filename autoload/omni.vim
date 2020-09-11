@@ -3,75 +3,59 @@ function! omni#ConfigurePreDeoplete()
 	if dein#tap('deoplete.nvim')
 		" General options
 		let g:deoplete#enable_at_startup = 1
-		let g:deoplete#file#enable_buffer_path = 1
-		let g:deoplete#auto_completion_start_length = 2
-		let g:deoplete#manual_completion_start_length = 1
-		let g:deoplete#sources#syntax#min_keyword_length = 3
-		let g:deoplete#auto_complete_delay = 5
-		let g:deoplete#auto_refresh_delay = 30
-		let g:deoplete#refresh_always = v:true
-
-		let g:deoplete#enable_smart_case = 1
-		let g:deoplete#enable_ignore_case = 1
-		let g:deoplete#enable_camel_case = 1
-
-		if !exists('g:deoplete#omni#input_patterns')
-			let g:deoplete#omni#input_patterns = {}
-		endif
-
-		if !exists('g:deoplete#sources')
-			let g:deoplete#sources = {}
-		endif
-
-		if !exists('g:deoplete#omni#functions')
-			let g:deoplete#omni#functions = {}
-		endif
-
-		if !exists('g:deoplete#ignore_sources')
-			let g:deoplete#ignore_sources = {}
-		endif
-
-		if dein#tap('neosnippet.vim')
-			let g:deoplete#sources._ = ['omni', 'buffer', 'file', 'neosnippet']
-
-			" C# options
-			let g:deoplete#sources.cs = ['neosnippet', 'omni']
-
-			" Javascript options
-			let g:deoplete#sources.javascript = ['neosnippet', 'tern', 'omni']
-
-			" Python options
-			let g:deoplete#sources.python = ['neosnippet', 'jedi']
-
-			" Vim options
-			let g:deoplete#sources.vim = ['neosnippet', 'vim']
-		else
-			let g:deoplete#sources._ = ['omni', 'buffer', 'file']
-
-			" C# options
-			let g:deoplete#sources.cs = ['omni']
-
-			" Javascript options
-			let g:deoplete#sources.javascript = ['tern', 'omni']
-
-			" Python options
-			let g:deoplete#sources.python = ['jedi']
-
-			" Vim options
-			let g:deoplete#sources.vim = ['vim']
-		endif
-
-		let g:deoplete#ignore_sources._ = ['around']
-
-		" C# options
-		let g:deoplete#omni#input_patterns.cs = ['.*[^=\);]']
-
 	endif
 endfunction
 
 function! omni#ConfigureDeoplete()
 	if dein#tap('deoplete.nvim')
+                call deoplete#custom#option(
+                        \{
+                        \ 'auto_complete_delay' : 5,
+                        \ 'auto_refresh_delay'  : 30,
+                        \ 'refresh_always'      : v:true,
+                        \ 'smart_case'          : v:true,
+                        \ 'ignore_case'         : v:true,
+                        \ 'camel_case'          : v:true,
+                        \}
+                \)
+
+		call deoplete#custom#option('ignore_sources',
+			\{
+			\ '_' : ['around'],
+			\}
+		\)
+
+		if dein#tap('neosnippet.vim')
+			call deoplete#custom#option('sources',
+				\{
+				\ '_'          : ['omni', 'buffer', 'file', 'neosnippet'],
+				\ 'cs'         : ['neosnippet', 'omni'                  ],
+				\ 'javascript' : ['neosnippet', 'tern', 'omni'          ],
+				\ 'python'     : ['neosnippet', 'jedi'                  ],
+				\ 'vim'        : ['neosnippet', 'vim'                   ],
+				\}
+			\)
+		else
+			call deoplete#custom#option('sources',
+				\{
+				\ '_'          : ['omni', 'buffer', 'file'],
+				\ 'cs'         : ['omni'                  ],
+				\ 'javascript' : ['tern', 'omni'          ],
+				\ 'python'     : ['jedi'                  ],
+				\ 'vim'        : ['vim'                   ],
+				\}
+			\)
+		endif
+
+		" C# options
+                call deoplete#custom#option('omni_patterns',
+                        \{
+                        \ 'cs' : ['.*[^=\);]'],
+                        \}
+                \)
+
 		call deoplete#custom#var('buffer', 'require_same_filetype', v:false)
+		call deoplete#custom#var('file', 'enable_buffer_path', v:true)
 		call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
 		call deoplete#custom#source('_', 'matchers', ['matcher_head'])
 		call deoplete#custom#source('_', 'sorters', [])
@@ -237,6 +221,7 @@ function! omni#ConfigureOmnisharp()
 		endif
 
 		sign define OmniSharpCodeActions text=💡
+		let g:OmniSharp_server_stdio = 0
 		let g:OmniSharp_server_type = 'roslyn'
 		let g:OmniSharp_prefer_global_sln = 0
 		let g:OmniSharp_highlight_groups = {
