@@ -341,6 +341,14 @@ endif
 		" A cleaner diff using built-in xdiff
 		" Taken from https://vimways.org/2018/the-power-of-diff/
 		set diffopt+=algorithm:patience
+		" The Shada is Nvim's global session persistance file
+		" This value will:
+		" - Store globals
+		" - Remember 1000 files with their marks
+		" - Registers of up to 50 lines will be remembered
+		" - Items larger than 20kb will not be remembered
+		" - Remember hlsearch option
+		set shada=!,'1000,<50,s20,h
 	endif
 " }
 
