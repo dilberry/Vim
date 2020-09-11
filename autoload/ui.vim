@@ -366,7 +366,7 @@ endfunction
 
 " lightline.vim
 call dein#add('https://github.com/itchyny/lightline.vim.git')
-call dein#config('lightline.vim', {'hook_source': 'call ui#ConfigureLightline()', 'on_event': 'VimEnter'})
+call dein#config('lightline.vim', {'hook_source': 'call ui#ConfigureLightline()', 'on_source' : 'random-colorscheme-picker', 'on_event': 'VimEnter'})
 
 " lightline-ale
 call dein#add('https://github.com/maximbaz/lightline-ale.git')
@@ -385,7 +385,7 @@ call dein#config('colour-schemes', {'rtp': 'vim'})
 call dein#add('https://github.com/shinespark/vim-colorscheme-metroid.git')
 
 " random-colorscheme-picker
-call dein#add('https://github.com/dilberry/random-colorscheme-picker.git')
+call dein#add('https://github.com/dilberry/random-colorscheme-picker.git', {'merged' : 0})
 
 " vim-indent-guides
 call dein#add('https://github.com/nathanaelkane/vim-indent-guides.git')
