@@ -20,11 +20,13 @@ function! git#ConfigureFugitive()
 		augroup END
 
 		command! Gupdate silent execute 'Git add -u'
+		command! Gflog silent execute 'Git log -- ' . expand('%:p:h')
 		call LeaderBind('nnoremap <silent>', ['g', 'b'], 'Gblame'          , 'Blame'                , 'blame'                , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'B'], 'Gbrowse'         , 'Browse'               , 'browse'               , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'c'], 'Gcommit'         , 'Commit'               , 'commit'               , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'D'], 'Gdiffsplit! HEAD', 'Diff HEAD'            , 'diff HEAD'            , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'd'], 'Gdiffsplit!'     , 'Diff'                 , 'diff'                 , v:true)
+		call LeaderBind('nnoremap <silent>', ['g', 'f'], 'Gflog'           , 'Log for current dir'  , 'flog'                 , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'm'], ':Gmove<Space>'   , 'Move'                 , 'move'                 , v:false)
 		call LeaderBind('nnoremap <silent>', ['g', 'p'], 'Gpull'           , 'Pull'                 , 'pull'                 , v:true)
 		call LeaderBind('nnoremap <silent>', ['g', 'P'], 'Gpush'           , 'Push'                 , 'push'                 , v:true)
