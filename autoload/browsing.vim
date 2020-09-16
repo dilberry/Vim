@@ -329,8 +329,8 @@ function! browsing#ConfigureVaffle()
 		function! s:vaffle_options() abort
 			" Go up directory like vim-vinegar
 			nmap <buffer> -     <Plug>(vaffle-open-parent)
-			" Actually quit, unlike vim-vinegar
-			nmap <buffer> <Esc> <Plug>(vaffle-quit)
+			" Actually quit back to starting file, unlike vim-vinegar
+			nmap <buffer> <Esc> <Plug>(vaffle-quit)2<C-o>
 			" Show cursorline in vaffle
 			setlocal cursorline
 		endfunction
