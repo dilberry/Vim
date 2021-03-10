@@ -13,6 +13,9 @@ endfunction
 call dein#add('https://github.com/lboulard/Align.git')
 call dein#config('Align', {'hook_source': 'call editing#ConfigureAlign()'})
 
+" vim-abolish
+call dein#add('https://github.com/tpope/vim-abolish.git')
+
 " vim-sleuth
 call dein#add('https://github.com/tpope/vim-sleuth.git')
 
