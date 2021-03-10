@@ -1,7 +1,12 @@
 " polyglot options {
-function! files#ConfigurePolyglot()
+function! files#ConfigurePrePolyglot()
 	if dein#tap('vim-polyglot')
 		let g:polyglot_disabled = ['graphql']
+	endif
+endfunction
+
+function! files#ConfigurePolyglot()
+	if dein#tap('vim-polyglot')
 		augroup OmniFuncs
 			autocmd!
 		augroup END
@@ -120,7 +125,7 @@ call dein#add('https://github.com/RobertCWebb/vim-jumpmethod.git')
 
 " vim-polyglot
 call dein#add('https://github.com/sheerun/vim-polyglot.git')
-call dein#config('vim-polyglot', {'hook_post_source': 'call files#ConfigurePolyglot()'})
+call dein#config('vim-polyglot', {'hook_add': 'call files#ConfigurePrePolyglot()', 'hook_post_source': 'call files#ConfigurePolyglot()'})
 
 " vim-jsbeautify
 if executable('node')
