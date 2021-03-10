@@ -92,7 +92,7 @@ function! browsing#ConfigureDenite()
 
 		autocmd FileType denite-filter call s:denite_filter_mappings()
 		function! s:denite_filter_mappings() abort
-			imap     <silent><buffer>       <Esc>  <Plug>(denite_filter_quit)
+			imap     <silent><buffer>       <Esc>  <Plug>(denite_filter_update)
 			inoremap <silent><buffer><expr> <Tab>  denite#do_map('choose_action')
 			inoremap <silent><buffer>       <Up>   <Esc><C-w>p:call cursor(line('.')-1,0)<CR>
 			inoremap <silent><buffer>       <Down> <Esc><C-w>p:call cursor(line('.')+1,0)<CR>
@@ -357,8 +357,8 @@ endfunction
 
 if has('python3') && executable('python')
 	" denite
-	call dein#add('https://github.com/Shougo/denite.nvim.git')
-	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()', 'rev': '*'})
+	call dein#add('https://github.com/Shougo/denite.nvim.git', {'rev': '3.2'})
+	call dein#config('denite.nvim', {'hook_post_source': 'call browsing#ConfigureDenite()'})
 
 	" denite-ale
 	call dein#add('https://github.com/iyuuya/denite-ale.git')
