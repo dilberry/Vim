@@ -25,27 +25,15 @@ function! omni#ConfigureDeoplete()
 			\}
 		\)
 
-		if dein#tap('neosnippet.vim')
-			call deoplete#custom#option('sources',
-				\{
-				\ '_'          : ['omni', 'buffer', 'file', 'neosnippet'],
-				\ 'cs'         : ['neosnippet', 'omni'                  ],
-				\ 'javascript' : ['neosnippet', 'tern', 'omni'          ],
-				\ 'python'     : ['neosnippet', 'jedi'                  ],
-				\ 'vim'        : ['neosnippet', 'vim'                   ],
-				\}
-			\)
-		else
-			call deoplete#custom#option('sources',
-				\{
-				\ '_'          : ['omni', 'buffer', 'file'],
-				\ 'cs'         : ['omni'                  ],
-				\ 'javascript' : ['tern', 'omni'          ],
-				\ 'python'     : ['jedi'                  ],
-				\ 'vim'        : ['vim'                   ],
-				\}
-			\)
-		endif
+		call deoplete#custom#option('sources',
+			\{
+			\ '_'          : ['omni', 'buffer', 'file'],
+			\ 'cs'         : ['omni'                  ],
+			\ 'javascript' : ['tern', 'omni'          ],
+			\ 'python'     : ['jedi'                  ],
+			\ 'vim'        : ['vim'                   ],
+			\}
+		\)
 
 		" C# options
                 call deoplete#custom#option('omni_patterns',
@@ -61,11 +49,6 @@ function! omni#ConfigureDeoplete()
 		call deoplete#custom#source('_', 'sorters', [])
 		call deoplete#custom#source('omni', 'matchers', ['matcher_full_fuzzy'])
 		call deoplete#custom#source('omni', 'sorters', ['sorter_rank'])
-
-		" Snippets should get preference over other sources
-		if dein#tap('neosnippet.vim')
-			call deoplete#custom#source('neosnippet', 'rank', 1000)
-		endif
 
 		call deoplete#custom#source('buffer', 'rank', 100)
 		call deoplete#custom#source('buffer', 'disabled_syntaxes', ['Comment', 'String'])

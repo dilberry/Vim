@@ -5,32 +5,19 @@ function! s:TabInsertMode()
 		return "\<c-n>"
 	endif
 
-	" if no previous option worked, just use regular tab
-	return "\<tab>"
+	if check_back_space()
+		return "\<tab>"
+	else
+		deoplete#mappings#manual_complete()
+	endif
 endfunction
 
-function! s:TabInsertModeNeoSnippet()
-	" is completion menu open? cycle to next item
-	if pumvisible()
-		return "\<c-n>"
-	endif
-
-	" is there a snippet that can be expanded?
-	" is there a placholder inside the snippet that can be jumped to?
-	if  neosnippet#expandable_or_jumpable()
-		return "\<Plug>(neosnippet_expand_or_jump)"
-	endif
-
-	" if no previous option worked, just use regular tab
-	return "\<tab>"
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
 
-if dein#tap('neosnippet.vim')
-	imap <silent><expr><Tab> <SID>TabInsertModeNeoSnippet()
-	smap <silent><expr><Tab> <SID>TabInsertModeNeoSnippet()
-else
-	imap <silent><expr><Tab> <SID>TabInsertMode()
-endif
+imap <silent><expr><Tab> <SID>TabInsertMode()
 
 " Shift-Tab behaviour in insert mode
 " - popup menu previous item OR shift-tab character
@@ -46,26 +33,9 @@ endfunction
 
 imap <silent><expr><S-Tab> <SID>ShiftTabInsertMode()
 
-function! s:EnterInsertModeNeoSnippet()
-	" is completion menu open? cycle to next item
-	if pumvisible()
-		if neosnippet#expandable()
-			return "\<Plug>(neosnippet_expand_or_jump)"
-		else
-			return deoplete#close_popup()
-		endif
-	endif
-
-	" if no previous option worked, just use Enter
-	return "\<cr>"
+" <CR>: close popup and save indent.
+function! s:DeopleteSelect() abort
+	return deoplete#close_popup() . "\<CR>"
 endfunction
 
-if dein#tap('deoplete.nvim') && dein#tap('neosnippet.vim')
-	imap <silent><expr><cr> <SID>EnterInsertModeNeoSnippet()
-endif
-
-if dein#tap('neosnippet.vim')
-	imap <C-j>     <Plug>(neosnippet_expand_or_jump)
-	smap <C-j>     <Plug>(neosnippet_expand_or_jump)
-	xmap <C-j>     <Plug>(neosnippet_expand_target)
-endif
+inoremap <silent> <CR> <C-r>=<SID>DeopleteSelect()<CR>
